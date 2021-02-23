@@ -1,0 +1,40 @@
+name: Continous Delivery
+
+on:
+  push:
+    tags:
+      - '*'
+      
+jobs:
+  
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    
+    - name: Checkout
+      uses: actions/checkout@v1
+               
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.100
+    
+    - name: Get version
+      run:  echo "app_version=`git describe --tags`" >> $GITHUB_ENV      
+    - name: Get release status
+      run:  echo "app_release=`(git describe --tags --exact-match>/dev/null 2>&1 && echo true) || echo false`" >> $GITHUB_ENV
+    - name: Status
+      run: echo "Release=$app_release, version=$app_version"
+      
+    - name: Build
+      run: dotnet build ./src/ServiceComponents.sln --configuration Release -p:Version=$app_version
+    
+    - name: Test
+      run: dotnet test ./src/ServiceComponents.sln
+      
+    - name: Pack
+      run: |
+        dotnet pack ./src/ServiceComponents.sln --configuration Release -p:Version=$app_version --output ./packages --include-symbols --include-source
+        
+    - name: publish      
+      run: dotnet nuget push ./packages/**/*.nupkg --skip-duplicate true --no-symbols true --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.nuget_api_key }}
