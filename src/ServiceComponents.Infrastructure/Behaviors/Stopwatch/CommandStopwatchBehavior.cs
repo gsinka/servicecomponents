@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Serilog;
 using ServiceComponents.Api.Mediator;
+using ServiceComponents.Application.Mediator;
 using ServiceComponents.Infrastructure.Dispatchers;
 
 namespace ServiceComponents.Infrastructure.Behaviors.Stopwatch

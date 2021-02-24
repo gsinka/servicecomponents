@@ -5,7 +5,7 @@ using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using ServiceComponents.AspNet.SSO;
 
-namespace ReferenceApplication.AspNet.Wireup
+namespace ReferenceApplication.AspNet.Wireup.Extensions
 {
     public static class SingleSignOnServiceExtensions
     {

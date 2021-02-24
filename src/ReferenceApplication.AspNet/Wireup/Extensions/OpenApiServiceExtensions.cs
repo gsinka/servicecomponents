@@ -8,7 +8,7 @@ using NSwag.Generation.Processors.Security;
 using ServiceComponents.AspNet.OpenApi;
 using ServiceComponents.Core.ExtensionMethods;
 
-namespace ReferenceApplication.AspNet.Wireup
+namespace ReferenceApplication.AspNet.Wireup.Extensions
 {
     public static class OpenApiServiceExtensions
     {

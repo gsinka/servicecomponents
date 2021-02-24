@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using ReferenceApplication.Api;
 using Serilog;
@@ -30,6 +31,5 @@ namespace ReferenceApplication.Application
             await PublishAsync(new TestEvent("event from command handler"), cancellationToken);
 
         }
-
     }
 }
