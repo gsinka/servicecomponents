@@ -4,12 +4,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Autofac;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using NHibernate;
+using NHibernate.Tool.hbm2ddl;
 using ReferenceApplication.AspNet.Wireup;
 using ReferenceApplication.AspNet.Wireup.Extensions;
 using ServiceComponents.AspNet;
 using ServiceComponents.AspNet.Metrics;
 using ServiceComponents.AspNet.OpenApi;
 using ServiceComponents.Infrastructure.Http;
+using ServiceComponents.Infrastructure.NHibernate;
 
 namespace ReferenceApplication.AspNet
 {
@@ -39,7 +43,9 @@ namespace ReferenceApplication.AspNet
             
             // Health check
 
-            services.AddHealthChecks();
+            services.AddHealthChecks()
+                .AddCheck("self", () => HealthCheckResult.Healthy(), new[] {HealthcheckExtensions.LivenessTag})
+                .AddRabbitMQ(rabbitConnectionString: Configuration.GetValue<string>("rabbitMQ:endpointUri"));
 
             // SSO
 
@@ -53,7 +59,15 @@ namespace ReferenceApplication.AspNet
         public void ConfigureContainer(ContainerBuilder builder)
         {
             builder.RegisterModule<ServiceComponentsModule>();
-            builder.RegisterModule<RabbitModule>();
+
+            builder.RegisterModule(new NhibernateModule(
+                Configuration.GetConnectionString("postgres"), 
+                mapping => mapping.FluentMappings.AddFromAssemblyOf<OutgoingEventEntity>(), 
+                configuration => new SchemaUpdate(configuration).Execute(true, true)));
+
+            builder.RegisterModule(new RabbitModule(Configuration));
+
+            builder.AddNhibernateRabbitPublisher();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

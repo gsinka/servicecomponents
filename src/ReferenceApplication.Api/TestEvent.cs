@@ -6,7 +6,7 @@ namespace ReferenceApplication.Api
     {
         public string Data { get; }
 
-        public TestEvent(string data)
+        public TestEvent(string data, string eventId = null) : base(eventId)
         {
             Data = data;
         }

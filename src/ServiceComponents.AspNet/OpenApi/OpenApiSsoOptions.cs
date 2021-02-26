@@ -1,4 +1,6 @@
-﻿using NSwag;
+﻿
+
+using NSwag;
 
 namespace ServiceComponents.AspNet.OpenApi
 {

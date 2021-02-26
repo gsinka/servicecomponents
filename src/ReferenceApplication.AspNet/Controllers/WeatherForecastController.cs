@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Neodynamic.SDK.Printing;
 using ReferenceApplication.Api;
 using Serilog.Data;
 using ServiceComponents.Application.Senders;

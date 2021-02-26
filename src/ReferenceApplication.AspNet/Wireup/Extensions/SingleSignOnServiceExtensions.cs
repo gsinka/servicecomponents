@@ -31,6 +31,7 @@ namespace ReferenceApplication.AspNet.Wireup.Extensions
 
             services.AddAuthorization(options => {
                 options.AddPolicy("admin", builder => builder.RequireClaim("user-roles", new[] { "administrator" }));
+                // TODO: add custom claim for resource-access
             });
 
             return services;
