@@ -14,6 +14,7 @@
     <ProjectReference Include="..\ReferenceApplication.Api\ReferenceApplication.Api.csproj" />
     <ProjectReference Include="..\ServiceComponents.Application\ServiceComponents.Application.csproj" />
     <ProjectReference Include="..\ServiceComponents.Core\ServiceComponents.Core.csproj" />
+    <ProjectReference Include="..\ServiceComponents.Infrastructure.NHibernate\ServiceComponents.Infrastructure.NHibernate.csproj" />
   </ItemGroup>
 
 </Project>

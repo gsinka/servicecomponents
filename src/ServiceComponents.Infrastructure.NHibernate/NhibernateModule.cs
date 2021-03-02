@@ -6,7 +6,7 @@ using NHibernate;
 using NHibernate.Cfg;
 using NHibernate.Logging.Serilog;
 
-namespace ReferenceApplication.AspNet.Wireup
+namespace ServiceComponents.Infrastructure.NHibernate
 {
     public class NhibernateModule : Module
     {

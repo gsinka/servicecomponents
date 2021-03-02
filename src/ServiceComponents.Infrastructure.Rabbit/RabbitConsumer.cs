@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
@@ -7,8 +6,8 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Serilog;
-using Serilog.Context;
-using ServiceComponents.Infrastructure.Http;
+using ServiceComponents.Infrastructure.Receivers;
+
 
 namespace ServiceComponents.Infrastructure.Rabbit
 {

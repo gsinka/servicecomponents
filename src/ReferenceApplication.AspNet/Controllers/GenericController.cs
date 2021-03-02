@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Serilog;
-using ServiceComponents.Infrastructure.Http;
+using ServiceComponents.AspNet.Http;
 
 namespace ReferenceApplication.AspNet.Controllers
 {

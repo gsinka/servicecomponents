@@ -3,13 +3,10 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Neodynamic.SDK.Printing;
 using ReferenceApplication.Api;
 using Serilog.Data;
 using ServiceComponents.Application.Senders;
 using ServiceComponents.Infrastructure.CorrelationContext;
-using ServiceComponents.Infrastructure.Http;
-using ILogger = Serilog.ILogger;
 
 namespace ReferenceApplication.AspNet.Controllers
 {

@@ -10,10 +10,11 @@ using NHibernate.Tool.hbm2ddl;
 using ReferenceApplication.AspNet.Wireup;
 using ReferenceApplication.AspNet.Wireup.Extensions;
 using ServiceComponents.AspNet;
+using ServiceComponents.AspNet.Http;
 using ServiceComponents.AspNet.Metrics;
 using ServiceComponents.AspNet.OpenApi;
-using ServiceComponents.Infrastructure.Http;
 using ServiceComponents.Infrastructure.NHibernate;
+using ServiceComponents.Infrastructure.Rabbit.Senders;
 
 namespace ReferenceApplication.AspNet
 {
@@ -54,6 +55,8 @@ namespace ReferenceApplication.AspNet
             // OpenAPI
 
             services.ConfigureOpenApi(Configuration);
+
+            //services.AddHostedService<BackgroundEventPublisher>();
         }
 
         public void ConfigureContainer(ContainerBuilder builder)

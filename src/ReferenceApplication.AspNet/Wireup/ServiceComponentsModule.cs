@@ -2,11 +2,12 @@
 using Autofac;
 using ReferenceApplication.Api;
 using ReferenceApplication.Application;
+using ServiceComponents.AspNet.Http;
+using ServiceComponents.AspNet.Http.Senders;
 using ServiceComponents.Core;
 using ServiceComponents.Infrastructure.Behaviors.Logging;
 using ServiceComponents.Infrastructure.Behaviors.Stopwatch;
 using ServiceComponents.Infrastructure.CorrelationContext;
-using ServiceComponents.Infrastructure.Http;
 using ServiceComponents.Infrastructure.Mediator;
 using ServiceComponents.Infrastructure.Receivers;
 using ServiceComponents.Infrastructure.Senders;
@@ -46,8 +47,8 @@ namespace ReferenceApplication.AspNet.Wireup
             builder.AddQueryRouter(command => "http");
             builder.AddHttpQuerySender(new Uri("http://localhost:5000/api/generic"), "http");
 
-            builder.AddEventRouter(command => "rabbit-nhibernate");
-            builder.AddHttpEventPublisher(new Uri("http://localhost:5000/api/generic"), "rabbit");
+            builder.AddEventRouter(command => "rabbit");
+            //builder.AddHttpEventPublisher(new Uri("http://localhost:5000/api/generic"), "rabbit");
 
             builder.AddHttpSenderCorrelationBehavior();
 

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReferenceApplication.Api;
-using ServiceComponents.Infrastructure.Http;
+using ServiceComponents.AspNet.Http;
 
 namespace ReferenceApplication.AspNet.Controllers
 {
