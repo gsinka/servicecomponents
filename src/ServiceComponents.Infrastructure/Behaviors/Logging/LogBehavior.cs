@@ -50,8 +50,7 @@ namespace ServiceComponents.Infrastructure.Behaviors.Logging
 
         public Task PostHandleAsync(IQuery query, object result, CancellationToken cancellationToken = default)
         {
-            _log.Verbose("Handling {queryType} succeeded", query.DisplayName());
-            _log.Debug("Query result: {@result}", result);
+            _log.ForContext("queryResult", result, true).Verbose("Handling {queryType} succeeded", query.DisplayName());
             return Task.CompletedTask;
         }
 
