@@ -6,7 +6,7 @@ namespace ServiceComponents.Api.Mediator
     {
         public string QueryId { get; }
 
-        protected Query(string queryId = default)
+        protected Query(string queryId)
         {
             QueryId = queryId ?? Guid.NewGuid().ToString();
         }

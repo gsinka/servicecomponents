@@ -6,7 +6,7 @@ namespace ServiceComponents.Api.Mediator
     {
         public string EventId { get; }
 
-        protected Event(string eventId = null)
+        protected Event(string eventId)
         {
             EventId = eventId ?? Guid.NewGuid().ToString();
         }

@@ -8,7 +8,7 @@ namespace ReferenceApplication.Api
     {
         public string Data { get; }
 
-        public TestCommand(string data)
+        public TestCommand(string data) : base(default)
         {
             Data = data;
         }

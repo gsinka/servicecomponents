@@ -7,7 +7,7 @@ namespace ReferenceApplication.Api
     {
         public string Data { get; }
 
-        public TestQuery(string data)
+        public TestQuery(string data) : base(default)
         {
             Data = data;
         }
