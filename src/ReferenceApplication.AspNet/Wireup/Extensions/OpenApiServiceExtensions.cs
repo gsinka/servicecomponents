@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,6 +8,7 @@ using NSwag.AspNetCore;
 using NSwag.Generation.Processors.Security;
 using ServiceComponents.AspNet.OpenApi;
 using ServiceComponents.Core.ExtensionMethods;
+using ServiceComponents.Core.Helpers;
 
 namespace ReferenceApplication.AspNet.Wireup.Extensions
 {
@@ -14,6 +16,8 @@ namespace ReferenceApplication.AspNet.Wireup.Extensions
     {
         public static IServiceCollection ConfigureOpenApi(this IServiceCollection services, IConfiguration configuration)
         {
+            var assembly = Assembly.GetExecutingAssembly();
+
             var documentOptions = new OpenApiDocumentOptions();
             configuration.GetSection("openAPiDocument").Bind(documentOptions);
 
@@ -21,9 +25,9 @@ namespace ReferenceApplication.AspNet.Wireup.Extensions
             configuration.GetSection("openAPiSso").Bind(ssoOptions);
             
             services.AddOpenApiDocument(options => {
-                options.DocumentName = documentOptions.DocumentName;
+                options.DocumentName = string.IsNullOrEmpty(documentOptions.DocumentName) ? $"{documentOptions.AppTitle} v{assembly.ProductVersion()}" : documentOptions.DocumentName;
                 options.Title = documentOptions.AppTitle;
-                options.Version = documentOptions.AppVersion;
+                options.Version = string.IsNullOrEmpty(documentOptions.AppVersion) ? Assembly.GetExecutingAssembly().AssemblyVersion() : documentOptions.AppVersion;
                 options.AllowReferencesWithProperties = true;
                 options.OperationProcessors.Add(new OperationSecurityScopeProcessor(ssoOptions.SecuritySchemeName));
 
