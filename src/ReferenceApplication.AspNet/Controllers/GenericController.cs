@@ -41,7 +41,7 @@ namespace ReferenceApplication.AspNet.Controllers
                     async (@event, ct) => await _eventReceiver.ReceiveAsync(@event, ct),
                     cancellationToken);
 
-                return Ok(JsonConvert.SerializeObject(result, Formatting.None));
+                return result == null ? (IActionResult) Ok() : Ok(JsonConvert.SerializeObject(result, Formatting.None));
             }
             catch (Exception exception) {
                 return BadRequest(exception.Message);

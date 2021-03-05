@@ -17,27 +17,40 @@ namespace ReferenceApplication.AspNet.Wireup
 
         override protected void Load(ContainerBuilder builder)
         {
-            builder.AddRabbitConnection(new Uri(_configuration.GetValue<string>("rabbitMQ:endpointUri")), _configuration.GetValue<string>("rabbitMQ:clientName"));
+            var queue = "test";
+            var exchange = "test";
+            var routingKey = string.Empty;
+            var clientName = _configuration.GetValue<string>("rabbitMQ:clientName");
 
-            builder.AddRabbitChannel(); // Generic channel, for setup for eg.
-            builder.RegisterType<RabbitSetup>().AsImplementedInterfaces().InstancePerDependency();
-
-            builder.AddRabbitChannel("publisher"); // Channel dedicated for sender
-            builder.AddRabbitEventPublisher("test", string.Empty, channelKey: "publisher", key: "rabbit");
+            // Generic connection and channel
+            builder.AddRabbitConnection(new Uri(_configuration.GetValue<string>("rabbitMQ:endpointUri")), $"{clientName}-generic");
+            builder.AddRabbitChannel();
+            
+            // Publisher connection, channel
+            builder.AddRabbitConnection(new Uri(_configuration.GetValue<string>("rabbitMQ:endpointUri")), $"{clientName}-publisher", "publisher");
+            builder.AddRabbitChannel(key: "publisher", connectionKey: "publisher");
+            builder.AddRabbitEventPublisher(exchange, routingKey, channelKey: "publisher", key: "rabbit");
             builder.AddNhibernateRabbitPublisher("rabbit-nhibernate");
 
-            builder.AddRabbitChannel("consumer1");
-            builder.AddRabbitChannel("consumer2");
-            builder.AddRabbitConsumer("test", "consumer1", "consumer1");
-            builder.AddRabbitConsumer("test", "consumer2", "consumer2");
+            // Consumers
+            builder.AddRabbitConnection(new Uri(_configuration.GetValue<string>("rabbitMQ:endpointUri")), $"{clientName}-consumer", "consumer");
+
+            for (var i = 0; i < Environment.ProcessorCount; i++) {
+
+                builder.AddRabbitChannel(connectionKey: "consumer", key: $"consumer-{i}");
+                builder.AddRabbitConsumer(queue, $"{clientName}-consumer-{i}", $"consumer-{i}", $"consumer-{i}");
+            }
 
             builder.AddRabbitReceivers();
             builder.AddRabbitReceiverCorrelationBehavior();
 
-            builder.AddRabbitCommandSender("test", string.Empty, "publisher", "rabbit");
-            builder.AddRabbitQuerySender("test", string.Empty, "publisher", "rabbit");
+            builder.AddRabbitCommandSender(exchange, string.Empty, "publisher", "rabbit");
+            builder.AddRabbitQuerySender(exchange, string.Empty, "publisher", "rabbit");
 
             builder.AddRabbitSenderCorrelationBehavior();
+
+            // Setup - uses generic connection
+            builder.RegisterType<RabbitSetup>().AsImplementedInterfaces().InstancePerDependency();
         }
     }
 }

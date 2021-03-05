@@ -9,23 +9,29 @@ namespace ServiceComponents.Infrastructure.Rabbit
 {
     public static class RabbitAutofacExtensions
     {
-        public static ContainerBuilder AddRabbitConnection(this ContainerBuilder builder, Uri endpointUri,
-            string clientName)
+        public static ContainerBuilder AddRabbitConnection(this ContainerBuilder builder, Uri endpointUri, string clientName, object key = default)
         {
-            builder.Register(context => new ConnectionFactory() {
+            var registrtion = builder.Register(context => new ConnectionFactory() {
 
                 Uri = endpointUri,
                 AutomaticRecoveryEnabled = true,
                 ClientProvidedName = clientName,
 
-            }.CreateConnection()).As<IConnection>().SingleInstance();
+            }.CreateConnection()).SingleInstance();
+
+            if (key == default) {
+                registrtion.As<IConnection>();
+            }
+            else {
+                registrtion.Keyed<IConnection>(key);
+            }
 
             return builder;
         }
 
-        public static ContainerBuilder AddRabbitChannel(this ContainerBuilder builder, object key = default)
+        public static ContainerBuilder AddRabbitChannel(this ContainerBuilder builder, object connectionKey = default, object key = default)
         {
-            var channelRegistration = builder.Register(context => context.Resolve<IConnection>().CreateModel())
+            var channelRegistration = builder.Register(context => connectionKey == default ? context.Resolve<IConnection>().CreateModel() : context.ResolveKeyed<IConnection>(connectionKey).CreateModel())
                 .SingleInstance();
 
             if (key == default) {
@@ -63,13 +69,14 @@ namespace ServiceComponents.Infrastructure.Rabbit
             return builder;
         }
 
-        public static ContainerBuilder AddRabbitConsumer(this ContainerBuilder builder, string queue, string channelKey = default, string consumerKey = default)
+        public static ContainerBuilder AddRabbitConsumer(this ContainerBuilder builder, string queue, string consumerTag = default, string channelKey = default, string consumerKey = default)
         {
             var registration = builder.Register(context => new RabbitConsumer(
                     context.Resolve<ILogger>(),
                     context.Resolve<ILifetimeScope>(),
                     channelKey == default ? context.Resolve<IModel>() : context.ResolveKeyed<IModel>(channelKey),
-                    queue))
+                    queue, 
+                    consumerTag))
                 .SingleInstance();
 
             if (consumerKey == default) {
