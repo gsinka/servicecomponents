@@ -1,31 +1,31 @@
-﻿using ServiceComponents.Infrastructure.CorrelationContext;
+﻿using System;
+using Serilog;
+using Serilog.Context;
+using ServiceComponents.Application;
+using ServiceComponents.Infrastructure.CorrelationContext;
 
 namespace ServiceComponents.Infrastructure.Receivers
 {
     public abstract class LoopbackReceiverCorrelationBehavior
     {
+        private readonly ILogger _log;
         private readonly Correlation _correlation;
         private string _causationId;
         private string _currentId;
 
-        protected LoopbackReceiverCorrelationBehavior(Correlation correlation)
+        protected LoopbackReceiverCorrelationBehavior(ILogger log, Correlation correlation)
         {
+            _log = log;
             _correlation = correlation;
         }
 
-        protected void SetCorrelation(string requestId)
+        protected void SetCorrelation(string requestId, ICorrelation originalCorrelation)
         {
-            _causationId = _correlation.CausationId;
-            _currentId = _correlation.CurrentId;
-
-            _correlation.CausationId = _correlation.CurrentId;
+            _correlation.CorrelationId = originalCorrelation.CorrelationId ?? Guid.NewGuid().ToString();
+            _correlation.CausationId = originalCorrelation.CurrentId;
             _correlation.CurrentId = requestId;
-        }
 
-        protected void ResetCorrelation()
-        {
-            _correlation.CurrentId = _currentId;
-            _correlation.CausationId = _causationId;
+            _log.ForContext("correlation", _correlation,true).Debug("Correlation in loopback scope updated from parent");
         }
     }
 }

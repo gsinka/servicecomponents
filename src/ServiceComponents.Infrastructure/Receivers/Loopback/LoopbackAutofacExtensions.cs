@@ -9,7 +9,7 @@ namespace ServiceComponents.Infrastructure.Senders
         public static ContainerBuilder AddLoopbackCommandSender(this ContainerBuilder builder, object key = default)
         {
             var proxyRegistration = builder.Register(context =>
-                new LoopbackCommandSenderProxy(key == default
+                new LoopbackCommandSenderProxy(context.Resolve<ILifetimeScope>(), key == default
                     ? context.Resolve<ISendLoopbackCommand>()
                     : context.ResolveKeyed<ISendLoopbackCommand>(key))).InstancePerDependency();
 
@@ -30,7 +30,7 @@ namespace ServiceComponents.Infrastructure.Senders
         public static ContainerBuilder AddLoopbackQuerySender(this ContainerBuilder builder, object key = default)
         {
             var proxyRegistration = builder.Register(context =>
-                new LoopbackQuerySenderProxy(key == default
+                new LoopbackQuerySenderProxy(context.Resolve<ILifetimeScope>(), key == default
                     ? context.Resolve<ISendLoopbackQuery>()
                     : context.ResolveKeyed<ISendLoopbackQuery>(key))).InstancePerDependency();
 
@@ -51,7 +51,7 @@ namespace ServiceComponents.Infrastructure.Senders
         public static ContainerBuilder AddLoopbackEventPublisher(this ContainerBuilder builder, object key = default)
         {
             var proxyRegistration = builder.Register(context =>
-                new LoopbackEventPublisherProxy(key == default
+                new LoopbackEventPublisherProxy(context.Resolve<ILifetimeScope>(), key == default
                     ? context.Resolve<IPublishLoopbackEvent>()
                     : context.ResolveKeyed<IPublishLoopbackEvent>(key))).InstancePerDependency();
 

@@ -5,8 +5,8 @@ using ServiceComponents.Application;
 
 namespace ServiceComponents.Infrastructure.Senders
 {
-    public interface ISendLoopbackCommand
+    public interface ISendLoopbackQuery
     {
-        Task SendAsync<TCommand>(TCommand command, ICorrelation correlation, CancellationToken cancellationToken = default) where TCommand : ICommand;
+        Task<TResult> SendAsync<TResult>(IQuery<TResult> query, ICorrelation correlation, CancellationToken cancellationToken = default);
     }
 }

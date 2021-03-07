@@ -1,22 +1,25 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Autofac;
 using ServiceComponents.Api.Mediator;
+using ServiceComponents.Application;
 using ServiceComponents.Infrastructure.Receivers;
 
 namespace ServiceComponents.Infrastructure.Senders
 {
     public class LoopbackCommandSender : ISendLoopbackCommand
     {
-        private readonly IReceiveLoopbackCommand _receiver;
+        private readonly ILifetimeScope _scope;
         
-        public LoopbackCommandSender(IReceiveLoopbackCommand receiver)
+        public LoopbackCommandSender(ILifetimeScope scope)
         {
-            _receiver = receiver;
+            _scope = scope;
         }
 
-        public async Task SendAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default) where TCommand : ICommand
+        public async Task SendAsync<TCommand>(TCommand command, ICorrelation correlation, CancellationToken cancellationToken = default) where TCommand : ICommand
         {
-            await _receiver.ReceiveAsync(command, cancellationToken);
+            await using var scope = _scope.BeginLifetimeScope();
+            await scope.Resolve<IReceiveLoopbackCommand>().ReceiveAsync(command, correlation, cancellationToken);
         }
     }
 }

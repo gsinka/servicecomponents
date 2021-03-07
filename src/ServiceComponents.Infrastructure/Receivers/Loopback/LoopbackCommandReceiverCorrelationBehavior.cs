@@ -1,6 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using ServiceComponents.Api.Mediator;
+using ServiceComponents.Application;
 using ServiceComponents.Infrastructure.CorrelationContext;
 
 namespace ServiceComponents.Infrastructure.Receivers
@@ -8,19 +10,16 @@ namespace ServiceComponents.Infrastructure.Receivers
     public class LoopbackCommandReceiverCorrelationBehavior : LoopbackReceiverCorrelationBehavior, IReceiveLoopbackCommand
     {
         private readonly IReceiveLoopbackCommand _next;
-        private readonly Correlation _correlation;
 
-        public LoopbackCommandReceiverCorrelationBehavior(IReceiveLoopbackCommand next, Correlation correlation) : base(correlation)
+        public LoopbackCommandReceiverCorrelationBehavior(ILogger log, IReceiveLoopbackCommand next, Correlation correlation) : base(log, correlation)
         {
             _next = next;
-            _correlation = correlation;
         }
 
-        public async Task ReceiveAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default) where TCommand : ICommand
+        public async Task ReceiveAsync<TCommand>(TCommand command, ICorrelation correlation, CancellationToken cancellationToken = default) where TCommand : ICommand
         {
-            SetCorrelation(command.CommandId);
-            await _next.ReceiveAsync(command, cancellationToken);
-            ResetCorrelation();
+            SetCorrelation(command.CommandId, correlation);
+            await _next.ReceiveAsync(command, correlation, cancellationToken);
         }
     }
 }

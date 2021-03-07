@@ -7,21 +7,22 @@ using ServiceComponents.Application.Senders;
 
 namespace ServiceComponents.Infrastructure.Senders
 {
-    public class LoopbackCommandSenderProxy : ISendCommand
+    public class LoopbackQuerySenderProxy : ISendQuery
     {
         private readonly ILifetimeScope _scope;
-        private readonly ISendLoopbackCommand _next;
+        private readonly ISendLoopbackQuery _next;
 
-        public LoopbackCommandSenderProxy(ILifetimeScope scope, ISendLoopbackCommand next)
+        public LoopbackQuerySenderProxy(ILifetimeScope scope, ISendLoopbackQuery next)
         {
             _scope = scope;
             _next = next;
         }
 
-        public async Task SendAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default) where TCommand : ICommand
+        public async Task<TResult> SendAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default)
         {
             var correlation = _scope.ResolveOptional<ICorrelation>();
-            await _next.SendAsync(command, correlation, cancellationToken);
+
+            return await _next.SendAsync(query, correlation, cancellationToken);
         }
     }
 }

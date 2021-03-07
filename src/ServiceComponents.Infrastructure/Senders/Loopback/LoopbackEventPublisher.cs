@@ -1,32 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using ServiceComponents.Api.Mediator;
-using ServiceComponents.Application.Senders;
+using ServiceComponents.Application;
 using ServiceComponents.Infrastructure.Receivers;
 
 namespace ServiceComponents.Infrastructure.Senders
 {
     public class LoopbackEventPublisher : IPublishLoopbackEvent
     {
-        private readonly IReceiveLoopbackEvent _receiver;
+        private readonly ILifetimeScope _scope;
 
-        public LoopbackEventPublisher(IReceiveLoopbackEvent receiver)
+        public LoopbackEventPublisher(ILifetimeScope scope)
         {
-            _receiver = receiver;
+            _scope = scope;
         }
 
-        public async Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : IEvent
+        public async Task PublishAsync<TEvent>(TEvent @event, ICorrelation correlation, CancellationToken cancellationToken = default) where TEvent : IEvent
         {
-            await _receiver.ReceiveAsync(@event, cancellationToken);
+            await using var scope = _scope.BeginLifetimeScope();
+            await scope.Resolve<IReceiveLoopbackEvent>().ReceiveAsync(@event, correlation, cancellationToken);
         }
 
-        public async Task PublishAsync(IEnumerable<IEvent> events, CancellationToken cancellationToken = default)
+        public async Task PublishAsync(IEnumerable<IEvent> events, ICorrelation correlation, CancellationToken cancellationToken = default)
         {
+            await using var scope = _scope.BeginLifetimeScope();
+            var receiver = scope.Resolve<IReceiveLoopbackEvent>();
+
             foreach (IEvent @event in events) {
-                await PublishAsync(@event, cancellationToken);
+                await receiver.ReceiveAsync(@event, correlation, cancellationToken);
             }
         }
     }

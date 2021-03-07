@@ -1,25 +1,25 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using ServiceComponents.Api.Mediator;
-using ServiceComponents.Application.Senders;
+using ServiceComponents.Application;
 using ServiceComponents.Infrastructure.Receivers;
 
 namespace ServiceComponents.Infrastructure.Senders
 {
     public class LoopbackQuerySender : ISendLoopbackQuery
     {
-        private readonly IReceiveLoopbackQuery _receiver;
-        
-        public LoopbackQuerySender(IReceiveLoopbackQuery receiver)
+        private readonly ILifetimeScope _scope;
+
+        public LoopbackQuerySender(ILifetimeScope scope)
         {
-            _receiver = receiver;
+            _scope = scope;
         }
 
-        public async Task<TResult> SendAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default)
+        public async Task<TResult> SendAsync<TResult>(IQuery<TResult> query, ICorrelation correlation, CancellationToken cancellationToken = default)
         {
-            return await _receiver.ReceiveAsync(query, cancellationToken);
+            await using var scope = _scope.BeginLifetimeScope();
+            return await scope.Resolve<IReceiveLoopbackQuery>().ReceiveAsync(query, correlation, cancellationToken);
         }
     }
 }

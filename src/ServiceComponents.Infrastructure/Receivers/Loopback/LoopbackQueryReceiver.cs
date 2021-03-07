@@ -8,23 +8,16 @@ namespace ServiceComponents.Infrastructure.Receivers
 {
     public class LoopbackQueryReceiver : IReceiveLoopbackQuery
     {
-        private readonly ILifetimeScope _scope;
+        private readonly IReceiveQuery _receiver;
 
-        public LoopbackQueryReceiver(ILifetimeScope scope)
+        public LoopbackQueryReceiver(IReceiveQuery receiver)
         {
-            _scope = scope;
+            _receiver = receiver;
         }
 
-        public async Task<TResult> ReceiveAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default)
+        public async Task<TResult> ReceiveAsync<TResult>(IQuery<TResult> query, ICorrelation correlation, CancellationToken cancellationToken = default)
         {
-            var correlation = _scope.ResolveOptional<ICorrelation>();
-            await using var scope = _scope.BeginLifetimeScope(builder => {
-                if (correlation != null) {
-                    builder.RegisterInstance(correlation).AsSelf().AsImplementedInterfaces();
-                }
-            });
-            return await scope.Resolve<IReceiveQuery>().ReceiveAsync(query, cancellationToken);
-
+            return await _receiver.ReceiveAsync(query, cancellationToken);
         }
     }
 }

@@ -7,6 +7,6 @@ namespace ServiceComponents.Infrastructure.Receivers
 {
     public interface IReceiveLoopbackCommand
     {
-        Task ReceiveAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default) where TCommand : ICommand;
+        Task ReceiveAsync<TCommand>(TCommand command, ICorrelation correlation, CancellationToken cancellationToken = default) where TCommand : ICommand;
     }
 }

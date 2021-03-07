@@ -1,11 +1,12 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using ServiceComponents.Api.Mediator;
+using ServiceComponents.Application;
 
 namespace ServiceComponents.Infrastructure.Receivers
 {
     public interface IReceiveLoopbackEvent
     {
-        Task ReceiveAsync<T>(T @event, CancellationToken cancellationToken = default) where T : IEvent;
+        Task ReceiveAsync<T>(T @event, ICorrelation correlation, CancellationToken cancellationToken = default) where T : IEvent;
     }
 }
