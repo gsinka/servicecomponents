@@ -30,7 +30,7 @@ namespace ReferenceApplication.AspNet.Wireup
             builder.AddRabbitConnection(new Uri(_configuration.GetValue<string>("rabbitMQ:endpointUri")), $"{clientName}-publisher", "publisher");
             builder.AddRabbitChannel(key: "publisher", connectionKey: "publisher");
             builder.AddRabbitEventPublisher(exchange, routingKey, channelKey: "publisher", key: "rabbit");
-            builder.AddNhibernateRabbitPublisher("rabbit-nhibernate");
+            //builder.AddNhibernateRabbitPublisher("rabbit-nhibernate");
 
             // Consumers
             builder.AddRabbitConnection(new Uri(_configuration.GetValue<string>("rabbitMQ:endpointUri")), $"{clientName}-consumer", "consumer");

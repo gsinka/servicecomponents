@@ -39,18 +39,25 @@ namespace ReferenceApplication.AspNet.Wireup
             builder.AddHttpReceivers();
             builder.AddHttpReceiverCorrelationBehavior();
 
-            
-            builder.AddCommandRouter(command => "http");
+            builder.AddLoopbackReceivers();
+            builder.AddLoopbackReceiverCorrelationBehavior();
+
+            builder.AddCommandRouter(command => "loopback");
 
             builder.AddHttpCommandSender(new Uri("http://localhost:5000/api/generic"), "http");
+            builder.AddLoopbackCommandSender("loopback");
             
-            builder.AddQueryRouter(command => "http");
+            builder.AddQueryRouter(query => "loopback");
             builder.AddHttpQuerySender(new Uri("http://localhost:5000/api/generic"), "http");
+            builder.AddLoopbackQuerySender("loopback");
 
-            builder.AddEventRouter(command => "rabbit");
+            builder.AddEventRouter(@event => "loopback");
             //builder.AddHttpEventPublisher(new Uri("http://localhost:5000/api/generic"), "rabbit");
+            builder.AddLoopbackEventPublisher("loopback");
 
             builder.AddHttpSenderCorrelationBehavior();
+            
+
 
 
         }

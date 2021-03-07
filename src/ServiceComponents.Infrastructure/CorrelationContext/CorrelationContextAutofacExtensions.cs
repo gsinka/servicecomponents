@@ -6,7 +6,7 @@ namespace ServiceComponents.Infrastructure.CorrelationContext
     {
         public static ContainerBuilder AddCorrelationInfo(this ContainerBuilder builder)
         {
-            builder.RegisterType<CorrelationContext.Correlation>().AsImplementedInterfaces().AsSelf().InstancePerLifetimeScope();
+            builder.RegisterType<Correlation>().AsImplementedInterfaces().AsSelf().InstancePerLifetimeScope();
             return builder;
         }
     }

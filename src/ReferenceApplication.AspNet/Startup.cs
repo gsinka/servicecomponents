@@ -5,16 +5,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Autofac;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using NHibernate;
 using NHibernate.Tool.hbm2ddl;
 using ReferenceApplication.AspNet.Wireup;
 using ReferenceApplication.AspNet.Wireup.Extensions;
 using ServiceComponents.AspNet;
 using ServiceComponents.AspNet.Http;
 using ServiceComponents.AspNet.Metrics;
-using ServiceComponents.AspNet.OpenApi;
 using ServiceComponents.Infrastructure.NHibernate;
-using ServiceComponents.Infrastructure.Rabbit.Senders;
 
 namespace ReferenceApplication.AspNet
 {
@@ -70,7 +67,7 @@ namespace ReferenceApplication.AspNet
 
             builder.RegisterModule(new RabbitModule(Configuration));
 
-            builder.AddNhibernateRabbitPublisher();
+            //builder.AddNhibernateRabbitPublisher();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
