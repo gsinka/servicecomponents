@@ -1,5 +1,6 @@
 ﻿using System;
 using Autofac;
+using Microsoft.Extensions.Configuration;
 using ReferenceApplication.Api;
 using ReferenceApplication.Application;
 using ServiceComponents.AspNet.Http;
@@ -10,6 +11,7 @@ using ServiceComponents.Infrastructure.Behaviors.Stopwatch;
 using ServiceComponents.Infrastructure.CorrelationContext;
 using ServiceComponents.Infrastructure.Mediator;
 using ServiceComponents.Infrastructure.Receivers;
+using ServiceComponents.Infrastructure.Redis;
 using ServiceComponents.Infrastructure.Senders;
 using ServiceComponents.Infrastructure.Validation;
 
@@ -17,6 +19,13 @@ namespace ReferenceApplication.AspNet.Wireup
 {
     public class ServiceComponentsModule : Module
     {
+        private readonly IConfiguration _configuration;
+
+        public ServiceComponentsModule(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         protected override void Load(ContainerBuilder builder)
         {
             var apiAssembly = typeof(TestCommandValidator).Assembly;
@@ -51,14 +60,13 @@ namespace ReferenceApplication.AspNet.Wireup
             builder.AddHttpQuerySender(new Uri("http://localhost:5000/api/generic"), "http");
             builder.AddLoopbackQuerySender("loopback");
 
-            builder.AddEventRouter(@event => "loopback");
-            //builder.AddHttpEventPublisher(new Uri("http://localhost:5000/api/generic"), "rabbit");
+            builder.AddEventRouter(@event => "rabbit");
+            builder.AddHttpEventPublisher(new Uri("http://localhost:5000/api/generic"), "rabbit");
             builder.AddLoopbackEventPublisher("loopback");
 
             builder.AddHttpSenderCorrelationBehavior();
-            
 
-
+            builder.AddRedis(_configuration.GetValue("connectionStrings:redis", "localhost"));
 
         }
     }

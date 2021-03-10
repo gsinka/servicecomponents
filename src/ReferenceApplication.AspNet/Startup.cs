@@ -58,7 +58,7 @@ namespace ReferenceApplication.AspNet
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            builder.RegisterModule<ServiceComponentsModule>();
+            builder.RegisterModule(new ServiceComponentsModule(Configuration));
 
             builder.RegisterModule(new NhibernateModule(
                 Configuration.GetConnectionString("postgres"), 

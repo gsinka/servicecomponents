@@ -20,6 +20,8 @@ namespace ReferenceApplication.Application
             var queryResult = await SendAsync(new TestQuery("from command handler"), cancellationToken);
             Log.Information("Query called from command handler with result: {queryResult}", queryResult);
 
+            var queryResult2 = await SendAsync(new TestQuery("from command handler 2"), cancellationToken);
+
             Log.Information("{command} handled", command.DisplayName());
 
             Log.Information("Publishing event");

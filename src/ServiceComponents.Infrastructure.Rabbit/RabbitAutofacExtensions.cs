@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using Autofac;
+using Autofac.Features.ResolveAnything;
 using RabbitMQ.Client;
 using Serilog;
 using ServiceComponents.Application.Senders;
@@ -166,5 +170,41 @@ namespace ServiceComponents.Infrastructure.Rabbit
 
             return builder;
         }
+
+        public static ContainerBuilder AddRabbitRetryConsumers(this ContainerBuilder builder, string connectionKey, string queue, IEnumerable<int> ttls, string clientName)
+        {
+            builder.AddRabbitChannel(connectionKey: connectionKey, key: $"consumer-retry");
+            
+            foreach (var ttl in ttls) {
+                builder.AddRabbitConsumer($"{queue}-retry-{ttl}", $"{clientName}-consumer-retry-{ttl}", $"consumer-retry", $"consumer-retry-{ttl}");
+            }
+
+            return builder;
+        }
+
+        public static IModel AddRabbitRetry(this IModel channel, ILifetimeScope scope, string queue, int [] ttls)
+        {
+            channel.QueueDeclare(queue, false, false, true, new Dictionary<string, object>() { { "x-dead-letter-exchange", $"{queue}-dlx-wait-{ttls[0]}" } });
+
+            for (var i = 0; i < ttls.Length; i++) {
+
+                channel.ExchangeDeclare($"{queue}-dlx-wait-{ttls[i]}", "direct", false, true, null);
+                channel.ExchangeDeclare($"{queue}-dlx-retry-{ttls[i]}", "direct", false, true, null);
+
+                channel.QueueDeclare($"{queue}-wait-{ttls[i]}", false, false, true, new Dictionary<string, object>() { { "x-message-ttl", ttls[i] }, { "x-dead-letter-exchange", $"{queue}-dlx-retry-{ttls[i]}" }});
+                channel.QueueDeclare($"{queue}-retry-{ttls[i]}", false, false, true, new Dictionary<string, object>() { { "x-dead-letter-exchange", i == ttls.Length - 1 ? $"{queue}-dlx" : $"{queue}-dlx-wait-{ttls[i + 1]}" } });
+                channel.QueueBind($"{queue}-wait-{ttls[i]}", $"{queue}-dlx-wait-{ttls[i]}", string.Empty);
+                channel.QueueBind($"{queue}-retry-{ttls[i]}", $"{queue}-dlx-retry-{ttls[i]}", string.Empty);
+
+                scope.ResolveKeyed<RabbitConsumer>($"consumer-retry-{ttls[i]}").StartAsync(CancellationToken.None).Wait();
+            }
+
+            channel.ExchangeDeclare($"{queue}-dlx", "direct", false, true, null);
+            channel.QueueDeclare($"{queue}-dlx", false, false, true);
+            channel.QueueBind($"{queue}-dlx", $"{queue}-dlx", string.Empty);
+            
+            return channel;
+        }
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Autofac;
 using Microsoft.Extensions.Configuration;
 using ServiceComponents.Infrastructure.NHibernate;
@@ -40,6 +41,20 @@ namespace ReferenceApplication.AspNet.Wireup
                 builder.AddRabbitChannel(connectionKey: "consumer", key: $"consumer-{i}");
                 builder.AddRabbitConsumer(queue, $"{clientName}-consumer-{i}", $"consumer-{i}", $"consumer-{i}");
             }
+
+            var ttls = _configuration.GetValue("rabbit:retryIntervals", "1000, 3000, 10000")
+                .Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(int.Parse)
+                .OrderBy(i => i)
+                .ToArray();
+
+
+            builder.AddRabbitRetryConsumers("consumer", queue, ttls, clientName);
+
+            //builder.AddRabbitChannel(connectionKey: "consumer", key: $"consumer-retry");
+            //builder.AddRabbitConsumer("r1", $"{clientName}-consumer-r1", $"consumer-retry", $"consumer-r1");
+            ////builder.AddRabbitConsumer("r2", $"{clientName}-consumer-r2", $"consumer-retry", $"consumer-r2");
+            ////builder.AddRabbitConsumer("r3", $"{clientName}-consumer-r3", $"consumer-retry", $"consumer-r3");
 
             builder.AddRabbitReceivers();
             builder.AddRabbitReceiverCorrelationBehavior();
