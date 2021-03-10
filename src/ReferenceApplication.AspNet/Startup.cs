@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Autofac;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using NHibernate.Tool.hbm2ddl;
+using ReferenceApplication.Application;
 using ReferenceApplication.AspNet.Wireup;
 using ReferenceApplication.AspNet.Wireup.Extensions;
 using ServiceComponents.AspNet;
@@ -62,7 +63,7 @@ namespace ReferenceApplication.AspNet
 
             builder.RegisterModule(new NhibernateModule(
                 Configuration.GetConnectionString("postgres"), 
-                mapping => mapping.FluentMappings.AddFromAssemblyOf<OutgoingEventEntity>(), 
+                mapping => mapping.FluentMappings.AddFromAssemblyOf<TestCommandHandler>(), 
                 configuration => new SchemaUpdate(configuration).Execute(true, true)));
 
             builder.RegisterModule(new RabbitModule(Configuration));

@@ -11,7 +11,6 @@ using ServiceComponents.Infrastructure.Behaviors.Stopwatch;
 using ServiceComponents.Infrastructure.CorrelationContext;
 using ServiceComponents.Infrastructure.Mediator;
 using ServiceComponents.Infrastructure.Receivers;
-using ServiceComponents.Infrastructure.Redis;
 using ServiceComponents.Infrastructure.Senders;
 using ServiceComponents.Infrastructure.Validation;
 
@@ -66,7 +65,7 @@ namespace ReferenceApplication.AspNet.Wireup
 
             builder.AddHttpSenderCorrelationBehavior();
 
-            builder.AddRedis(_configuration.GetValue("connectionStrings:redis", "localhost"));
+            //builder.AddRedis(_configuration.GetValue("connectionStrings:redis", "localhost"));
 
         }
     }

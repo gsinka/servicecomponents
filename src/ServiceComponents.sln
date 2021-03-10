@@ -25,9 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReferenceApplication.Api", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceComponents.Infrastructure.Rabbit", "ServiceComponents.Infrastructure.Rabbit\ServiceComponents.Infrastructure.Rabbit.csproj", "{547196A8-DAE7-4988-AAEB-627CF6759BE2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceComponents.Infrastructure.NHibernate", "ServiceComponents.Infrastructure.NHibernate\ServiceComponents.Infrastructure.NHibernate.csproj", "{8A45715D-D36E-4810-9576-0653D0E694EF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceComponents.Infrastructure.Redis", "ServiceComponents.Infrastructure.Redis\ServiceComponents.Infrastructure.Redis.csproj", "{81797B7D-FB32-4A33-82B3-8EC4494E01A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceComponents.Infrastructure.NHibernate", "ServiceComponents.Infrastructure.NHibernate\ServiceComponents.Infrastructure.NHibernate.csproj", "{B78964C8-D8A4-4770-AEA7-E86B3D10A9EC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,14 +73,10 @@ Global
 		{547196A8-DAE7-4988-AAEB-627CF6759BE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{547196A8-DAE7-4988-AAEB-627CF6759BE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{547196A8-DAE7-4988-AAEB-627CF6759BE2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8A45715D-D36E-4810-9576-0653D0E694EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8A45715D-D36E-4810-9576-0653D0E694EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8A45715D-D36E-4810-9576-0653D0E694EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8A45715D-D36E-4810-9576-0653D0E694EF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{81797B7D-FB32-4A33-82B3-8EC4494E01A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{81797B7D-FB32-4A33-82B3-8EC4494E01A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{81797B7D-FB32-4A33-82B3-8EC4494E01A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{81797B7D-FB32-4A33-82B3-8EC4494E01A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B78964C8-D8A4-4770-AEA7-E86B3D10A9EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B78964C8-D8A4-4770-AEA7-E86B3D10A9EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B78964C8-D8A4-4770-AEA7-E86B3D10A9EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B78964C8-D8A4-4770-AEA7-E86B3D10A9EC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
