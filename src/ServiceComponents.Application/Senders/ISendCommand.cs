@@ -7,6 +7,5 @@ namespace ServiceComponents.Application.Senders
     public interface ISendCommand
     {
         Task SendAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default) where TCommand : ICommand;
-
     }
 }
