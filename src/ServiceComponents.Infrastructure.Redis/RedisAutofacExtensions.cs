@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 using Autofac;
 using ServiceComponents.Api.Mediator;
-using ServiceComponents.Infrastructure.Receivers;
+using ServiceComponents.Infrastructure.Redis.Behaviors;
 using StackExchange.Redis;
 
 namespace ServiceComponents.Infrastructure.Redis
@@ -16,30 +15,13 @@ namespace ServiceComponents.Infrastructure.Redis
 
             return builder;
         }
-    }
 
-    public class RedisReceiverRetryBehavior : IReceiveEvent
-    {
-        private readonly IReceiveEvent _next;
-        private readonly IConnectionMultiplexer _connection;
-
-        public RedisReceiverRetryBehavior(IReceiveEvent next, IConnectionMultiplexer connection)
+        public static ContainerBuilder AddRedisCommandConstraints(this ContainerBuilder builder, Func<IList<ICommand>, bool> constraint, int database = -1)
         {
-            _next = next;
-            _connection = connection;
+            builder.Register(context => new ParallelExecutionBehavior(context.Resolve<IConnectionMultiplexer>().GetDatabase(database), constraint)).AsImplementedInterfaces().InstancePerDependency();
+
+            return builder;
         }
 
-        public async Task ReceiveAsync<T>(T @event, CancellationToken cancellationToken = default) where T : IEvent
-        {
-
-            try {
-                await _next.ReceiveAsync(@event, cancellationToken);
-            }
-            catch (Exception exception) {
-
-                var db = _connection.GetDatabase();
-                await db.StringSetAsync(new RedisKey(@event.EventId), new RedisValue());
-            }
-        }
     }
 }

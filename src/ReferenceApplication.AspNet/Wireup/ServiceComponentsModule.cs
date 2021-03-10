@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Autofac;
 using Microsoft.Extensions.Configuration;
 using ReferenceApplication.Api;
@@ -11,6 +12,7 @@ using ServiceComponents.Infrastructure.Behaviors.Stopwatch;
 using ServiceComponents.Infrastructure.CorrelationContext;
 using ServiceComponents.Infrastructure.Mediator;
 using ServiceComponents.Infrastructure.Receivers;
+using ServiceComponents.Infrastructure.Redis;
 using ServiceComponents.Infrastructure.Senders;
 using ServiceComponents.Infrastructure.Validation;
 
@@ -65,8 +67,8 @@ namespace ReferenceApplication.AspNet.Wireup
 
             builder.AddHttpSenderCorrelationBehavior();
 
-            //builder.AddRedis(_configuration.GetValue("connectionStrings:redis", "localhost"));
-
+            builder.AddRedis(_configuration.GetValue("connectionStrings:redis", "localhost"));
+            builder.AddRedisCommandConstraints(list => list.All(command => command.GetType() != typeof(LongCommand)));
         }
     }
 }

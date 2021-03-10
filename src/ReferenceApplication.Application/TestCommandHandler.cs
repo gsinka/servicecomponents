@@ -29,6 +29,7 @@ namespace ReferenceApplication.Application
 
         }
     }
+
     //public class TestCommandHandler : TransactionCommandHandler<TestCommand>
     //{
     //    private readonly ISession _session;
