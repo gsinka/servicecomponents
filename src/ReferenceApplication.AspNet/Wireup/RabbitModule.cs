@@ -42,7 +42,7 @@ namespace ReferenceApplication.AspNet.Wireup
                 builder.AddRabbitConsumer(queue, $"{clientName}-consumer-{i}", $"consumer-{i}", $"consumer-{i}");
             }
 
-            var ttls = _configuration.GetValue("rabbit:retryIntervals", "1000, 3000, 10000")
+            var ttls = _configuration.GetValue("rabbitMQ:retryIntervals", "1000, 3000, 10000")
                 .Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(int.Parse)
                 .OrderBy(i => i)

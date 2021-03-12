@@ -31,22 +31,15 @@ namespace ReferenceApplication.AspNet.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(CancellationToken cancellationToken)
         {
-            try {
+            object result = null;
 
-                object result = null;
+            await _httpRequestParser.Parse(HttpContext.Request,
+                async (command, ct) => await _commandReceiver.ReceiveAsync(command, ct),
+                async (query, ct) => result = await _queryReceiver.ReceiveAsync((dynamic)query, ct),
+                async (@event, ct) => await _eventReceiver.ReceiveAsync(@event, ct),
+                cancellationToken);
 
-                await _httpRequestParser.Parse(HttpContext.Request,
-                    async (command, ct) => await _commandReceiver.ReceiveAsync(command, ct),
-                    async (query, ct) => result = await _queryReceiver.ReceiveAsync((dynamic)query, ct),
-                    async (@event, ct) => await _eventReceiver.ReceiveAsync(@event, ct),
-                    cancellationToken);
-
-                return result == null ? (IActionResult) Ok() : Ok(JsonConvert.SerializeObject(result, Formatting.None));
-            }
-            catch (Exception exception) {
-                return BadRequest(exception.Message);
-            }
-
+            return result == null ? (IActionResult)Ok() : Ok(JsonConvert.SerializeObject(result, Formatting.None));
         }
     }
 }

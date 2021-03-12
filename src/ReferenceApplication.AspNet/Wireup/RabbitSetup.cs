@@ -28,7 +28,7 @@ namespace ReferenceApplication.AspNet.Wireup
 
         public void Start()
         {
-            var ttls = _configuration.GetValue("rabbit:retryIntervals", "1000, 3000, 10000")
+            var ttls = _configuration.GetValue("rabbitMQ:retryIntervals", "1000, 3000, 10000")
                 .Split(new[] {',', ';'}, StringSplitOptions.RemoveEmptyEntries)
                 .Select(int.Parse)
                 .OrderBy(i => i)

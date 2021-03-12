@@ -9,7 +9,10 @@ namespace ReferenceApplication.AspNet
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var host = CreateHostBuilder(args).Build();
+            
+            Log.Information("Ref-app starting");
+            host.Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

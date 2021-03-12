@@ -10,6 +10,7 @@ using ReferenceApplication.Application;
 using ReferenceApplication.AspNet.Wireup;
 using ReferenceApplication.AspNet.Wireup.Extensions;
 using ServiceComponents.AspNet;
+using ServiceComponents.AspNet.Exceptions;
 using ServiceComponents.AspNet.Http;
 using ServiceComponents.AspNet.Metrics;
 using ServiceComponents.Infrastructure.NHibernate;
@@ -54,7 +55,6 @@ namespace ReferenceApplication.AspNet
 
             services.ConfigureOpenApi(Configuration);
 
-            //services.AddHostedService<BackgroundEventPublisher>();
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
@@ -67,6 +67,8 @@ namespace ReferenceApplication.AspNet
                 configuration => new SchemaUpdate(configuration).Execute(true, true)));
 
             builder.RegisterModule(new RabbitModule(Configuration));
+
+            builder.RegisterModule<MonitoringModule>();
 
             //builder.AddNhibernateRabbitPublisher();
         }
@@ -85,6 +87,9 @@ namespace ReferenceApplication.AspNet
             app.UseAuthentication();
             app.UseAuthorization();
             app.AddReadiness().AddLiveness();
+            app
+                .UseMiddleware<ErrorMetricsMiddleware>()
+                .UseMiddleware<ErrorHandlingMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {

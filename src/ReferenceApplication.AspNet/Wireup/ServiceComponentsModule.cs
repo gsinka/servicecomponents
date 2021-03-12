@@ -33,7 +33,7 @@ namespace ReferenceApplication.AspNet.Wireup
             var applicationAssembly = typeof(TestCommandHandler).Assembly;
 
             builder.RegisterType<ComputerClock>().AsImplementedInterfaces().SingleInstance();
-
+            
             builder.AddMediator(applicationAssembly);
             builder.AddMediatorBehavior(applicationAssembly);
             builder.AddValidationBehavior(apiAssembly);
@@ -67,8 +67,12 @@ namespace ReferenceApplication.AspNet.Wireup
 
             builder.AddHttpSenderCorrelationBehavior();
 
-            builder.AddRedis(_configuration.GetValue("connectionStrings:redis", "localhost"));
-            builder.AddRedisCommandConstraints(list => list.All(command => command.GetType() != typeof(LongCommand)));
+            builder.AddRedisConnection(_configuration.GetValue("connectionStrings:redis", "localhost"));
+            builder.AddRedisDatabase();
+
+            builder.AddRedisCommandConstraints(
+                (command, commands) => commands.All(x => x.GetType() != command.GetType()), 
+                command => TimeSpan.FromSeconds(60));
         }
     }
 }

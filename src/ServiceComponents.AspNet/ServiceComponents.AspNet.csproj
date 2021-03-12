@@ -6,16 +6,15 @@
 
   <ItemGroup>
     <Compile Remove="Correlation\**" />
+    <Compile Remove="Logging\**" />
     <EmbeddedResource Remove="Correlation\**" />
+    <EmbeddedResource Remove="Logging\**" />
     <None Remove="Correlation\**" />
+    <None Remove="Logging\**" />
   </ItemGroup>
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Logging\" />
   </ItemGroup>
 
   <ItemGroup>

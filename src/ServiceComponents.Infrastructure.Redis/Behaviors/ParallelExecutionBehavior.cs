@@ -12,40 +12,40 @@ namespace ServiceComponents.Infrastructure.Redis.Behaviors
 {
     public class ParallelExecutionBehavior : IPreHandleCommand, IPostHandleCommand, IHandleCommandFailure
     {
-        private readonly IDatabaseAsync _redisDatabase;
-        private readonly Func<IList<ICommand>, bool> _enablerFunc;
+        private readonly IDatabase _database;
+        private readonly Func<ICommand, IList<ICommand>, bool> _enablerFunc;
+        private readonly Func<ICommand, TimeSpan?> _expiryFunc;
         private readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All };
 
 
-        public ParallelExecutionBehavior(IDatabaseAsync redisDatabase, Func<IList<ICommand>, bool> enablerFunc)
+        public ParallelExecutionBehavior(IDatabase database, Func<ICommand, IList<ICommand>, bool> enablerFunc, Func<ICommand, TimeSpan?> expiryFunc)
         {
-            _redisDatabase = redisDatabase;
             _enablerFunc = enablerFunc;
+            _expiryFunc = expiryFunc;
+            _database = database;
         }
         
         public async Task PreHandleAsync(ICommand command, CancellationToken cancellationToken = default)
         {
-            var executingCommands = 
-                (await _redisDatabase.HashGetAllAsync(new RedisKey("commands")))
-                .Select(hash => JsonConvert.DeserializeObject(hash.Value, _jsonSerializerSettings) as ICommand)
-                .Where(x => x != null)
-                .ToList();
+            var connection = _database.Multiplexer;
+            var runningKeys = connection.GetServer(connection.GetEndPoints().First()).Keys(database: _database.Database, pattern: "command:*");
+            var executingCommands = runningKeys.Select(key => JsonConvert.DeserializeObject(_database.StringGet(key), _jsonSerializerSettings) as ICommand).ToList();
 
-            if (!_enablerFunc(executingCommands)) {
+            if (!_enablerFunc(command, executingCommands)) {
                 throw new InvalidOperationException("Cannot execute command because of parallel constraints");
             }
 
-            await _redisDatabase.HashSetAsync(new RedisKey("commands"), new[] { new HashEntry(new RedisValue(command.CommandId), new RedisValue(JsonConvert.SerializeObject(command, _jsonSerializerSettings)))});
+            await _database.StringSetAsync($"command:{command.CommandId}", new RedisValue(JsonConvert.SerializeObject(command, _jsonSerializerSettings)), _expiryFunc(command));
         }
 
         public async Task PostHandleAsync(ICommand command, CancellationToken cancellationToken = default)
         {
-            await _redisDatabase.HashDeleteAsync(new RedisKey("commands"), new RedisValue(command.CommandId));
+            await _database.KeyDeleteAsync(new RedisKey($"command:{command.CommandId}"));
         }
 
         public async Task HandleFailureAsync(ICommand command, Exception exception, CancellationToken cancellationToken = default)
         {
-            await _redisDatabase.HashDeleteAsync(new RedisKey(command.CommandId), new RedisValue(command.CommandId));
+            await _database.KeyDeleteAsync(new RedisKey($"command:{command.CommandId}"));
         }
     }
 }
