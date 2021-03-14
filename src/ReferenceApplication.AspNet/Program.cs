@@ -1,6 +1,6 @@
-using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using ReferenceApplication.AspNet.Wireup;
 using Serilog;
 
 namespace ReferenceApplication.AspNet
@@ -19,12 +19,15 @@ namespace ReferenceApplication.AspNet
 
             Host.CreateDefaultBuilder(args)
 
-                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
-                .UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration))
-                
+                // Inject host builder wireup
+                .WireupServiceComponents(args)
+
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder
+                        // Inject web host builder wireup
+                        .WireupServiceComponents(args)
+                        .UseStartup<Startup>();
                 });
     }
 }
