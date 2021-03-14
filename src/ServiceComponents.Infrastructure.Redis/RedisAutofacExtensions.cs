@@ -41,7 +41,7 @@ namespace ServiceComponents.Infrastructure.Redis
             return builder;
         }
 
-        public static ContainerBuilder AddRedisCommandConstraints(this ContainerBuilder builder, Func<ICommand, IList<ICommand>, bool> constraint, Func<ICommand, TimeSpan?> expiryFunc, object databaseKey = default)
+        public static ContainerBuilder AddRedisCommandConstraints(this ContainerBuilder builder, Func<ICommand, IList<ICommand>, bool> constraint, Func<ICommand, TimeSpan?> expiryFunc = default, object databaseKey = default)
         {
             builder.Register(context => new ParallelExecutionBehavior(
                 databaseKey == default ? context.Resolve<IDatabase>() : context.ResolveKeyed<IDatabase>(databaseKey),

@@ -72,7 +72,7 @@ namespace ReferenceApplication.AspNet.Wireup
 
             builder.AddRedisCommandConstraints(
                 (command, commands) => commands.All(x => x.GetType() != command.GetType()), 
-                command => TimeSpan.FromSeconds(60));
+                null /*command => TimeSpan.FromSeconds(60)*/);
         }
     }
 }

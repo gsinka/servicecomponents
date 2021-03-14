@@ -18,7 +18,7 @@ namespace ServiceComponents.Infrastructure.Redis.Behaviors
         private readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All };
 
 
-        public ParallelExecutionBehavior(IDatabase database, Func<ICommand, IList<ICommand>, bool> enablerFunc, Func<ICommand, TimeSpan?> expiryFunc)
+        public ParallelExecutionBehavior(IDatabase database, Func<ICommand, IList<ICommand>, bool> enablerFunc, Func<ICommand, TimeSpan?> expiryFunc = default)
         {
             _enablerFunc = enablerFunc;
             _expiryFunc = expiryFunc;
@@ -35,7 +35,9 @@ namespace ServiceComponents.Infrastructure.Redis.Behaviors
                 throw new InvalidOperationException("Cannot execute command because of parallel constraints");
             }
 
-            await _database.StringSetAsync($"command:{command.CommandId}", new RedisValue(JsonConvert.SerializeObject(command, _jsonSerializerSettings)), _expiryFunc(command));
+            await _database.StringSetAsync(
+                $"command:{command.CommandId}", 
+                new RedisValue(JsonConvert.SerializeObject(command, _jsonSerializerSettings)), _expiryFunc == default ? TimeSpan.FromMinutes(1) : _expiryFunc(command) ?? TimeSpan.FromMinutes(1));
         }
 
         public async Task PostHandleAsync(ICommand command, CancellationToken cancellationToken = default)
