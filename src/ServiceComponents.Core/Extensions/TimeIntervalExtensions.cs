@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace ServiceComponents.Core.Extensions
@@ -61,6 +62,24 @@ namespace ServiceComponents.Core.Extensions
                     recentStart = change.d;
                 }
             }
+        }
+
+        public static ITimeInterval Week(this DateTime date)
+        {
+            var fdow = date.Date.StartOfWeek();
+            return new TimeInterval(fdow, fdow.AddDays(7));
+        }
+
+        public static ITimeInterval WorkWeek(this DateTime date)
+        {
+            var fdow = date.Date.StartOfWeek(DayOfWeek.Monday);
+            return new TimeInterval(fdow, fdow.AddDays(5));
+        }
+
+        public static ITimeInterval Month(DateTime date)
+        {
+            var start = new DateTime(date.Year, date.Month, 1);
+            return new TimeInterval(start, start.AddMonths(1));
         }
     }
 }

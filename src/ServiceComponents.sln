@@ -29,6 +29,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceComponents.Infrastru
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceComponents.Infrastructure.Redis", "ServiceComponents.Infrastructure.Redis\ServiceComponents.Infrastructure.Redis.csproj", "{86EAF067-AE7C-41A1-A4FC-6AEBB1F6FA83}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceComponents.Test", "ServiceComponents.Test\ServiceComponents.Test.csproj", "{FE38AD7E-199D-4944-A885-4B75567B9230}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,10 @@ Global
 		{86EAF067-AE7C-41A1-A4FC-6AEBB1F6FA83}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86EAF067-AE7C-41A1-A4FC-6AEBB1F6FA83}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86EAF067-AE7C-41A1-A4FC-6AEBB1F6FA83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE38AD7E-199D-4944-A885-4B75567B9230}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE38AD7E-199D-4944-A885-4B75567B9230}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE38AD7E-199D-4944-A885-4B75567B9230}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE38AD7E-199D-4944-A885-4B75567B9230}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
