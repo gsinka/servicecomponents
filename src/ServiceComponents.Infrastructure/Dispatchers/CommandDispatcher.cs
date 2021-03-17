@@ -5,8 +5,8 @@ using Autofac;
 using Serilog;
 using ServiceComponents.Api.Mediator;
 using ServiceComponents.Application.Mediator;
-using ServiceComponents.Core.ExtensionMethods;
-using TypeExtensions = ServiceComponents.Core.ExtensionMethods.TypeExtensions;
+using ServiceComponents.Core.Extensions;
+using TypeExtensions = ServiceComponents.Core.Extensions.TypeExtensions;
 
 namespace ServiceComponents.Infrastructure.Dispatchers
 {

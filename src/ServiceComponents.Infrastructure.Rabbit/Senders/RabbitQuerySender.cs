@@ -8,7 +8,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Serilog;
 using ServiceComponents.Api.Mediator;
-using ServiceComponents.Core.ExtensionMethods;
+using ServiceComponents.Core.Extensions;
 
 namespace ServiceComponents.Infrastructure.Rabbit.Senders
 {

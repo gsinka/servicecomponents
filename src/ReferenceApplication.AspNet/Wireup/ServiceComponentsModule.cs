@@ -7,6 +7,7 @@ using ReferenceApplication.Application;
 using ServiceComponents.AspNet.Http;
 using ServiceComponents.AspNet.Http.Senders;
 using ServiceComponents.Core;
+using ServiceComponents.Core.Services;
 using ServiceComponents.Infrastructure.Behaviors.Logging;
 using ServiceComponents.Infrastructure.Behaviors.Stopwatch;
 using ServiceComponents.Infrastructure.CorrelationContext;

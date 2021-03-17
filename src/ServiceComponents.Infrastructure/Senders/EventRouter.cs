@@ -6,7 +6,7 @@ using Autofac;
 using Serilog;
 using ServiceComponents.Api.Mediator;
 using ServiceComponents.Application.Senders;
-using ServiceComponents.Core.ExtensionMethods;
+using ServiceComponents.Core.Extensions;
 
 namespace ServiceComponents.Infrastructure.Senders
 {

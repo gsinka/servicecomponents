@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 
-namespace ServiceComponents.Core.Helpers
+namespace ServiceComponents.Core.Extensions
 {
     public static class VersionHelpers
     {

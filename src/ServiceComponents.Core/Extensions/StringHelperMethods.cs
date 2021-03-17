@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace ServiceComponents.Core.ExtensionMethods
+namespace ServiceComponents.Core.Extensions
 {
     public static class StringHelper
     {
@@ -15,7 +15,6 @@ namespace ServiceComponents.Core.ExtensionMethods
         {
             return $"{Random(length, characterSet)}{separator}{str}";
         }
-
 
         public static string Random(int length, string characterSet = RandomCharacterSet.Alphanumeric)
         {

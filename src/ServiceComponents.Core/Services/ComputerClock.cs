@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ServiceComponents.Core
+namespace ServiceComponents.Core.Services
 {
     public class ComputerClock : IClock
     {

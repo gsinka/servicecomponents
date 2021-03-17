@@ -1,6 +1,4 @@
-﻿using ServiceComponents.Api.Mediator;
-
-namespace ServiceComponents.Core.ExtensionMethods
+﻿namespace ServiceComponents.Core.Extensions
 {
     public static class TypeExtensions
     {

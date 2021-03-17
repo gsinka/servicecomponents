@@ -7,8 +7,7 @@ using NSwag;
 using NSwag.AspNetCore;
 using NSwag.Generation.Processors.Security;
 using ServiceComponents.AspNet.OpenApi;
-using ServiceComponents.Core.ExtensionMethods;
-using ServiceComponents.Core.Helpers;
+using ServiceComponents.Core.Extensions;
 
 namespace ReferenceApplication.AspNet.Wireup.Extensions
 {

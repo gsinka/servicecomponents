@@ -6,7 +6,7 @@ using Serilog.Context;
 using Serilog.Events;
 using ServiceComponents.Api.Mediator;
 using ServiceComponents.Application.Mediator;
-using ServiceComponents.Core.ExtensionMethods;
+using ServiceComponents.Core.Extensions;
 
 namespace ServiceComponents.Infrastructure.Behaviors.Logging
 {

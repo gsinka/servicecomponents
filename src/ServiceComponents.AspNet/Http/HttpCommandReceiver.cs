@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Serilog;
 using ServiceComponents.Api.Mediator;
-using ServiceComponents.Core.ExtensionMethods;
+using ServiceComponents.Core.Extensions;
 using ServiceComponents.Infrastructure.Receivers;
 
 namespace ServiceComponents.AspNet.Http

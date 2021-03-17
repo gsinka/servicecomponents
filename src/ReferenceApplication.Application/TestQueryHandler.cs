@@ -5,7 +5,7 @@ using Serilog;
 using ServiceComponents.Application;
 using ServiceComponents.Application.Mediator;
 using ServiceComponents.Application.Senders;
-using ServiceComponents.Core.ExtensionMethods;
+using ServiceComponents.Core.Extensions;
 
 namespace ReferenceApplication.Application
 {
