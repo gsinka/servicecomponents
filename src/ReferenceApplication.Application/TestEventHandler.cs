@@ -17,7 +17,7 @@ namespace ReferenceApplication.Application
 
         override async public Task HandleAsync(TestEvent @event, CancellationToken cancellationToken = default)
         {
-            throw new InvalidOperationException();
+            //throw new InvalidOperationException();
 
             await SendAsync(new TestQuery("now what?"), cancellationToken);
             Log.Information("Test event handled. Data: {eventData}", @event.Data);

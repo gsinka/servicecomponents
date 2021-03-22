@@ -9,7 +9,7 @@ namespace ServiceComponents.AspNet.Http.Senders
 {
     public static class HttpSenderAutofacExtensions
     {
-        public static ContainerBuilder AddHttpCommandSender(this ContainerBuilder builder, Uri requestUri, string key = default)
+        public static ContainerBuilder AddHttpCommandSender(this ContainerBuilder builder, Uri requestUri, object key = default)
         {
             var proxyRegistration = builder.Register(context => new HttpCommandSenderProxy(key == default ? context.Resolve<ISendHttpCommand>() : context.ResolveKeyed<ISendHttpCommand>(key))).InstancePerDependency();
 
@@ -31,7 +31,7 @@ namespace ServiceComponents.AspNet.Http.Senders
             return builder;
         }
 
-        public static ContainerBuilder AddHttpQuerySender(this ContainerBuilder builder, Uri requestUri, string key = default)
+        public static ContainerBuilder AddHttpQuerySender(this ContainerBuilder builder, Uri requestUri, object key = default)
         {
             var proxyRegistration = builder.Register(context => new HttpQuerySenderProxy(key == default ? context.Resolve<ISendHttpQuery>() : context.ResolveKeyed<ISendHttpQuery>(key))).InstancePerDependency();
 
@@ -53,7 +53,7 @@ namespace ServiceComponents.AspNet.Http.Senders
             return builder;
         }
 
-        public static ContainerBuilder AddHttpEventPublisher(this ContainerBuilder builder, Uri requestUri, string key = default)
+        public static ContainerBuilder AddHttpEventPublisher(this ContainerBuilder builder, Uri requestUri, object key = default)
         {
             var proxyRegistration = builder.Register(context => new HttpEventPublisherProxy(key == default ? context.Resolve<IPublishHttpEvent>() : context.ResolveKeyed<IPublishHttpEvent>(key))).InstancePerDependency();
 

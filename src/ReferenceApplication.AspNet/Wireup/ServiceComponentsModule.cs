@@ -37,6 +37,7 @@ namespace ReferenceApplication.AspNet.Wireup
             builder.AddMediator(applicationAssembly);
             builder.AddMediatorBehavior(applicationAssembly);
             builder.AddValidationBehavior(apiAssembly);
+            
             builder.AddLogBehavior();
             builder.AddStopwatchBehavior();
 
