@@ -26,4 +26,8 @@
     <ProjectReference Include="..\ServiceComponents.Core\ServiceComponents.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Wireup\" />
+  </ItemGroup>
+
 </Project>

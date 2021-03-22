@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -20,6 +21,7 @@ namespace ServiceComponents.AspNet.Wireup
         public readonly List<Action<IMvcBuilder>> MvcBuilderCallbacks = new List<Action<IMvcBuilder>>();
         public readonly List<Action<IConfiguration, IHostEnvironment, IApplicationBuilder>> ApplicationBuilderCallbacks = new List<Action<IConfiguration, IHostEnvironment, IApplicationBuilder>>();
         public readonly List<Action<HostBuilderContext, ContainerBuilder>> ContainerBuilderCallbacks = new List<Action<HostBuilderContext, ContainerBuilder>>();
+        public readonly List<Action<IConfiguration, ILifetimeScope>> StartupCallbacks = new List<Action<IConfiguration, ILifetimeScope>>();
 
 
         public ServiceComponentsHostBuilder RegisterCallback(Action<IHostBuilder> callback)
@@ -44,11 +46,19 @@ namespace ServiceComponents.AspNet.Wireup
             MvcOptionsBuilderCallbacks.Add(callback);
             return this;
         }
+        
         public ServiceComponentsHostBuilder RegisterCallback(Action<IMvcBuilder> callback)
         {
             MvcBuilderCallbacks.Add(callback);
             return this;
         }
+        
+        public ServiceComponentsHostBuilder RegisterCallback(Action<IConfiguration, ILifetimeScope> callback)
+        {
+            StartupCallbacks.Add(callback);
+            return this;
+        }
+
         public ServiceComponentsHostBuilder RegisterCallback(Action<IConfiguration, IHostEnvironment, IApplicationBuilder> callback)
         {
             ApplicationBuilderCallbacks.Add(callback);
@@ -75,6 +85,10 @@ namespace ServiceComponents.AspNet.Wireup
 
             var logger = host.Services.GetService<ILogger>();
             logger.Information("Starting application");
+
+            //var configuration = host.Services.GetService<IConfiguration>();
+            //var scope = host.Services.GetService<ILifetimeScope>();
+            //StartupCallbacks.ForEach(action => action(configuration, scope));
             return host;
         }
     }

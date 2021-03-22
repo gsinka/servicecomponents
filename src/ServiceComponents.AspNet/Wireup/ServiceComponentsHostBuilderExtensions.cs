@@ -8,6 +8,7 @@ using ServiceComponents.Infrastructure.Behaviors.Logging;
 using ServiceComponents.Infrastructure.Behaviors.Stopwatch;
 using ServiceComponents.Infrastructure.CorrelationContext;
 using ServiceComponents.Infrastructure.Mediator;
+using ServiceComponents.Infrastructure.Rabbit;
 using ServiceComponents.Infrastructure.Receivers;
 using ServiceComponents.Infrastructure.Senders;
 using ServiceComponents.Infrastructure.Validation;
@@ -50,7 +51,8 @@ namespace ServiceComponents.AspNet.Wireup
                 containerBuilder.AddHttpReceiverCorrelationBehavior();
                 containerBuilder.AddHttpSenderCorrelationBehavior();
                 containerBuilder.AddLoopbackReceiverCorrelationBehavior();
-
+                containerBuilder.AddRabbitReceiverCorrelationBehavior();
+                containerBuilder.AddRabbitSenderCorrelationBehavior();
             });
         }
         

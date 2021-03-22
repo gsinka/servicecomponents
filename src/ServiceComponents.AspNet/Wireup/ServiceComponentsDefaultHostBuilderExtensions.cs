@@ -39,9 +39,7 @@ namespace ServiceComponents.AspNet.Wireup
 
                     // Add request binder for command, query and event deserialization
                     .UseRequestBinder()
-
-                    .AddGenericController("api/generic")
-
+                    
                     .RegisterCallback((configuration, services) => {
                         var mvcBuilder = services.AddControllers(options => {
                             builder.MvcOptionsBuilderCallbacks.ForEach(action => action(options));
