@@ -50,12 +50,7 @@ namespace ReferenceApplication.AspNet.Wireup
 
 
             builder.AddRabbitRetryConsumers("consumer", queue, ttls, clientName);
-
-            //builder.AddRabbitChannel(connectionKey: "consumer", key: $"consumer-retry");
-            //builder.AddRabbitConsumer("r1", $"{clientName}-consumer-r1", $"consumer-retry", $"consumer-r1");
-            ////builder.AddRabbitConsumer("r2", $"{clientName}-consumer-r2", $"consumer-retry", $"consumer-r2");
-            ////builder.AddRabbitConsumer("r3", $"{clientName}-consumer-r3", $"consumer-retry", $"consumer-r3");
-
+            
             builder.AddRabbitReceivers();
             builder.AddRabbitReceiverCorrelationBehavior();
 

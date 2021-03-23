@@ -85,9 +85,11 @@ namespace ServiceComponents.Infrastructure.Rabbit
 
             if (consumerKey == default) {
                 registration.AsSelf();
+                registration.Keyed<RabbitConsumer>("__consumer__");
             }
             else {
                 registration.Keyed<RabbitConsumer>(consumerKey);
+                registration.Keyed<RabbitConsumer>("__consumer__");
             }
 
             return builder;
@@ -196,7 +198,7 @@ namespace ServiceComponents.Infrastructure.Rabbit
                 channel.QueueBind($"{queue}-wait-{ttls[i]}", $"{queue}-dlx-wait-{ttls[i]}", string.Empty);
                 channel.QueueBind($"{queue}-retry-{ttls[i]}", $"{queue}-dlx-retry-{ttls[i]}", string.Empty);
 
-                scope.ResolveKeyed<RabbitConsumer>($"consumer-retry-{ttls[i]}").StartAsync(CancellationToken.None).Wait();
+                //scope.ResolveKeyed<RabbitConsumer>($"consumer-retry-{ttls[i]}").StartAsync(CancellationToken.None).Wait();
             }
 
             channel.ExchangeDeclare($"{queue}-dlx", "direct", false, true, null);

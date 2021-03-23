@@ -18,7 +18,7 @@ namespace ServiceComponents.Infrastructure.Rabbit
         private readonly ILifetimeScope _rootScope;
         private readonly IModel _model;
         private readonly string _queue;
-        private string _consumerTag;
+        public string ConsumerTag;
         private readonly EventingBasicConsumer _consumer;
 
         public RabbitConsumer(ILogger log, ILifetimeScope rootScope, IModel model, string queue, string consumerTag = default)
@@ -27,7 +27,7 @@ namespace ServiceComponents.Infrastructure.Rabbit
             _rootScope = rootScope;
             _model = model;
             _queue = queue;
-            _consumerTag = consumerTag;
+            ConsumerTag = consumerTag;
             _consumer = new EventingBasicConsumer(_model);
             _consumer.Received += ConsumerOnReceived;
         }
@@ -73,11 +73,11 @@ namespace ServiceComponents.Infrastructure.Rabbit
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            if (_consumerTag == default) {
-                _consumerTag = _model.BasicConsume(_queue, false, _consumer);
+            if (ConsumerTag == default) {
+                ConsumerTag = _model.BasicConsume(_queue, false, _consumer);
             }
             else {
-                _model.BasicConsume(_queue, false, _consumerTag, _consumer);
+                _model.BasicConsume(_queue, false, ConsumerTag, _consumer);
             }
         }
     }
