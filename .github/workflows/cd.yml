@@ -39,10 +39,10 @@ jobs:
       
     - name: Pack
       run: |
-        dotnet pack ./src/ServiceComponents.sln --configuration Release -p:Version=$app_version --output ./packages --include-source
+        dotnet pack ./src/ServiceComponents.sln --configuration Release -p:Version=$app_version --output ./packages --include-symbols false --include-source
         
     - name: List packages
       run: ls ./packages
         
     - name: Publish      
-      run: dotnet nuget push ./packages/*.nupkg --skip-duplicate true --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.nuget_api_key }}
+      run: dotnet nuget push ./packages/*.nupkg --skip-duplicate true --no-symbols true --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.nuget_api_key }}
