@@ -42,7 +42,7 @@ jobs:
         dotnet pack ./src/ServiceComponents.sln --configuration Release -p:Version=$app_version --output nuget-packages --include-symbols --include-source
         
     - name: List packages
-      run: ls ./packages
+      run: ls ./nuget-packages
         
     - name: Publish      
       run: dotnet nuget push nuget-packages/*.nupkg --skip-duplicate true --no-symbols true --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.nuget_api_key }}
