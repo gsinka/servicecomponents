@@ -24,7 +24,7 @@ namespace ReferenceApplication2.AspNet.Controllers
         [HttpGet]
         public async Task<IActionResult> Get(CancellationToken cancellationToken)
         {
-            await _receiver.ReceiveAsync(new LongCommand(), cancellationToken);
+            await _receiver.ReceiveAsync(new TestCommand("data"), cancellationToken);
             
             return Ok($"OK : {_clock.UtcNow.ToString(CultureInfo.InvariantCulture)}");
         }

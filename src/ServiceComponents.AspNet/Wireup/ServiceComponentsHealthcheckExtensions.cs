@@ -16,11 +16,11 @@ namespace ServiceComponents.AspNet.Wireup
         public static ServiceComponentsHostBuilder AddHealthCheck(
             this ServiceComponentsHostBuilder hostBuilder,
             Action<IConfiguration, IHealthChecksBuilder> builder,
-            string readinessPath = "/.well-known/ready", 
+            string readinessPath = "/.well-known/ready",
             string livenessPath = "/.well-known/live")
         {
             return hostBuilder
-                
+
                 .RegisterCallback((configuration, environment, app) => {
 
                     app.UseHealthChecks(readinessPath, new HealthCheckOptions {
@@ -38,7 +38,7 @@ namespace ServiceComponents.AspNet.Wireup
                 .RegisterCallback((configuration, services) => {
 
                     builder(configuration, services.AddHealthChecks()
-                        .AddCheck("self", () => HealthCheckResult.Healthy(), new[] { LivenessTag }));
+                        .AddCheck("self", () => HealthCheckResult.Healthy(), new[] {LivenessTag}));
 
                 });
 

@@ -21,12 +21,6 @@ namespace ServiceComponents.AspNet.Wireup
                     // Use Autofac for dependency injection
                     .UseAutofac()
 
-                    // Use serilog for logging
-                    .UseSerilog((context, log) => log
-                        .WriteTo.Console()
-                        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-                        .MinimumLevel.Verbose())
-
                     .RegisterCallback((configuration, environment, app) => {
                         
                         if (environment.IsDevelopment()) {
@@ -86,8 +80,6 @@ namespace ServiceComponents.AspNet.Wireup
 
                     // Add endpoints
                     .AddEndpoints()
-
-
                 ;
         }
     }

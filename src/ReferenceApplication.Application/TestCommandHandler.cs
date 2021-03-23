@@ -1,6 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using NHibernate;
 using ReferenceApplication.Api;
+using ReferenceApplication.Application.Entities;
 using Serilog;
 using ServiceComponents.Application;
 using ServiceComponents.Application.Mediator;
@@ -12,9 +14,13 @@ namespace ReferenceApplication.Application
 {
     public class TestCommandHandler : CommandHandler<TestCommand>
     {
-        public TestCommandHandler(ILogger log, ICorrelation correlation, ISendQuery querySender, IPublishEvent eventPublisher) 
+        private readonly ISession _session;
+
+        public TestCommandHandler(ILogger log, ICorrelation correlation, ISendQuery querySender, IPublishEvent eventPublisher, ISession session) 
             : base(log, correlation, querySender, eventPublisher)
-        { }
+        {
+            _session = session;
+        }
 
         override public async Task HandleAsync(TestCommand command, CancellationToken cancellationToken = default)
         {
@@ -22,6 +28,11 @@ namespace ReferenceApplication.Application
             Log.Information("Query called from command handler with result: {queryResult}", queryResult);
 
             var queryResult2 = await SendAsync(new TestQuery("from command handler 2"), cancellationToken);
+
+            using (var tx = _session.BeginTransaction()) {
+                await _session.SaveAsync(new TestEntity() {Name = "Test-".AddRandomPostfix()}, cancellationToken);
+                await tx.CommitAsync(cancellationToken);
+            }
 
             Log.Information("{command} handled", command.DisplayName());
 

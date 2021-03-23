@@ -36,6 +36,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ServiceComponents.Api\ServiceComponents.Api.csproj" />
     <ProjectReference Include="..\ServiceComponents.Core\ServiceComponents.Core.csproj" />
+    <ProjectReference Include="..\ServiceComponents.Infrastructure.NHibernate\ServiceComponents.Infrastructure.NHibernate.csproj" />
     <ProjectReference Include="..\ServiceComponents.Infrastructure.Rabbit\ServiceComponents.Infrastructure.Rabbit.csproj" />
     <ProjectReference Include="..\ServiceComponents.Infrastructure.Redis\ServiceComponents.Infrastructure.Redis.csproj" />
     <ProjectReference Include="..\ServiceComponents.Infrastructure\ServiceComponents.Infrastructure.csproj" />
