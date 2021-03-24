@@ -1,10 +1,13 @@
 ﻿using System;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
 namespace ServiceComponents.AspNet.Wireup
 {
@@ -51,19 +54,17 @@ namespace ServiceComponents.AspNet.Wireup
             return builder;
         }
 
-        public static ServiceComponentsHostBuilder AddOpenApi(this ServiceComponentsHostBuilder builder)
+        public static ServiceComponentsHostBuilder AddOpenApi(this ServiceComponentsHostBuilder builder, Action<IConfiguration, SwaggerGenOptions> generatorOptions, Action<IConfiguration, SwaggerUIOptions> uiOptions)
         {
             builder.RegisterCallback((configuration, services) => {
 
-                services.AddSwaggerGen(c => {
-                    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ReferenceApplication2.AspNet", Version = "v1" });
-                });
+                services.AddSwaggerGen(c => { generatorOptions(configuration, c); });
 
             });
 
             builder.RegisterCallback((configuration, environment, app) => {
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ReferenceApplication2.AspNet v1"));
+                app.UseSwaggerUI(c => uiOptions(configuration, c));
             });
 
             return builder;

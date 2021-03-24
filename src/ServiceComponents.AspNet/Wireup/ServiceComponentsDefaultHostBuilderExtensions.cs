@@ -48,10 +48,7 @@ namespace ServiceComponents.AspNet.Wireup
                         services.AddHttpContextAccessor();
                         services.AddHttpClient();
                     })
-                    
-                    // Add OpenApi
-                    .AddOpenApi()
-                    
+
                     .RegisterCallback((context, containerBuilder) => {
 
                         containerBuilder.RegisterType<ComputerClock>().AsImplementedInterfaces().SingleInstance();

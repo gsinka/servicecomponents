@@ -1,7 +1,9 @@
 using System;
 using System.Linq;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using NHibernate.Tool.hbm2ddl;
 using ReferenceApplication.Api;
 using ReferenceApplication.Application;
@@ -30,6 +32,11 @@ namespace ReferenceApplication2.AspNet
                     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                     .MinimumLevel.Override("NHibernate", LogEventLevel.Warning)
                     .MinimumLevel.Verbose())
+
+                // Add OpenApi
+                .AddOpenApi(
+                    (configuration, options) => options.SwaggerDoc("v1", new OpenApiInfo { Title = "ReferenceApplication2.AspNet", Version = "v1" }), 
+                    (configuration, options) => options.SwaggerEndpoint("/swagger/v1/swagger.json", "ReferenceApplication2.AspNet v1"))
 
                 // Health check
                 .AddHealthCheck((configuration, check) => {
