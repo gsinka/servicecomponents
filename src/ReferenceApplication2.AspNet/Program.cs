@@ -60,6 +60,8 @@ namespace ReferenceApplication2.AspNet
                 //.AddRabbit("amqp://guest:guest@localhost:5672", "test2", "test-queue", "test-exchange", retryIntervals: new[] { 1000, 3000, 5000 })
                 .AddRabbit("amqp://guest:guest@localhost:5672", "test2", "test-queue", "test-exchange")
 
+                .RegisterCallback(builder => builder.AddNewtonsoftJson(options => options.UseCamelCasing(true)))
+
                 // NHibernate
                 .AddNHibernate(
                     configuration => "Server=localhost; Port=5432; Database=ref-app; User Id=postgres; Password=postgres", 

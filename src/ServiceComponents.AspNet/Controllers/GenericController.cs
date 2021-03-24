@@ -38,7 +38,7 @@ namespace ServiceComponents.AspNet.Controllers
                 async (@event, ct) => await _eventReceiver.ReceiveAsync(@event, ct),
                 cancellationToken);
 
-            return result == null ? (IActionResult)Ok() : Ok(JsonConvert.SerializeObject(result, Formatting.None));
+            return result == null ? (IActionResult)Ok() : Ok(result);
         }
     }
 }
