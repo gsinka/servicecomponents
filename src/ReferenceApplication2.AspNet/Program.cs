@@ -50,11 +50,12 @@ namespace ReferenceApplication2.AspNet
                 .AddRedisCommandRules((command, commands) => commands.All(x => x.GetType() != command.GetType()))
 
                 // Rabbit
-                .AddRabbit("amqp://guest:guest@localhost:5672", "test2", "test-queue", "test-exchange", retryIntervals: new [] { 1000, 3000, 5000} )
+                //.AddRabbit("amqp://guest:guest@localhost:5672", "test2", "test-queue", "test-exchange", retryIntervals: new[] { 1000, 3000, 5000 })
+                .AddRabbit("amqp://guest:guest@localhost:5672", "test2", "test-queue", "test-exchange")
 
                 // NHibernate
                 .AddNHibernate(
-                    "Server=localhost; Port=5432; Database=ref-app; User Id=postgres; Password=postgres", 
+                    configuration => "Server=localhost; Port=5432; Database=ref-app; User Id=postgres; Password=postgres", 
                     map => map.FluentMappings.AddFromAssemblyOf<TestEntity>(),
                     configuration => new SchemaUpdate(configuration).Execute(true, true))
 
