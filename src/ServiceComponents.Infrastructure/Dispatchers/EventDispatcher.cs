@@ -24,9 +24,13 @@ namespace ServiceComponents.Infrastructure.Dispatchers
 
         public async Task DispatchAsync<T>(T @event, CancellationToken cancellationToken = default) where T : IEvent
         {
-            dynamic handler = _scope.ResolveOptional(typeof(IHandleEvent<>).MakeGenericType(@event.GetType())) ?? throw new InvalidOperationException($"No handler registered for {@event.DisplayName()}");
-            _log.Verbose("Dispatching {eventType} to {handlerType}", @event.DisplayName(), TypeExtensions.DisplayName(handler));
-            await handler.HandleAsync((dynamic)@event, cancellationToken);
+            var handlers = (IEnumerable<dynamic>)_scope.ResolveOptional(typeof(IEnumerable<>).MakeGenericType(typeof(IHandleEvent<>).MakeGenericType(@event.GetType())));
+
+            foreach (dynamic handler in handlers) {
+                _log.Verbose("Dispatching {eventType} to {handlerType}", @event.DisplayName(), TypeExtensions.DisplayName(handler));
+                await handler.HandleAsync((dynamic)@event, cancellationToken);
+            }
+            
         }
     }
 }

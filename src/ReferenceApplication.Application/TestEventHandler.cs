@@ -25,4 +25,18 @@ namespace ReferenceApplication.Application
             await SendAsync(new TestCommand2(), cancellationToken);
         }
     }
+    
+    public class TestEventHandler2 : ServiceComponents.Application.Mediator.EventHandler<TestEvent>
+    {
+        public TestEventHandler2(ILogger log, ICorrelation correlation, ISendCommand commandSender, ISendQuery querySender) : base(log, correlation, commandSender, querySender)
+        {
+        }
+
+        override async public Task HandleAsync(TestEvent @event, CancellationToken cancellationToken = default)
+        {
+            //throw new InvalidOperationException();
+            
+            Log.Information("Test event handled with handler 2. Data: {eventData}", @event.Data);
+        }
+    }
 }
