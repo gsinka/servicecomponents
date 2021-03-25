@@ -19,7 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ReferenceApplication.Api\ReferenceApplication.Api.csproj" />
     <ProjectReference Include="..\ServiceComponents.Core\ServiceComponents.Core.csproj" />
+    <ProjectReference Include="..\ServiceComponents.Infrastructure\ServiceComponents.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

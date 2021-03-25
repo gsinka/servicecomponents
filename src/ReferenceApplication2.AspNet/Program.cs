@@ -11,6 +11,7 @@ using ReferenceApplication.Application.Entities;
 using Serilog;
 using Serilog.Events;
 using ServiceComponents.AspNet.Wireup;
+using ServiceComponents.Infrastructure.Monitoring;
 
 namespace ReferenceApplication2.AspNet
 {
@@ -67,6 +68,8 @@ namespace ReferenceApplication2.AspNet
                     configuration => "Server=localhost; Port=5432; Database=ref-app; User Id=postgres; Password=postgres", 
                     map => map.FluentMappings.AddFromAssemblyOf<TestEntity>(),
                     configuration => new SchemaUpdate(configuration).Execute(true, true))
+                
+                //.RegisterCallback((context, builder) => builder.AddPrometheusRequestMetricsBehavior())
 
                 .Build(args).Run();
         }
