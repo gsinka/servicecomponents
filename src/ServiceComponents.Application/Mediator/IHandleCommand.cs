@@ -6,6 +6,6 @@ namespace ServiceComponents.Application.Mediator
 {
     public interface IHandleCommand<in T> where T : ICommand
     {
-        public Task HandleAsync(T command, CancellationToken cancellationToken = default);
+        Task HandleAsync(T command, CancellationToken cancellationToken = default);
     }
 }
