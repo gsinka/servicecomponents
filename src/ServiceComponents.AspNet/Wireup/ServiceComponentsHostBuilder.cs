@@ -5,6 +5,7 @@ using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -22,6 +23,7 @@ namespace ServiceComponents.AspNet.Wireup
         public readonly List<Action<IConfiguration, IHostEnvironment, IApplicationBuilder>> ApplicationBuilderCallbacks = new List<Action<IConfiguration, IHostEnvironment, IApplicationBuilder>>();
         public readonly List<Action<HostBuilderContext, ContainerBuilder>> ContainerBuilderCallbacks = new List<Action<HostBuilderContext, ContainerBuilder>>();
         public readonly List<Action<IConfiguration, ILifetimeScope>> StartupCallbacks = new List<Action<IConfiguration, ILifetimeScope>>();
+        public readonly List<Action<IConfiguration, IEndpointRouteBuilder>> EndpointRouteBuilderCallbacks = new List<Action<IConfiguration, IEndpointRouteBuilder>>();
 
 
         public ServiceComponentsHostBuilder RegisterCallback(Action<IHostBuilder> callback)
@@ -56,6 +58,12 @@ namespace ServiceComponents.AspNet.Wireup
         public ServiceComponentsHostBuilder RegisterCallback(Action<IConfiguration, ILifetimeScope> callback)
         {
             StartupCallbacks.Add(callback);
+            return this;
+        }
+        
+        public ServiceComponentsHostBuilder RegisterCallback(Action<IConfiguration, IEndpointRouteBuilder> callback)
+        {
+            EndpointRouteBuilderCallbacks.Add(callback);
             return this;
         }
 

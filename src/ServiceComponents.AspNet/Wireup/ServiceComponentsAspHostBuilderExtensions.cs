@@ -47,7 +47,12 @@ namespace ServiceComponents.AspNet.Wireup
             builder.RegisterCallback((configuration, environment, app) => {
 
                 app.UseEndpoints(endpoints => {
+
                     endpoints.MapControllers();
+
+                    builder.EndpointRouteBuilderCallbacks.ForEach(action => {
+                        action(configuration, endpoints);
+                    });
                 });
             });
 

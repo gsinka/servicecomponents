@@ -71,6 +71,8 @@ namespace ReferenceApplication2.AspNet
                     configuration => new SchemaUpdate(configuration).Execute(true, true))
          
                 .AddPrometheusMetrics()
+                
+                .AddBadge()
 
                 .Build(args).Run();
         }
