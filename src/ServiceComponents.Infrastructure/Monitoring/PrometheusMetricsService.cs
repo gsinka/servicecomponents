@@ -12,16 +12,82 @@ namespace ServiceComponents.Infrastructure.Monitoring
         private readonly Dictionary<object, Counter> _counters = new();
         private readonly Dictionary<object, Summary> _summaries = new();
         private readonly Dictionary<object, Histogram> _histograms = new();
+        private readonly Dictionary<object, Gauge> _gauges = new();
 
         public void Increment(object metric, double increment = 1)
         {
-            if (!_counters.ContainsKey(metric.GetType())) {
+            var metricType = metric.GetType();
+            var metricKind = metricType.GetCustomAttributes(true).FirstOrDefault();
 
-                var (name, title) = metric.MetricDescription();
-                _counters.Add(metric.GetType(), Metrics.CreateCounter(name, title, new CounterConfiguration() { LabelNames = metric.MetricFields().ToArray() }));
+            switch (metricKind) {
+                
+                case CounterMetric counter:
+
+                    if (!_counters.ContainsKey(metric.GetType())) {
+
+                        var (name, title) = metric.MetricDescription();
+                        _counters.Add(metric.GetType(), Metrics.CreateCounter(name, title, new CounterConfiguration() { LabelNames = metric.MetricFields().ToArray() }));
+                    }
+                    _counters[metric.GetType()].WithLabels(metric.MetricValues().ToArray()).Inc(increment);
+                    break;
+
+                case GaugeMetric gauge:
+
+                    if (!_gauges.ContainsKey(metric.GetType())) {
+
+                        var (name, title) = metric.MetricDescription();
+                        _gauges.Add(metric.GetType(), Metrics.CreateGauge(name, title, new GaugeConfiguration { LabelNames = metric.MetricFields().ToArray() }));
+                    }
+                    _gauges[metric.GetType()].WithLabels(metric.MetricValues().ToArray()).Inc(increment);
+                    break;
+
+                default:
+                    throw new InvalidOperationException($"Increment cannot be used on metric annotated as {metricKind.DisplayName()}");
             }
-            
-            _counters[metric.GetType()].WithLabels(metric.MetricValues().ToArray()).Inc(increment);
+        }
+        
+        public void Decrement(object metric, double decrement = 1)
+        {
+            var metricType = metric.GetType();
+            var metricKind = metricType.GetCustomAttributes(true).FirstOrDefault();
+
+            switch (metricKind) {
+                
+                case GaugeMetric gauge:
+
+                    if (!_gauges.ContainsKey(metric.GetType())) {
+
+                        var (name, title) = metric.MetricDescription();
+                        _gauges.Add(metric.GetType(), Metrics.CreateGauge(name, title, new GaugeConfiguration { LabelNames = metric.MetricFields().ToArray() }));
+                    }
+                    _gauges[metric.GetType()].WithLabels(metric.MetricValues().ToArray()).Dec(decrement);
+                    break;
+
+                default:
+                    throw new InvalidOperationException($"Decrement cannot be used on metric annotated as {metricKind.DisplayName()}");
+            }
+        }
+        
+        public void Set(object metric, double target)
+        {
+            var metricType = metric.GetType();
+            var metricKind = metricType.GetCustomAttributes(true).FirstOrDefault();
+
+            switch (metricKind) {
+                
+                case GaugeMetric gauge:
+
+                    if (!_gauges.ContainsKey(metric.GetType())) {
+
+                        var (name, title) = metric.MetricDescription();
+                        _gauges.Add(metric.GetType(), Metrics.CreateGauge(name, title, new GaugeConfiguration { LabelNames = metric.MetricFields().ToArray() }));
+                    }
+                    _gauges[metric.GetType()].WithLabels(metric.MetricValues().ToArray()).Set(target);
+                    break;
+
+                default:
+                    throw new InvalidOperationException($"Set cannot be used on metric annotated as {metricKind.DisplayName()}");
+            }
         }
 
         public void Observe(object metric, double duration)

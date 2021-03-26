@@ -56,7 +56,7 @@ namespace ReferenceApplication2.AspNet
 
                 // Redis
                 .AddRedis(configuration => "localhost:6379")
-                .AddRedisCommandRules((command, commands) => commands.All(x => x.GetType() != command.GetType()))
+                //.AddRedisCommandRules((command, commands) => commands.All(x => x.GetType() != command.GetType()))
 
                 // Rabbit
                 //.AddRabbit("amqp://guest:guest@localhost:5672", "test2", "test-queue", "test-exchange", retryIntervals: new[] { 1000, 3000, 5000 })

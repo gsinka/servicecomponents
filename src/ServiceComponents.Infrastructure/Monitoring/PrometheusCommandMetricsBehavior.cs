@@ -24,6 +24,7 @@ namespace ServiceComponents.Infrastructure.Monitoring
             var stopWatch = new Stopwatch();
 
             _metrics.Increment(new RequestCounterMetric(command));
+            _metrics.Increment(new RequestGaugeMetric("generic_request_gauge", "Current request count"));
 
             try {
 
@@ -39,6 +40,9 @@ namespace ServiceComponents.Infrastructure.Monitoring
                 _metrics.Increment(new RequestFailureMetric(command, exception));
 
                 throw;
+            }
+            finally {
+                _metrics.Decrement(new RequestGaugeMetric("generic_request_gauge", "Current request count"));
             }
         }
     }

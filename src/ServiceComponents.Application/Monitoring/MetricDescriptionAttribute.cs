@@ -22,6 +22,14 @@ namespace ServiceComponents.Application.Monitoring
         {
         }
     }
+    
+    [AttributeUsage(AttributeTargets.Class)]
+    public class GaugeMetric : MetricAttribute
+    {
+        public GaugeMetric(string name, string title) : base(name, title)
+        {
+        }
+    }
 
     [AttributeUsage(AttributeTargets.Class)]
     public class SummaryMetric : MetricAttribute
