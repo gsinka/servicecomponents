@@ -53,9 +53,11 @@ namespace ReferenceApplication.Application.TestProcess
 
             using var tx = _session.BeginTransaction();
             var process = await _session.GetAsync<TestProcessEntity>(CorrelationId, cancellationToken);
-
+            
             _metricsService.Observe(new MultiStepBusinessProcessMetric("test_process", "process_closed"), (now - process.EventTime).TotalMilliseconds);
             _metricsService.Observe(new MultiStepBusinessProcessMetric("test_process", "process_overall"), (now - process.StartTime).TotalMilliseconds);
+
+            _metricsService.Observe(new BusinessProcessHistogram("test_process"), (now - process.StartTime).TotalMilliseconds);
 
             await _session.DeleteAsync(process, cancellationToken);
             await tx.CommitAsync(cancellationToken);

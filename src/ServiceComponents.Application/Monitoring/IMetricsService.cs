@@ -5,5 +5,6 @@
         void Increment(object metric, double increment = 1);
 
         void Observe(object metric, double duration);
+        void Observe(object metric, double val, long count);
     }
 }

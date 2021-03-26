@@ -3,7 +3,7 @@ using ServiceComponents.Application.Monitoring;
 
 namespace ServiceComponents.Infrastructure.Monitoring
 {
-    [MetricDescription("generic_request_counter", "Request counter")]
+    [CounterMetric("generic_request_counter", "Request counter")]
     public class RequestCounterMetric : RequestMetrics
     {
         public RequestCounterMetric(ICommand command) : base(command)

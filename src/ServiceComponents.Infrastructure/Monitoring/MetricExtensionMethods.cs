@@ -14,7 +14,7 @@ namespace ServiceComponents.Infrastructure.Monitoring
         public static (string name, string title) MetricDescription(this object obj)
         {
             var type = obj.GetType();
-            var attribute = type.GetCustomAttribute<MetricDescriptionAttribute>();
+            var attribute = type.GetCustomAttribute<MetricAttribute>();
             return (attribute == null ? type.Name : attribute.Name, attribute == null ? type.Namespace : attribute.Title);
         }
 

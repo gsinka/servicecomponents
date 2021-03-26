@@ -2,7 +2,7 @@
 
 namespace ReferenceApplication.Application.TestProcess
 {
-    [MetricDescription("business_process", "Business processes")]
+    [SummaryMetric("business_process", "Business processes")]
     public class MultiStepBusinessProcessMetric
     {
         [MetricField("process_name", "Process")]

@@ -3,7 +3,7 @@ using ServiceComponents.Application.Monitoring;
 
 namespace ServiceComponents.Infrastructure.Monitoring
 {
-    [MetricDescription("request_duration", "Request duration")]
+    [SummaryMetric("request_duration", "Request duration")]
     public class RequestDurationMetric : RequestMetrics
     {
         public RequestDurationMetric(ICommand command) : base(command)

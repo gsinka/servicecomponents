@@ -4,7 +4,7 @@ using ServiceComponents.Application.Monitoring;
 
 namespace ServiceComponents.Infrastructure.Monitoring
 {
-    [MetricDescription("request_failure_counter", "Request failure counter")]
+    [CounterMetric("request_failure_counter", "Request failure counter")]
     public class RequestFailureMetric : RequestMetrics
     {
         [MetricField("exception_name")]
