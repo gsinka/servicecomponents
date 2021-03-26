@@ -1,5 +1,5 @@
 ﻿using Autofac;
-using ServiceComponents.AspNet.Metrics;
+using ServiceComponents.AspNet.Monitoring;
 
 namespace ReferenceApplication.AspNet.Wireup
 {

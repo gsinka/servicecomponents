@@ -5,7 +5,7 @@ using ServiceComponents.Api.Mediator;
 using ServiceComponents.Application;
 using ServiceComponents.Application.Senders;
 
-namespace ServiceComponents.Infrastructure.Senders
+namespace ServiceComponents.Infrastructure.Senders.Loopback
 {
     public class LoopbackQuerySenderProxy : ISendQuery
     {

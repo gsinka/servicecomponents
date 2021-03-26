@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ServiceComponents.AspNet.Metrics
+namespace ServiceComponents.AspNet.Monitoring
 {
     [Route("metrics")]
     [ApiController]

@@ -26,14 +26,12 @@ namespace ServiceComponents.Infrastructure.Mediator
             {
                 // Pre
 
-                foreach (var preHandler in _scope.Resolve<IEnumerable<IPreHandleEvent>>())
-                {
+                foreach (var preHandler in _scope.Resolve<IEnumerable<IPreHandleEvent>>()) {
                     await preHandler.PreHandleAsync(@event, cancellationToken);
                 }
 
-                foreach (var preHandler in _scope.Resolve<IEnumerable<IPreHandleEvent<T>>>())
-                {
-                    await preHandler.PreHandleAsync(@event, cancellationToken);
+                foreach (dynamic preHandler in (IEnumerable<dynamic>)_scope.Resolve(typeof(IEnumerable<>).MakeGenericType(typeof(IPreHandleEvent<>).MakeGenericType(@event.GetType())))) {
+                    await preHandler.PreHandleAsync((dynamic)@event, cancellationToken);
                 }
 
                 // Inner
@@ -42,28 +40,24 @@ namespace ServiceComponents.Infrastructure.Mediator
 
                 // Post
 
-                foreach (var postHandler in _scope.Resolve<IEnumerable<IPostHandleEvent>>())
-                {
+                foreach (var postHandler in _scope.Resolve<IEnumerable<IPostHandleEvent>>()) {
                     await postHandler.PostHandleAsync(@event, cancellationToken);
                 }
 
-                foreach (var postHandler in _scope.Resolve<IEnumerable<IPostHandleEvent<T>>>())
-                {
-                    await postHandler.PostHandleAsync(@event, cancellationToken);
+                foreach (dynamic postHandler in (IEnumerable<dynamic>)_scope.Resolve(typeof(IEnumerable<>).MakeGenericType(typeof(IPostHandleEvent<>).MakeGenericType(@event.GetType())))) {
+                    await postHandler.PostHandleAsync((dynamic)@event, cancellationToken);
                 }
             }
             catch (Exception exception)
             {
                 // Error
 
-                foreach (var errorHandler in _scope.Resolve<IEnumerable<IHandleEventFailure>>())
-                {
+                foreach (var errorHandler in _scope.Resolve<IEnumerable<IHandleEventFailure>>()) {
                     await errorHandler.HandleFailureAsync(@event, exception, cancellationToken);
                 }
 
-                foreach (var errorHandler in _scope.Resolve<IEnumerable<IHandleEventFailure<T>>>())
-                {
-                    await errorHandler.HandleFailureAsync(@event, exception, cancellationToken);
+                foreach (dynamic errorHandler in (IEnumerable<dynamic>)_scope.Resolve(typeof(IEnumerable<>).MakeGenericType(typeof(IHandleEventFailure<>).MakeGenericType(@event.GetType())))) {
+                    await errorHandler.HandleFailureAsync((dynamic)@event, exception, cancellationToken);
                 }
 
                 throw;

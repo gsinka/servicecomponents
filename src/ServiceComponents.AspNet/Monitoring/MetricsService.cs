@@ -7,7 +7,7 @@ using Prometheus;
  Not using quantiles: https://www.robustperception.io/how-does-a-prometheus-summary-work
  */
 
-namespace ServiceComponents.AspNet.Metrics
+namespace ServiceComponents.AspNet.Monitoring
 {
     public class MetricsService
     {

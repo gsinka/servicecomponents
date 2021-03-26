@@ -1,8 +1,8 @@
 ﻿using Autofac;
 using ServiceComponents.Application.Senders;
-using ServiceComponents.Infrastructure.Receivers;
+using ServiceComponents.Infrastructure.Senders.Loopback;
 
-namespace ServiceComponents.Infrastructure.Senders
+namespace ServiceComponents.Infrastructure.Receivers.Loopback
 {
     public static class LoopbackAutofacExtensions
     {

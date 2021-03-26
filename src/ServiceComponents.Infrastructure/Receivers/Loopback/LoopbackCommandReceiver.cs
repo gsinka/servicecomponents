@@ -1,10 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Autofac;
 using ServiceComponents.Api.Mediator;
 using ServiceComponents.Application;
 
-namespace ServiceComponents.Infrastructure.Receivers
+namespace ServiceComponents.Infrastructure.Receivers.Loopback
 {
     public class LoopbackCommandReceiver : IReceiveLoopbackCommand
     {

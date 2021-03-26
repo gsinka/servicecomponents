@@ -26,14 +26,12 @@ namespace ServiceComponents.Infrastructure.Mediator
             {
                 // Pre
 
-                foreach (var preHandler in _scope.Resolve<IEnumerable<IPreHandleQuery>>())
-                {
+                foreach (var preHandler in _scope.Resolve<IEnumerable<IPreHandleQuery>>()) {
                     await preHandler.PreHandleAsync(query, cancellationToken);
                 }
 
-                foreach (var preHandler in _scope.Resolve<IEnumerable<IPreHandleQuery<IQuery<TResult>, TResult>>>())
-                {
-                    await preHandler.PreHandleAsync(query, cancellationToken);
+                foreach (dynamic preHandler in (IEnumerable<dynamic>)_scope.Resolve(typeof(IEnumerable<>).MakeGenericType(typeof(IPreHandleQuery<,>).MakeGenericType(query.GetType(), typeof(TResult))))) {
+                    await preHandler.PreHandleAsync((dynamic)query, cancellationToken);
                 }
 
                 // Inner
@@ -42,14 +40,12 @@ namespace ServiceComponents.Infrastructure.Mediator
 
                 // Post
 
-                foreach (var postHandler in _scope.Resolve<IEnumerable<IPostHandleQuery>>())
-                {
+                foreach (var postHandler in _scope.Resolve<IEnumerable<IPostHandleQuery>>()) {
                     await postHandler.PostHandleAsync(query, result, cancellationToken);
                 }
 
-                foreach (var postHandler in _scope.Resolve<IEnumerable<IPostHandleQuery<IQuery<TResult>, TResult>>>())
-                {
-                    await postHandler.PostHandleAsync(query, result, cancellationToken);
+                foreach (dynamic postHandler in (IEnumerable<dynamic>)_scope.Resolve(typeof(IEnumerable<>).MakeGenericType(typeof(IPostHandleQuery<,>).MakeGenericType(query.GetType(), typeof(TResult))))) {
+                    await postHandler.PostHandleAsync((dynamic)query, result, cancellationToken);
                 }
 
                 return result;
@@ -58,14 +54,12 @@ namespace ServiceComponents.Infrastructure.Mediator
             {
                 // Error
 
-                foreach (var errorHandler in _scope.Resolve<IEnumerable<IHandleQueryFailure>>())
-                {
+                foreach (var errorHandler in _scope.Resolve<IEnumerable<IHandleQueryFailure>>()) {
                     await errorHandler.HandleFailureAsync(query, exception, cancellationToken);
                 }
 
-                foreach (var errorHandler in _scope.Resolve<IEnumerable<IHandleQueryFailure<IQuery<TResult>, TResult>>>())
-                {
-                    await errorHandler.HandleFailureAsync(query, exception, cancellationToken);
+                foreach (dynamic errorHandler in (IEnumerable<dynamic>)_scope.Resolve(typeof(IEnumerable<>).MakeGenericType(typeof(IHandleQueryFailure<,>).MakeGenericType(query.GetType(), typeof(TResult))))) {
+                    await errorHandler.HandleFailureAsync((dynamic)query, exception, cancellationToken);
                 }
 
                 throw;

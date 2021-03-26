@@ -7,7 +7,7 @@ namespace ReferenceApplication.Api
     public class TestCommand : Command
     {
         public string Data { get; }
-
+        
         public TestCommand(string data) : base(default)
         {
             Data = data;

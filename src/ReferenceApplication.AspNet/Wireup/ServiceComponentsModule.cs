@@ -13,6 +13,7 @@ using ServiceComponents.Infrastructure.Behaviors.Stopwatch;
 using ServiceComponents.Infrastructure.CorrelationContext;
 using ServiceComponents.Infrastructure.Mediator;
 using ServiceComponents.Infrastructure.Receivers;
+using ServiceComponents.Infrastructure.Receivers.Loopback;
 using ServiceComponents.Infrastructure.Redis;
 using ServiceComponents.Infrastructure.Senders;
 using ServiceComponents.Infrastructure.Validation;

@@ -18,7 +18,7 @@ using Serilog;
 using ServiceComponents.AspNet;
 using ServiceComponents.AspNet.Exceptions;
 using ServiceComponents.AspNet.Http;
-using ServiceComponents.AspNet.Metrics;
+using ServiceComponents.AspNet.Monitoring;
 using ServiceComponents.Infrastructure.NHibernate;
 
 namespace ReferenceApplication.AspNet.Wireup

@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using ServiceComponents.Application.Monitoring;
 using ServiceComponents.Infrastructure.Receivers;
 
 namespace ServiceComponents.Infrastructure.Monitoring
@@ -9,6 +10,8 @@ namespace ServiceComponents.Infrastructure.Monitoring
         {
             builder.RegisterType<PrometheusMetricsService>().As<IMetricsService>().SingleInstance();
             builder.RegisterDecorator<PrometheusCommandMetricsBehavior, IReceiveCommand>();
+            builder.RegisterDecorator<PrometheusQueryMetricsBehavior, IReceiveQuery>();
+            builder.RegisterDecorator<PrometheusEventMetricsBehavior, IReceiveEvent>();
 
             return builder;
         }

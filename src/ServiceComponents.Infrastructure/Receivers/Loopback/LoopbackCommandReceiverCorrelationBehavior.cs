@@ -5,7 +5,7 @@ using ServiceComponents.Api.Mediator;
 using ServiceComponents.Application;
 using ServiceComponents.Infrastructure.CorrelationContext;
 
-namespace ServiceComponents.Infrastructure.Receivers
+namespace ServiceComponents.Infrastructure.Receivers.Loopback
 {
     public class LoopbackCommandReceiverCorrelationBehavior : LoopbackReceiverCorrelationBehavior, IReceiveLoopbackCommand
     {

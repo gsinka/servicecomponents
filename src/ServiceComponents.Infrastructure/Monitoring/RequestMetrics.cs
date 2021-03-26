@@ -7,12 +7,12 @@ namespace ServiceComponents.Infrastructure.Monitoring
     {
         protected readonly Type Type;
 
-        [MetricField("namespace")]
+        [MetricField("request_namespace")]
         public string NameSpace { get; }
 
         [MetricField("name")]
         public string Name { get; }
-
+        
         private RequestMetrics(object obj)
         {
             Type = obj.GetType();

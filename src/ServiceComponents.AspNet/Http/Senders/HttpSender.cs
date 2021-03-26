@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
@@ -31,12 +32,16 @@ namespace ServiceComponents.AspNet.Http.Senders
 
             var objectJson = JsonConvert.SerializeObject(request, Formatting.None);
             var content = new StringContent(objectJson);
+            
             content.Headers.Add(_options.DomainTypeHeaderKey, request.AssemblyVersionlessQualifiedName());
             
+
             foreach (var (key, value) in header)
             {
                 content.Headers.Add(key, value);
             }
+
+            _httpClient.DefaultRequestHeaders.Add("accept", "application/json");
 
             var result = await _httpClient.PostAsync(RequestUri, content, cancellationToken);
             result.EnsureSuccessStatusCode();

@@ -10,6 +10,7 @@ using ServiceComponents.Infrastructure.CorrelationContext;
 using ServiceComponents.Infrastructure.Mediator;
 using ServiceComponents.Infrastructure.Rabbit;
 using ServiceComponents.Infrastructure.Receivers;
+using ServiceComponents.Infrastructure.Receivers.Loopback;
 using ServiceComponents.Infrastructure.Senders;
 using ServiceComponents.Infrastructure.Validation;
 

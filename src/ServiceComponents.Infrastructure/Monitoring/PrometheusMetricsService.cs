@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Prometheus;
+using ServiceComponents.Application.Monitoring;
 
 namespace ServiceComponents.Infrastructure.Monitoring
 {

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -10,6 +11,7 @@ using ReferenceApplication.Application;
 using ReferenceApplication.Application.Entities;
 using Serilog;
 using Serilog.Events;
+using ServiceComponents.Application.ProcessManagement;
 using ServiceComponents.AspNet.Wireup;
 using ServiceComponents.Infrastructure.Monitoring;
 
@@ -69,7 +71,12 @@ namespace ReferenceApplication2.AspNet
                     map => map.FluentMappings.AddFromAssemblyOf<TestEntity>(),
                     configuration => new SchemaUpdate(configuration).Execute(true, true))
                 
-                //.RegisterCallback((context, builder) => builder.AddPrometheusRequestMetricsBehavior())
+                .RegisterCallback((context, builder) => {
+                    
+                    builder.AddPrometheusRequestMetricsBehavior();
+                    builder.RegisterGeneric(typeof(GenericNHibernateRepository<>)).As(typeof(IProcessRepository<>)).InstancePerLifetimeScope();
+
+                })
 
                 .Build(args).Run();
         }

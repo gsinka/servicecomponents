@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using ServiceComponents.Api.Mediator;
 using ServiceComponents.Application;
 
-namespace ServiceComponents.Infrastructure.Receivers
+namespace ServiceComponents.Infrastructure.Receivers.Loopback
 {
     public interface IReceiveLoopbackQuery
     {

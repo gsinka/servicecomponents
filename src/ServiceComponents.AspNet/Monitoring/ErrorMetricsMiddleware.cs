@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace ServiceComponents.AspNet.Metrics
+namespace ServiceComponents.AspNet.Monitoring
 {
     public class ErrorMetricsMiddleware
     {

@@ -8,35 +8,37 @@ using ServiceComponents.Infrastructure.Receivers;
 
 namespace ServiceComponents.Infrastructure.Monitoring
 {
-    public class PrometheusCommandMetricsBehavior : IReceiveCommand
+    public class PrometheusQueryMetricsBehavior : IReceiveQuery
     {
         private readonly IMetricsService _metrics;
-        private readonly IReceiveCommand _next;
+        private readonly IReceiveQuery _next;
 
-        public PrometheusCommandMetricsBehavior(IMetricsService metrics, IReceiveCommand next)
+        public PrometheusQueryMetricsBehavior(IMetricsService metrics, IReceiveQuery next)
         {
             _metrics = metrics;
             _next = next;
         }
 
-        public async Task ReceiveAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default) where TCommand : ICommand
+        public async Task<TResult> ReceiveAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
 
-            _metrics.Increment(new RequestCounterMetric(command));
+            _metrics.Increment(new RequestCounterMetric(query));
 
             try {
 
                 stopWatch.Start();
-                await _next.ReceiveAsync(command, cancellationToken);
+                var result = await _next.ReceiveAsync(query, cancellationToken);
                 stopWatch.Stop();
 
-                _metrics.Observe(new RequestDurationMetric(command), stopWatch.ElapsedMilliseconds);
+                _metrics.Observe(new RequestDurationMetric(query), stopWatch.ElapsedMilliseconds);
+
+                return result;
             }
             catch (Exception exception) {
 
                 stopWatch.Stop();
-                _metrics.Increment(new RequestFailureMetric(command, exception));
+                _metrics.Increment(new RequestFailureMetric(query, exception));
 
                 throw;
             }

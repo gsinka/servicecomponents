@@ -1,10 +1,9 @@
 ﻿using System;
 using Serilog;
-using Serilog.Context;
 using ServiceComponents.Application;
 using ServiceComponents.Infrastructure.CorrelationContext;
 
-namespace ServiceComponents.Infrastructure.Receivers
+namespace ServiceComponents.Infrastructure.Receivers.Loopback
 {
     public abstract class LoopbackReceiverCorrelationBehavior
     {
