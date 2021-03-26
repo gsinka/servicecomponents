@@ -8,7 +8,7 @@ namespace ServiceComponents.Infrastructure.Monitoring
     {
         protected readonly Type Type;
 
-        [MetricField("request_namespace")]
+        [MetricField("namespace")]
         public string NameSpace { get; }
 
         [MetricField("name")]
