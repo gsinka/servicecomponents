@@ -1,4 +1,5 @@
 ﻿using ServiceComponents.Api.Mediator;
+using ServiceComponents.Application.Monitoring;
 
 namespace ServiceComponents.Infrastructure.Monitoring
 {

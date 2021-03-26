@@ -8,6 +8,7 @@ using ServiceComponents.Infrastructure.Behaviors.Logging;
 using ServiceComponents.Infrastructure.Behaviors.Stopwatch;
 using ServiceComponents.Infrastructure.CorrelationContext;
 using ServiceComponents.Infrastructure.Mediator;
+using ServiceComponents.Infrastructure.Monitoring;
 using ServiceComponents.Infrastructure.Rabbit;
 using ServiceComponents.Infrastructure.Receivers;
 using ServiceComponents.Infrastructure.Receivers.Loopback;
@@ -122,5 +123,15 @@ namespace ServiceComponents.AspNet.Wireup
 
             });
         }
+
+        public static ServiceComponentsHostBuilder AddPrometheusMetrics(this ServiceComponentsHostBuilder hostBuilder)
+        {
+            return hostBuilder.RegisterCallback((context, containerBuilder) => {
+                containerBuilder.AddPrometheusRequestMetricsService();
+                containerBuilder.AddPrometheusRequestMetricsBehavior();
+
+            });
+        }
+
     }
 }

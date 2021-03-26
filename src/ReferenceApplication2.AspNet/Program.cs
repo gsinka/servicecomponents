@@ -11,7 +11,6 @@ using ReferenceApplication.Application;
 using ReferenceApplication.Application.Entities;
 using Serilog;
 using Serilog.Events;
-using ServiceComponents.Application.ProcessManagement;
 using ServiceComponents.AspNet.Wireup;
 using ServiceComponents.Infrastructure.Monitoring;
 
@@ -70,13 +69,8 @@ namespace ReferenceApplication2.AspNet
                     configuration => "Server=localhost; Port=5432; Database=ref-app; User Id=postgres; Password=postgres", 
                     map => map.FluentMappings.AddFromAssemblyOf<TestEntity>(),
                     configuration => new SchemaUpdate(configuration).Execute(true, true))
-                
-                .RegisterCallback((context, builder) => {
-                    
-                    builder.AddPrometheusRequestMetricsBehavior();
-                    builder.RegisterGeneric(typeof(GenericNHibernateRepository<>)).As(typeof(IProcessRepository<>)).InstancePerLifetimeScope();
-
-                })
+         
+                .AddPrometheusMetrics()
 
                 .Build(args).Run();
         }

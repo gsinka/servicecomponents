@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ServiceComponents.Infrastructure.Monitoring
+namespace ServiceComponents.Application.Monitoring
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class MetricDescriptionAttribute : Attribute
