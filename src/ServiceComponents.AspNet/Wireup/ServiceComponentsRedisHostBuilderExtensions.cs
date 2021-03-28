@@ -34,12 +34,6 @@ namespace ServiceComponents.AspNet.Wireup
 
             return hostBuilder;
         }
-
-        public static ServiceComponentsHostBuilder AddRedisCommandRules(this ServiceComponentsHostBuilder hostBuilder, Func<ICommand, IList<ICommand>, bool> constraint, Func<ICommand, TimeSpan?> expiryFunc = default)
-        {
-            hostBuilder.RegisterCallback((context, containerBuilder) => { containerBuilder.AddRedisCommandConstraints(constraint, expiryFunc); });
-            return hostBuilder;
-        }
     }
 
     public static class ServiceComponentsRabbitHostBuilderExtensions

@@ -72,10 +72,6 @@ namespace ReferenceApplication.AspNet.Wireup
 
             builder.AddRedisConnection(_configuration.GetValue("connectionStrings:redis", "localhost"));
             builder.AddRedisDatabase();
-
-            builder.AddRedisCommandConstraints(
-                (command, commands) => commands.All(x => x.GetType() != command.GetType()), 
-                null /*command => TimeSpan.FromSeconds(60)*/);
         }
     }
 }

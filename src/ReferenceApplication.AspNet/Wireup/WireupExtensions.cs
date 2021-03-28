@@ -77,7 +77,6 @@ namespace ReferenceApplication.AspNet.Wireup
                 configuration => new SchemaUpdate(configuration).Execute(true, true)));
 
             builder.RegisterModule(new RabbitModule(configuration));
-            builder.RegisterModule<MonitoringModule>();
 
             return builder;
         }
@@ -95,7 +94,6 @@ namespace ReferenceApplication.AspNet.Wireup
             app.UseAuthorization();
             app.AddReadiness().AddLiveness();
             app
-                .UseMiddleware<ErrorMetricsMiddleware>()
                 .UseMiddleware<ErrorHandlingMiddleware>();
 
             app.UseEndpoints(endpoints => {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Autofac;
-using ServiceComponents.Api.Mediator;
-using ServiceComponents.Infrastructure.Redis.Behaviors;
+﻿using Autofac;
 using StackExchange.Redis;
 
 namespace ServiceComponents.Infrastructure.Redis
@@ -37,16 +33,6 @@ namespace ServiceComponents.Infrastructure.Redis
             else {
                 reg.Keyed<IDatabase>(key);
             }
-
-            return builder;
-        }
-
-        public static ContainerBuilder AddRedisCommandConstraints(this ContainerBuilder builder, Func<ICommand, IList<ICommand>, bool> constraint, Func<ICommand, TimeSpan?> expiryFunc = default, object databaseKey = default)
-        {
-            builder.Register(context => new ParallelExecutionBehavior(
-                databaseKey == default ? context.Resolve<IDatabase>() : context.ResolveKeyed<IDatabase>(databaseKey),
-                constraint,
-                expiryFunc)).AsImplementedInterfaces().InstancePerDependency();
 
             return builder;
         }

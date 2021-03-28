@@ -8,7 +8,9 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
 using ServiceComponents.AspNet.Controllers;
+using ServiceComponents.AspNet.Exceptions;
 using ServiceComponents.AspNet.Http;
+using ServiceComponents.AspNet.Monitoring;
 using ServiceComponents.Core;
 using ServiceComponents.Core.Services;
 
@@ -31,6 +33,7 @@ namespace ServiceComponents.AspNet.Wireup
 
                         app.UseRouting();
                         app.UseAuthorization();
+                        app.UseMiddleware<ErrorHandlingMiddleware>();
                     })
 
                     // Add request binder for command, query and event deserialization

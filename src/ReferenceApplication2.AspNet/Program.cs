@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +13,7 @@ using ReferenceApplication.Application.Entities;
 using Serilog;
 using Serilog.Events;
 using ServiceComponents.AspNet.Wireup;
+using ServiceComponents.Infrastructure.Behaviors.CommandConstraints;
 using ServiceComponents.Infrastructure.Monitoring;
 
 namespace ReferenceApplication2.AspNet
@@ -55,14 +57,28 @@ namespace ReferenceApplication2.AspNet
                 .AddEventRouter(evnt => "loopback")
 
                 // Redis
-                .AddRedis(configuration => "localhost:6379")
+                //.AddRedis(configuration => "localhost:6379")
                 //.AddRedisCommandRules((command, commands) => commands.All(x => x.GetType() != command.GetType()))
 
                 // Rabbit
                 //.AddRabbit("amqp://guest:guest@localhost:5672", "test2", "test-queue", "test-exchange", retryIntervals: new[] { 1000, 3000, 5000 })
                 .AddRabbit("amqp://guest:guest@localhost:5672", "test2", "test-queue", "test-exchange")
 
-                .RegisterCallback(builder => builder.AddNewtonsoftJson(options => options.UseCamelCasing(true)))
+                .RegisterCallback(builder => { builder.AddNewtonsoftJson(options => options.UseCamelCasing(true)); })
+                
+                .RegisterCallback((configuration, services) => services.AddStackExchangeRedisCache(options => options.Configuration = "localhost"))
+                
+                .RegisterCallback((context, builder) => builder.AddCommandConstraints(
+                    command => command switch  {
+                        
+                        LongCommand longCommand => "longCommand",
+
+                        _ => default
+                    }, (command, value) => command switch {
+                        
+                        LongCommand longCommand => (value == null, command.CommandId, default),
+                        _ => (true, default, default)
+                    }))
 
                 // NHibernate
                 .AddNHibernate(

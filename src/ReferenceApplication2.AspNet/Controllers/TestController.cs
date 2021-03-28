@@ -27,5 +27,12 @@ namespace ReferenceApplication2.AspNet.Controllers
             await _receiver.ReceiveAsync(new TestCommand("data"), cancellationToken);
             return Ok($"OK : {_clock.UtcNow.ToString(CultureInfo.InvariantCulture)}");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] TestCommand command, CancellationToken cancellation)
+        {
+            await _receiver.ReceiveAsync(command, cancellation);
+            return Ok();
+        }
     }
 }
