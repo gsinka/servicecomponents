@@ -31,9 +31,11 @@ namespace ServiceComponents.AspNet.Wireup
                             app.UseDeveloperExceptionPage();
                         }
 
+                        app.UseMiddleware<ErrorHandlingMiddleware>();
+
                         app.UseRouting();
                         app.UseAuthorization();
-                        app.UseMiddleware<ErrorHandlingMiddleware>();
+                        
                     })
 
                     // Add request binder for command, query and event deserialization

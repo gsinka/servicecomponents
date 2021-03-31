@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
+using Newtonsoft.Json;
 using ServiceComponents.Api.Mediator;
 using ServiceComponents.Application.Mediator;
 
@@ -12,49 +14,68 @@ namespace ServiceComponents.Infrastructure.Behaviors.CommandConstraints
     public class CommandExecutionConstraintBehavior : IPreHandleCommand, IPostHandleCommand, IHandleCommandFailure
     {
         private readonly IDistributedCache _cache;
-        private readonly Func<ICommand, string> _keyBuilder;
-        private readonly Func<ICommand, string, (bool, string, TimeSpan?)> _constraint;
+        private readonly Func<IRequest, string[]> _keys;
+        private readonly Func<string, int, bool> _constraint;
+        private readonly Func<string, TimeSpan?> _expiry;
 
-        public CommandExecutionConstraintBehavior(IDistributedCache cache, Func<ICommand, string> keyBuilder, Func<ICommand, string, (bool, string, TimeSpan?)> constraint)
+        public CommandExecutionConstraintBehavior(IDistributedCache cache, Func<IRequest, string[]> keys, Func<string, int, bool> constraint, Func<string, TimeSpan?> expiry)
         {
             _cache = cache;
-            _keyBuilder = keyBuilder;
+            _keys = keys;
             _constraint = constraint;
+            _expiry = expiry;
         }
 
         public async Task PreHandleAsync(ICommand command, CancellationToken cancellationToken = default)
         {
-            var key = _keyBuilder(command);
+            var keys = _keys(command);
+            if (keys.Length == 0) return;
 
-            if (key == default) return;
+            foreach (var key in keys) {
 
-            var value = await _cache.GetStringAsync(key, cancellationToken);
-            
-            (var canExecute, var newValue, TimeSpan? expiration) = _constraint(command, value);
+                var cacheItem = await _cache.GetAsync(key, cancellationToken);
+                var value = cacheItem == null ? 0 : BitConverter.ToInt32(cacheItem, 0);
+                
+                if (_constraint(key, value)) {
 
-            if (canExecute) {
-                if (string.IsNullOrWhiteSpace(newValue)) throw new ArgumentException("Command execution constraint value cannot be empty", nameof(newValue));
-                await _cache.SetStringAsync(key, newValue, new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = (expiration ?? TimeSpan.FromMinutes(1)) }, cancellationToken);
-            }
-            else {
-                throw new CommandConstraintException("Cannot execute command because of constraints");
+                    value++;
+                    await _cache.SetAsync(key, BitConverter.GetBytes(value), new DistributedCacheEntryOptions() {AbsoluteExpirationRelativeToNow =  _expiry(key) } , cancellationToken);
+                }
+                else {
+                    throw new CommandConstraintException("Cannot execute request because of constraints");
+                }
             }
         }
 
         public async Task PostHandleAsync(ICommand command, CancellationToken cancellationToken = default)
         {
-            var key = _keyBuilder(command);
-            if (key == default) return;
-            await _cache.RemoveAsync(key, cancellationToken);
+            await DecrementValue(command, cancellationToken);
         }
 
         public async Task HandleFailureAsync(ICommand command, Exception exception, CancellationToken cancellationToken = default)
         {
             if (exception is CommandConstraintException) return;
+            await DecrementValue(command, cancellationToken);
+        }
 
-            var key = _keyBuilder(command);
-            if (key == default) return;
-            await _cache.RemoveAsync(key, cancellationToken);
+        private async Task DecrementValue(ICommand command, CancellationToken cancellationToken)
+        {
+            var keys = _keys(command);
+            if (keys.Length == 0) return;
+
+            foreach (var key in keys)
+            {
+                var value = BitConverter.ToInt32(await _cache.GetAsync(key, cancellationToken), 0);
+                value--;
+                if (value == 0)
+                {
+                    await _cache.SetAsync(key, BitConverter.GetBytes(value), cancellationToken);
+                }
+                else
+                {
+                    await _cache.RemoveAsync(key, cancellationToken);
+                }
+            }
         }
     }
 

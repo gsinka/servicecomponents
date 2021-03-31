@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using Autofac;
@@ -58,7 +59,6 @@ namespace ReferenceApplication2.AspNet
 
                 // Redis
                 //.AddRedis(configuration => "localhost:6379")
-                //.AddRedisCommandRules((command, commands) => commands.All(x => x.GetType() != command.GetType()))
 
                 // Rabbit
                 //.AddRabbit("amqp://guest:guest@localhost:5672", "test2", "test-queue", "test-exchange", retryIntervals: new[] { 1000, 3000, 5000 })
@@ -66,19 +66,24 @@ namespace ReferenceApplication2.AspNet
 
                 .RegisterCallback(builder => { builder.AddNewtonsoftJson(options => options.UseCamelCasing(true)); })
                 
-                .RegisterCallback((configuration, services) => services.AddStackExchangeRedisCache(options => options.Configuration = "localhost"))
+                .AddRedisDistributedCache("localhost")
                 
-                .RegisterCallback((context, builder) => builder.AddCommandConstraints(
-                    command => command switch  {
-                        
-                        LongCommand longCommand => "longCommand",
+                .RegisterCallback((context, builder) => {
 
+                    builder.AddRequestConstraints(request => request switch {
+
+                        LongCommand longCommand => new []{ "test1", "test2" },
+                        TestCommand testCommand => new[] { "test2" },
                         _ => default
-                    }, (command, value) => command switch {
-                        
-                        LongCommand longCommand => (value == null, command.CommandId, default),
-                        _ => (true, default, default)
-                    }))
+
+                    },(key, count) => (key, count) switch {
+
+                        ("test1", _) when count > 0 => false,
+                        ("test2", _) when count > 0 => false,
+                        (_, _) => true
+
+                    }, (key) => TimeSpan.FromSeconds(30));
+                })
 
                 // NHibernate
                 .AddNHibernate(

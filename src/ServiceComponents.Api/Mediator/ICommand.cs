@@ -1,6 +1,6 @@
 ﻿namespace ServiceComponents.Api.Mediator
 {
-    public interface ICommand
+    public interface ICommand : IRequest
     {
         string CommandId { get; }
     }

@@ -1,6 +1,6 @@
 ﻿namespace ServiceComponents.Api.Mediator
 {
-    public interface IQuery
+    public interface IQuery : IRequest
     {
         string QueryId { get; }
     }
