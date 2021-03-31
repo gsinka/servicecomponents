@@ -1,8 +1,4 @@
 using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
-using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,7 +11,6 @@ using Serilog;
 using Serilog.Events;
 using ServiceComponents.AspNet.Wireup;
 using ServiceComponents.Infrastructure.Behaviors.CommandConstraints;
-using ServiceComponents.Infrastructure.Monitoring;
 
 namespace ReferenceApplication2.AspNet
 {
