@@ -73,7 +73,7 @@ namespace ServiceComponents.AspNet.Wireup
             return this;
         }
 
-        public IHost Build(string[] args)
+        public IHostBuilder CreateHostBuilder(string[] args)
         {
             var hostBuilder = Host.CreateDefaultBuilder(args);
 
@@ -84,20 +84,10 @@ namespace ServiceComponents.AspNet.Wireup
             hostBuilder.ConfigureWebHostDefaults(webHostBuilder => {
                 webHostBuilder
                     .ConfigureServices((context, services) => _serviceCollectionCallbacks.ForEach(action => action(context.Configuration, services)))
-                    .Configure((context, app) => ApplicationBuilderCallbacks.ForEach(action => action(context.Configuration, context.HostingEnvironment, app)))
-                    ;
-
+                    .Configure((context, app) => ApplicationBuilderCallbacks.ForEach(action => action(context.Configuration, context.HostingEnvironment, app)));
             });
 
-            var host = hostBuilder.Build();
-
-            var logger = host.Services.GetService<ILogger>();
-            logger.Information("Starting application");
-
-            //var configuration = host.Services.GetService<IConfiguration>();
-            //var scope = host.Services.GetService<ILifetimeScope>();
-            //StartupCallbacks.ForEach(action => action(configuration, scope));
-            return host;
+            return hostBuilder;
         }
     }
 }
