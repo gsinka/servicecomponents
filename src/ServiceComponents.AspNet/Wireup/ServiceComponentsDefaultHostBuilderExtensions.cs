@@ -33,6 +33,12 @@ namespace ServiceComponents.AspNet.Wireup
 
                         app.UseMiddleware<ErrorHandlingMiddleware>();
 
+                        app.UseCors(builder => {
+                            builder.AllowAnyOrigin();
+                            builder.AllowAnyHeader();
+                            builder.AllowAnyMethod();
+                        });
+
                         app.UseRouting();
                         app.UseAuthorization();
                         
@@ -53,6 +59,8 @@ namespace ServiceComponents.AspNet.Wireup
 
                         services.AddHttpContextAccessor();
                         services.AddHttpClient();
+
+                        services.AddCors();
                     })
 
                     .RegisterCallback((context, containerBuilder) => {
