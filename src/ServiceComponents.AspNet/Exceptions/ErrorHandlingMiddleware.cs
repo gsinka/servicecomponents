@@ -27,7 +27,7 @@ namespace ServiceComponents.AspNet.Exceptions
             }
 
             //catch (HttpRequestException exception) {
-                
+
             //    context.Response.StatusCode = (int)exception.StatusCode;
             //    context.Response.ContentType = MediaTypeNames.Application.Json;
             //    await context.Response.WriteAsync(exception.Message);
@@ -47,6 +47,12 @@ namespace ServiceComponents.AspNet.Exceptions
             catch (GoneException exception) {
                 
                 context.Response.StatusCode = StatusCodes.Status410Gone;
+                context.Response.ContentType = MediaTypeNames.Text.Plain;
+                await context.Response.WriteAsync(exception.Message);
+            }
+            catch (ConflictException exception) {
+                
+                context.Response.StatusCode = StatusCodes.Status409Conflict;
                 context.Response.ContentType = MediaTypeNames.Text.Plain;
                 await context.Response.WriteAsync(exception.Message);
             }

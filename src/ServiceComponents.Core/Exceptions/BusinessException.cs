@@ -17,36 +17,4 @@ namespace ServiceComponents.Core.Exceptions
         public BusinessException(string message, Exception innerException) : base(message, innerException)
         { }
     }
-
-    public class NotFoundException : BusinessException
-    {
-        public NotFoundException()
-        { }
-
-        protected NotFoundException(SerializationInfo info, StreamingContext context) : base(info, context)
-        { }
-
-        public NotFoundException(string message) : base(message)
-        { }
-
-        public NotFoundException(string message, Exception innerException) : base(message, innerException)
-        { }
-    }
-
-    public class GoneException : BusinessException
-    {
-        public GoneException()
-        { }
-
-        protected GoneException(SerializationInfo info, StreamingContext context) : base(info, context)
-        { }
-
-        public GoneException(string message) : base(message)
-        { }
-
-        public GoneException(string message, Exception innerException) : base(message, innerException)
-        { }
-    }
-
-
 }
