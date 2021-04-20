@@ -25,13 +25,6 @@ namespace ServiceComponents.AspNet.Exceptions
             try {
                 await _request.Invoke(context);
             }
-
-            //catch (HttpRequestException exception) {
-
-            //    context.Response.StatusCode = (int)exception.StatusCode;
-            //    context.Response.ContentType = MediaTypeNames.Application.Json;
-            //    await context.Response.WriteAsync(exception.Message);
-            //}
             catch (ValidationException exception) {
 
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;

@@ -40,6 +40,8 @@ namespace ServiceComponents.AspNet.Wireup
                         });
 
                         app.UseRouting();
+
+                        app.UseAuthentication();
                         app.UseAuthorization();
                         
                     })
