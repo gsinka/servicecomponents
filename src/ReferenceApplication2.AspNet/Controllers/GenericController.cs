@@ -1,11 +1,10 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Serilog;
 using ServiceComponents.AspNet.Http;
 
-namespace ServiceComponents.AspNet.Controllers
+namespace ReferenceApplication2.AspNet.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
