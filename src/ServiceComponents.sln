@@ -15,8 +15,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceComponents.Core", "S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceComponents.AspNet", "ServiceComponents.AspNet\ServiceComponents.AspNet.csproj", "{B38C5BCC-ED6D-425C-84D0-F23B1B586333}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReferenceApplication.AspNet", "ReferenceApplication.AspNet\ReferenceApplication.AspNet.csproj", "{18F17A7D-9FD4-40D5-81FE-7F01DA5659CC}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Reference application", "Reference application", "{6DAA702D-B218-4B15-BF45-C3B9C971DDA4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReferenceApplication.Application", "ReferenceApplication.Application\ReferenceApplication.Application.csproj", "{7A81F9DA-8AD4-4D1D-ABA6-278F5BA21BDB}"
@@ -33,7 +31,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceComponents.Test", "S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReferenceApplication2.AspNet", "ReferenceApplication2.AspNet\ReferenceApplication2.AspNet.csproj", "{8AFDA585-F555-4629-934A-EBA91C7945EB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceComponents.Testing", "ServiceComponents.Testing\ServiceComponents.Testing.csproj", "{7A81BDA8-BCF8-46B4-A227-7AC60C377594}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceComponents.Testing", "ServiceComponents.Testing\ServiceComponents.Testing.csproj", "{7A81BDA8-BCF8-46B4-A227-7AC60C377594}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,10 +63,6 @@ Global
 		{B38C5BCC-ED6D-425C-84D0-F23B1B586333}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B38C5BCC-ED6D-425C-84D0-F23B1B586333}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B38C5BCC-ED6D-425C-84D0-F23B1B586333}.Release|Any CPU.Build.0 = Release|Any CPU
-		{18F17A7D-9FD4-40D5-81FE-7F01DA5659CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{18F17A7D-9FD4-40D5-81FE-7F01DA5659CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{18F17A7D-9FD4-40D5-81FE-7F01DA5659CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{18F17A7D-9FD4-40D5-81FE-7F01DA5659CC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7A81F9DA-8AD4-4D1D-ABA6-278F5BA21BDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7A81F9DA-8AD4-4D1D-ABA6-278F5BA21BDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A81F9DA-8AD4-4D1D-ABA6-278F5BA21BDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -106,7 +100,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{18F17A7D-9FD4-40D5-81FE-7F01DA5659CC} = {6DAA702D-B218-4B15-BF45-C3B9C971DDA4}
 		{7A81F9DA-8AD4-4D1D-ABA6-278F5BA21BDB} = {6DAA702D-B218-4B15-BF45-C3B9C971DDA4}
 		{18154493-C337-410D-83CD-B8856CE501DB} = {6DAA702D-B218-4B15-BF45-C3B9C971DDA4}
 		{8AFDA585-F555-4629-934A-EBA91C7945EB} = {6DAA702D-B218-4B15-BF45-C3B9C971DDA4}

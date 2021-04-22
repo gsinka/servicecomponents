@@ -26,6 +26,11 @@ namespace ReferenceApplication2.AspNet.Controllers
             _httpRequestParser = httpRequestParser;
         }
 
+        /// <summary>
+        /// Generic method to post commands, queries and events
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Post(CancellationToken cancellationToken)
         {

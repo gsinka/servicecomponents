@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ServiceComponents.AspNet.Badge;
 using ServiceComponents.AspNet.Http;
 using ServiceComponents.Core.Services;
 
@@ -36,7 +37,7 @@ namespace ServiceComponents.AspNet.Wireup
                     
                     // Add request binder for command, query and event deserialization
                     .UseRequestBinder()
-                    
+
                     .RegisterCallback((configuration, services) => {
 
                         var mvcBuilder = services.AddControllers(options => {
@@ -45,7 +46,7 @@ namespace ServiceComponents.AspNet.Wireup
 
                         var hostAssembly = Assembly.GetEntryAssembly();
                         mvcBuilder.PartManager.ApplicationParts.Add(new AssemblyPart(hostAssembly));
-                        //mvcBuilder.PartManager.ApplicationParts.Add(new AssemblyPart(typeof(GenericController).Assembly));
+                        mvcBuilder.PartManager.ApplicationParts.Add(new AssemblyPart(typeof(BadgeController).Assembly));
                         builder.MvcBuilderCallbacks.ForEach(x => x(mvcBuilder));
 
                         services.AddHttpContextAccessor();

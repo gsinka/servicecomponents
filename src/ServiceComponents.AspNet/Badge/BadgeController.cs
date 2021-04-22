@@ -11,7 +11,7 @@ namespace ServiceComponents.AspNet.Badge
         {
             _badgeService = badgeService;
         }
-
+        
         public async Task<IActionResult> Get([FromRoute(Name = "name")]string name)
         {
             return string.IsNullOrWhiteSpace(name) ? await _badgeService.GetAllBadgeAsync() : await _badgeService.GetBadgeAsync(name);

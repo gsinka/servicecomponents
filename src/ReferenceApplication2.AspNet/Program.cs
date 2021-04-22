@@ -14,6 +14,7 @@ using ReferenceApplication.Application.Entities;
 using Serilog;
 using Serilog.Events;
 using ServiceComponents.AspNet.Exceptions;
+using ServiceComponents.AspNet.Monitoring;
 using ServiceComponents.AspNet.Wireup;
 using ServiceComponents.Infrastructure.Behaviors.CommandConstraints;
 using Swashbuckle.AspNetCore.Filters;
@@ -24,12 +25,19 @@ namespace ReferenceApplication2.AspNet
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var host = CreateHostBuilder(args).Build();
+            Log.Information("Starting service");
+            host.Run();
         }
 
         private static IHostBuilder CreateHostBuilder(string[] args)
         {
             return new ServiceComponentsHostBuilder()
+                
+                .UseDefault(
+
+                    new[] { typeof(TestCommand).Assembly },
+                    new[] { typeof(TestCommandHandler).Assembly })
 
                 .ConfigureApp((configuration, environment, app) => {
 
@@ -51,11 +59,6 @@ namespace ReferenceApplication2.AspNet
                     app.UseAuthorization();
                 })
 
-                .UseDefault(
-
-                    new[] { typeof(TestCommand).Assembly },
-                    new[] { typeof(TestCommandHandler).Assembly })
-
                 // Add endpoints
                 .AddEndpoints()
 
@@ -72,11 +75,15 @@ namespace ReferenceApplication2.AspNet
                 .AddOpenApi(
                     (configuration, options) => {
                         options.SwaggerDoc("v1", new OpenApiInfo {
-                            Title = "ReferenceApplication2.AspNet", 
+                            Title = "Reference Application", 
                             Version = "v1"
                         });
 
-                        options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
+                        var appXmlDoc = Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
+                        options.IncludeXmlComments(appXmlDoc);
+
+                        var aspNetXmlDoc = Path.Combine(AppContext.BaseDirectory, $"{typeof(MetricsController).Assembly.GetName().Name}.xml");
+                        options.IncludeXmlComments(aspNetXmlDoc);
 
                         options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme() {
                             Type = SecuritySchemeType.OpenIdConnect,
@@ -94,8 +101,10 @@ namespace ReferenceApplication2.AspNet
                         options.OAuthClientId("reference-app");
                         options.OAuthScopes("openid", "profile");
 
-                        options.SwaggerEndpoint("/swagger/v1/swagger.json", "ReferenceApplication2.AspNet v1");
+                        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Reference Application v1");
                     })
+
+                .RegisterCallback((configuration, services) => services.AddSwaggerGenNewtonsoftSupport())
 
                 // Health check
                 .AddHealthCheck((configuration, check) => {

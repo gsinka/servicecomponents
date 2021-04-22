@@ -8,6 +8,10 @@ namespace ServiceComponents.AspNet.Monitoring
     [ApiController]
     public class MetricsController : ControllerBase
     {
+        /// <summary>
+        /// Provides metrics
+        /// </summary>
+        /// <returns></returns>
         // GET /metrics
         [HttpGet()]
         public async Task<ActionResult<string>> GetMetrics()
