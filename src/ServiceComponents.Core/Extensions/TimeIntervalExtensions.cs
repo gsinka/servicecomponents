@@ -7,6 +7,7 @@ namespace ServiceComponents.Core.Extensions
 {
     public static class TimeIntervalExtensions
     {
+        
         public static bool IntersectsWith(this ITimeInterval interval, ITimeInterval other)
         {
             return interval.Finish > other.Start && interval.Start < other.Finish;
@@ -76,10 +77,20 @@ namespace ServiceComponents.Core.Extensions
             return new TimeInterval(fdow, fdow.AddDays(5));
         }
 
-        public static ITimeInterval Month(DateTime date)
+        public static ITimeInterval CalendarMonth(DateTime date)
         {
             var start = new DateTime(date.Year, date.Month, 1);
             return new TimeInterval(start, start.AddMonths(1));
+        }
+
+        public static ITimeInterval CalendarYear(DateTime date)
+        {
+            return new TimeInterval(new DateTime(date.Year, 1, 1), new DateTime(date.Year + 1, 1, 1));
+        }
+
+        public static double DurationRateOf(this ITimeInterval part, ITimeInterval whole)
+        {
+            return part.Duration.Ticks / whole.Duration.Ticks;
         }
     }
 }

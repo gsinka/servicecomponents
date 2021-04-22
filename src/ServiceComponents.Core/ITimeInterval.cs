@@ -9,6 +9,7 @@ namespace ServiceComponents.Core
     {
         DateTime Start { get; }
         DateTime Finish { get; }
+        TimeSpan Duration { get; }
 
         void Deconstruct(out DateTime start, out DateTime finish);
     }
