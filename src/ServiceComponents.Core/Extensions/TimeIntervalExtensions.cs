@@ -83,7 +83,7 @@ namespace ServiceComponents.Core.Extensions
             return new TimeInterval(start, start.AddMonths(1));
         }
 
-        public static ITimeInterval CalendarYear(DateTime date)
+        public static ITimeInterval CalendarYear(this DateTime date)
         {
             return new TimeInterval(new DateTime(date.Year, 1, 1), new DateTime(date.Year + 1, 1, 1));
         }
