@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
-using ServiceComponents.Application.Monitoring;
 
-namespace ServiceComponents.Infrastructure.Monitoring
+namespace ServiceComponents.Application.Monitoring
 {
     public class DurationMetric<T> : IDisposable
     {
         private readonly IMetricsService _service;
         private readonly T _metric;
-        private readonly Stopwatch _stopwatch = new();
+        private readonly Stopwatch _stopwatch = new Stopwatch();
 
         public DurationMetric(IMetricsService service, T metric)
         {
