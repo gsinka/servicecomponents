@@ -28,11 +28,10 @@ namespace ServiceComponents.Infrastructure.Monitoring
 
             try {
 
-                stopWatch.Start();
-                await _next.ReceiveAsync(command, cancellationToken);
-                stopWatch.Stop();
-
-                _metrics.Observe(new RequestDurationMetric(command), stopWatch.ElapsedMilliseconds);
+                using (_metrics.Observe(new RequestDurationMetric(command)))
+                {
+                    await _next.ReceiveAsync(command, cancellationToken);
+                }
             }
             catch (Exception exception) {
 

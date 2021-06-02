@@ -136,19 +136,19 @@ namespace ReferenceApplication2.AspNet
 
                 .ConfigureContainer((context, builder) => {
 
-                    builder.AddRequestConstraints(request => request switch {
+                    //builder.AddRequestConstraints(request => request switch {
 
-                        LongCommand longCommand => new[] { "test1", "test2" },
-                        TestCommand testCommand => new[] { "test2" },
-                        _ => default
+                    //    LongCommand longCommand => new[] { "test1", "test2" },
+                    //    TestCommand testCommand => new[] { "test2" },
+                    //    _ => default
 
-                    }, (key, count) => (key, count) switch {
+                    //}, (key, count) => (key, count) switch {
 
-                        ("test1", _) when count > 0 => false,
-                        ("test2", _) when count > 0 => false,
-                        (_, _) => true
+                    //    ("test1", _) when count > 0 => false,
+                    //    ("test2", _) when count > 0 => false,
+                    //    (_, _) => true
 
-                    }, (key) => TimeSpan.FromSeconds(30));
+                    //}, (key) => TimeSpan.FromSeconds(30));
                 })
 
                 // NHibernate
