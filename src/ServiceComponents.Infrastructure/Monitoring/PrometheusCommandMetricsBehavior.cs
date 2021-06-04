@@ -21,8 +21,6 @@ namespace ServiceComponents.Infrastructure.Monitoring
 
         public async Task ReceiveAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default) where TCommand : ICommand
         {
-            var stopWatch = new Stopwatch();
-
             _metrics.Increment(new RequestCounterMetric(command));
             _metrics.Increment(new RequestGaugeMetric("generic_request_gauge", "Current request count"));
 
@@ -34,10 +32,8 @@ namespace ServiceComponents.Infrastructure.Monitoring
                 }
             }
             catch (Exception exception) {
-
-                stopWatch.Stop();
+                
                 _metrics.Increment(new RequestFailureMetric(command, exception));
-
                 throw;
             }
             finally {
