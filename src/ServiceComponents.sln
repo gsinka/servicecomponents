@@ -33,6 +33,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReferenceApplication2.AspNe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceComponents.Testing", "ServiceComponents.Testing\ServiceComponents.Testing.csproj", "{7A81BDA8-BCF8-46B4-A227-7AC60C377594}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceComponents.AspNetCore.Hosting", "ServiceComponents.AspNetCore.Host\ServiceComponents.AspNetCore.Hosting.csproj", "{B382A4C9-EEAD-4C57-88D4-8A1EE655DA91}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -95,6 +97,10 @@ Global
 		{7A81BDA8-BCF8-46B4-A227-7AC60C377594}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A81BDA8-BCF8-46B4-A227-7AC60C377594}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A81BDA8-BCF8-46B4-A227-7AC60C377594}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B382A4C9-EEAD-4C57-88D4-8A1EE655DA91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B382A4C9-EEAD-4C57-88D4-8A1EE655DA91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B382A4C9-EEAD-4C57-88D4-8A1EE655DA91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B382A4C9-EEAD-4C57-88D4-8A1EE655DA91}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

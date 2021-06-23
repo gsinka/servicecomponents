@@ -16,7 +16,7 @@ using Serilog.Events;
 using ServiceComponents.AspNet.Exceptions;
 using ServiceComponents.AspNet.Monitoring;
 using ServiceComponents.AspNet.Wireup;
-using ServiceComponents.Infrastructure.Behaviors.CommandConstraints;
+using ServiceComponents.AspNetCore.Hosting;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace ReferenceApplication2.AspNet
@@ -32,136 +32,138 @@ namespace ReferenceApplication2.AspNet
 
         private static IHostBuilder CreateHostBuilder(string[] args)
         {
-            return new ServiceComponentsHostBuilder()
-                
-                .UseDefault(
+            return ServiceComponentsHost.CreateDefaultHost<AppWireup>();
 
-                    new[] { typeof(TestCommand).Assembly },
-                    new[] { typeof(TestCommandHandler).Assembly })
+            //return new ServiceComponentsHostBuilder()
 
-                .ConfigureApp((configuration, environment, app) => {
+            //    .UseDefault(
 
-                    if (environment.IsDevelopment()) {
-                        app.UseDeveloperExceptionPage();
-                    }
+            //        new[] { typeof(TestCommand).Assembly },
+            //        new[] { typeof(TestCommandHandler).Assembly })
 
-                    app.UseMiddleware<ErrorHandlingMiddleware>();
+            //    .ConfigureApp((configuration, environment, app) => {
 
-                    app.UseCors(builder => {
-                        builder.AllowAnyOrigin();
-                        builder.AllowAnyHeader();
-                        builder.AllowAnyMethod();
-                    });
+            //        if (environment.IsDevelopment()) {
+            //            app.UseDeveloperExceptionPage();
+            //        }
 
-                    app.UseRouting();
+            //        app.UseMiddleware<ErrorHandlingMiddleware>();
 
-                    app.UseAuthentication();
-                    app.UseAuthorization();
-                })
+            //        app.UseCors(builder => {
+            //            builder.AllowAnyOrigin();
+            //            builder.AllowAnyHeader();
+            //            builder.AllowAnyMethod();
+            //        });
 
-                // Add endpoints
-                .AddEndpoints()
+            //        app.UseRouting();
 
-                // Use serilog for logging
-                .UseSerilog((context, log) => log
-                    .WriteTo.Console(LogEventLevel.Information)
-                    .WriteTo.Seq("http://localhost:5341", LogEventLevel.Verbose)
-                    .Enrich.FromLogContext()
-                    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-                    .MinimumLevel.Override("NHibernate", LogEventLevel.Warning)
-                    .MinimumLevel.Verbose())
+            //        app.UseAuthentication();
+            //        app.UseAuthorization();
+            //    })
 
-                // Add OpenApi
-                .AddOpenApi(
-                    (configuration, options) => {
-                        options.SwaggerDoc("v1", new OpenApiInfo {
-                            Title = "Reference Application", 
-                            Version = "v1"
-                        });
+            //    // Add endpoints
+            //    .AddEndpoints()
 
-                        var appXmlDoc = Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
-                        options.IncludeXmlComments(appXmlDoc);
+            //    // Use serilog for logging
+            //    .UseSerilog((context, log) => log
+            //        .WriteTo.Console(LogEventLevel.Information)
+            //        .WriteTo.Seq("http://localhost:5341", LogEventLevel.Verbose)
+            //        .Enrich.FromLogContext()
+            //        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+            //        .MinimumLevel.Override("NHibernate", LogEventLevel.Warning)
+            //        .MinimumLevel.Verbose())
 
-                        var aspNetXmlDoc = Path.Combine(AppContext.BaseDirectory, $"{typeof(MetricsController).Assembly.GetName().Name}.xml");
-                        options.IncludeXmlComments(aspNetXmlDoc);
+            //    // Add OpenApi
+            //    .AddOpenApi(
+            //        (configuration, options) => {
+            //            options.SwaggerDoc("v1", new OpenApiInfo {
+            //                Title = "Reference Application",
+            //                Version = "v1"
+            //            });
 
-                        options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme() {
-                            Type = SecuritySchemeType.OpenIdConnect,
-                            OpenIdConnectUrl = new Uri("http://localhost:8080/auth/realms/develop/.well-known/openid-configuration"),
-                            In = ParameterLocation.Header,
-                            BearerFormat = "JWT",
-                            Scheme = JwtBearerDefaults.AuthenticationScheme
-                        });
+            //            var appXmlDoc = Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
+            //            options.IncludeXmlComments(appXmlDoc);
 
-                        options.OperationFilter<SecurityRequirementsOperationFilter>(true, JwtBearerDefaults.AuthenticationScheme);
+            //            var aspNetXmlDoc = Path.Combine(AppContext.BaseDirectory, $"{typeof(MetricsController).Assembly.GetName().Name}.xml");
+            //            options.IncludeXmlComments(aspNetXmlDoc);
 
-                    },
-                    (configuration, options) => {
-                        
-                        options.OAuthClientId("reference-app");
-                        options.OAuthScopes("openid", "profile");
+            //            options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme() {
+            //                Type = SecuritySchemeType.OpenIdConnect,
+            //                OpenIdConnectUrl = new Uri("http://localhost:8080/auth/realms/develop/.well-known/openid-configuration"),
+            //                In = ParameterLocation.Header,
+            //                BearerFormat = "JWT",
+            //                Scheme = JwtBearerDefaults.AuthenticationScheme
+            //            });
 
-                        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Reference Application v1");
-                    })
+            //            options.OperationFilter<SecurityRequirementsOperationFilter>(true, JwtBearerDefaults.AuthenticationScheme);
 
-                .RegisterCallback((configuration, services) => services.AddSwaggerGenNewtonsoftSupport())
+            //        },
+            //        (configuration, options) => {
 
-                // Health check
-                .AddHealthCheck((configuration, check) => {
-                    check.AddRabbitMQ(rabbitConnectionString: "amqp://localhost:5672");
-                    check.AddRedis("localhost");
-                })
+            //            options.OAuthClientId("reference-app");
+            //            options.OAuthScopes("openid", "profile");
 
-                // Add http sender
-                .AddHttpSender(new Uri("http://localhost:5000/api/generic"), "http")
+            //            options.SwaggerEndpoint("/swagger/v1/swagger.json", "Reference Application v1");
+            //        })
 
-                // Routing
-                .AddCommandRouter(command => "loopback")
-                .AddQueryRouter(query => "loopback")
-                .AddEventRouter(evnt => "loopback")
+            //    .RegisterCallback((configuration, services) => services.AddSwaggerGenNewtonsoftSupport())
 
-                // Redis
-                //.AddRedis(configuration => "localhost:6379")
+            //    // Health check
+            //    .AddHealthCheck((configuration, check) => {
+            //        check.AddRabbitMQ(rabbitConnectionString: "amqp://localhost:5672");
+            //        check.AddRedis("localhost");
+            //    })
 
-                // Rabbit
-                //.AddRabbit("amqp://guest:guest@localhost:5672", "test2", "test-queue", "test-exchange", retryIntervals: new[] { 1000, 3000, 5000 })
-                .AddRabbit("amqp://guest:guest@localhost:5672", "test2", "test-queue", "test-exchange")
+            //    // Add http sender
+            //    .AddHttpSender(new Uri("http://localhost:5000/api/generic"), "http")
 
-                .ConfigureMvc(builder => builder.AddNewtonsoftJson(options => {
-                    options.UseCamelCasing(true);
-                    options.SerializerSettings.Converters.Add(new StringEnumConverter());
-                }))
+            //    // Routing
+            //    .AddCommandRouter(command => "loopback")
+            //    .AddQueryRouter(query => "loopback")
+            //    .AddEventRouter(evnt => "loopback")
 
-                .AddRedisDistributedCache("localhost")
+            //    // Redis
+            //    //.AddRedis(configuration => "localhost:6379")
 
-                .ConfigureContainer((context, builder) => {
+            //    // Rabbit
+            //    //.AddRabbit("amqp://guest:guest@localhost:5672", "test2", "test-queue", "test-exchange", retryIntervals: new[] { 1000, 3000, 5000 })
+            //    .AddRabbit("amqp://guest:guest@localhost:5672", "test2", "test-queue", "test-exchange")
 
-                    //builder.AddRequestConstraints(request => request switch {
+            //    .ConfigureMvc(builder => builder.AddNewtonsoftJson(options => {
+            //        options.UseCamelCasing(true);
+            //        options.SerializerSettings.Converters.Add(new StringEnumConverter());
+            //    }))
 
-                    //    LongCommand longCommand => new[] { "test1", "test2" },
-                    //    TestCommand testCommand => new[] { "test2" },
-                    //    _ => default
+            //    .AddRedisDistributedCache("localhost")
 
-                    //}, (key, count) => (key, count) switch {
+            //    .ConfigureContainer((context, builder) => {
 
-                    //    ("test1", _) when count > 0 => false,
-                    //    ("test2", _) when count > 0 => false,
-                    //    (_, _) => true
+            //        //builder.AddRequestConstraints(request => request switch {
 
-                    //}, (key) => TimeSpan.FromSeconds(30));
-                })
+            //        //    LongCommand longCommand => new[] { "test1", "test2" },
+            //        //    TestCommand testCommand => new[] { "test2" },
+            //        //    _ => default
 
-                // NHibernate
-                .AddNHibernate(
-                    configuration => "Server=localhost; Port=5432; Database=ref-app; User Id=postgres; Password=postgres",
-                    map => map.FluentMappings.AddFromAssemblyOf<TestEntity>(),
-                    configuration => new SchemaUpdate(configuration).Execute(true, true))
+            //        //}, (key, count) => (key, count) switch {
 
-                .AddPrometheusMetrics()
+            //        //    ("test1", _) when count > 0 => false,
+            //        //    ("test2", _) when count > 0 => false,
+            //        //    (_, _) => true
 
-                .AddBadge()
+            //        //}, (key) => TimeSpan.FromSeconds(30));
+            //    })
 
-                .CreateHostBuilder(args);
+            //    // NHibernate
+            //    .AddNHibernate(
+            //        configuration => "Server=localhost; Port=5432; Database=ref-app; User Id=postgres; Password=postgres",
+            //        map => map.FluentMappings.AddFromAssemblyOf<TestEntity>(),
+            //        configuration => new SchemaUpdate(configuration).Execute(true, true))
+
+            //    .AddPrometheusMetrics()
+
+            //    .AddBadge()
+
+            //    .CreateHostBuilder(args);
         }
     }
 }

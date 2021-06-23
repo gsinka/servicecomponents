@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ReferenceApplication2.AspNet</name>
+    </assembly>
+    <members>
+        <member name="M:ReferenceApplication2.AspNet.Controllers.GenericController.Post(System.Threading.CancellationToken)">
+            <summary>
+            Generic method to post commands, queries and events
+            </summary>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
