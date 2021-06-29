@@ -12,7 +12,7 @@ namespace ServiceComponents.Infrastructure.Rabbit.Senders
     {
         private readonly ISendRabbitQuery _next;
 
-        public RabbitQuerySenderCorrelationBehavior(ILogger log, ILifetimeScope scope, ICorrelation correlation, ISendRabbitQuery next) : base(log, correlation)
+        public RabbitQuerySenderCorrelationBehavior(ILogger log, ICorrelation correlation, ISendRabbitQuery next) : base(log, correlation)
         {
             _next = next;
         }

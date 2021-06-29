@@ -19,7 +19,9 @@ namespace WebApplication1
 
             try {
                 Log.Information("Starting service web host");
-                CreateHostBuilder(args).Build().Run();
+                var host = CreateHostBuilder(args).Build();
+                CustomStartup.Initialize(host);
+                host.Run();
             }
             catch (Exception exception) {
                 Log.Fatal(exception, "Host terminated unexpectedly");

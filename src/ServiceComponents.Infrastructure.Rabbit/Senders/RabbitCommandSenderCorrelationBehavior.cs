@@ -11,7 +11,7 @@ namespace ServiceComponents.Infrastructure.Rabbit.Senders
     {
         private readonly ISendRabbitCommand _next;
 
-        public RabbitCommandSenderCorrelationBehavior(ILogger log, IModel model, ICorrelation correlation, ISendRabbitCommand next) : base(log, correlation)
+        public RabbitCommandSenderCorrelationBehavior(ILogger log, ICorrelation correlation, ISendRabbitCommand next) : base(log, correlation)
         {
             _next = next;
         }
