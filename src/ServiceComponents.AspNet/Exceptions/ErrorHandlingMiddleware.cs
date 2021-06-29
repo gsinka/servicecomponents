@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Net.Http;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
-using Serilog;
 using ServiceComponents.Core.Exceptions;
 
 namespace ServiceComponents.AspNet.Exceptions
@@ -12,12 +10,11 @@ namespace ServiceComponents.AspNet.Exceptions
     public class ErrorHandlingMiddleware
     {
         private readonly RequestDelegate _request;
-        private readonly ILogger _logger;
+        
 
-        public ErrorHandlingMiddleware(RequestDelegate next, ILogger logger)
+        public ErrorHandlingMiddleware(RequestDelegate next)
         {
             _request = next;
-            _logger = logger;
         }
 
         public async Task Invoke(HttpContext context)

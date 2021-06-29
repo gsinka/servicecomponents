@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Badge\**" />
+    <Compile Remove="Monitoring\**" />
+    <EmbeddedResource Remove="Badge\**" />
+    <EmbeddedResource Remove="Monitoring\**" />
+    <None Remove="Badge\**" />
+    <None Remove="Monitoring\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="RequestBinder.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="5.0.0" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="4.1.2" />
+    <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
+    <PackageReference Include="DotBadge" Version="1.2.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.1.1" />
+    <PackageReference Include="prometheus-net.AspNetCore" Version="4.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ServiceComponents.Api\ServiceComponents.Api.csproj" />
+    <ProjectReference Include="..\ServiceComponents.Application\ServiceComponents.Application.csproj" />
+    <ProjectReference Include="..\ServiceComponents.AspNet\ServiceComponents.AspNet.csproj" />
+    <ProjectReference Include="..\ServiceComponents.Infrastructure\ServiceComponents.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

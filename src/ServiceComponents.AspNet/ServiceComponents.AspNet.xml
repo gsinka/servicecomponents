@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ServiceComponents.AspNet</name>
+    </assembly>
+    <members>
+        <member name="M:ServiceComponents.AspNet.Monitoring.MetricsController.GetMetrics">
+            <summary>
+            Provides metrics
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:ServiceComponents.AspNet.OpenApi.ActionHidingConvention">
+            <summary>
+            Hiding specific endpoints
+            </summary>
+        </member>
+    </members>
+</doc>
