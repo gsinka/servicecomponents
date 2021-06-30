@@ -42,7 +42,7 @@ namespace WebApplication1
         {
             config
                 .MinimumLevel.Verbose()
-                .WriteTo.Console(LogEventLevel.Information)
+                .WriteTo.Console(LogEventLevel.Information, outputTemplate: "[{Timestamp:HH:mm:ss+fff}{EventType:x8} {Level:u3}] {Message:lj} [{SourceContext}]{NewLine}{Exception}")
                 .WriteTo.Seq("http://localhost:5341", LogEventLevel.Verbose)
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .MinimumLevel.Override("System", LogEventLevel.Warning)
@@ -113,6 +113,7 @@ namespace WebApplication1
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseSerilogRequestLogging();
             app.UseSwagger(options => { });
             app.UseSwaggerUI(options => {
                 options.OAuthClientId("ref-app");

@@ -1,5 +1,6 @@
 using System.Linq;
 using Autofac;
+using AutofacSerilogIntegration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
@@ -93,6 +94,8 @@ namespace WebApplication1
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
+            builder.RegisterLogger();
+
             builder.RegisterType<ComputerClock>().AsImplementedInterfaces().SingleInstance();
             
             builder.AddHttpRequestParser();
@@ -143,7 +146,7 @@ namespace WebApplication1
                 builder.AllowAnyHeader();
                 builder.AllowAnyMethod();
             });
-            app.UseSerilogRequestLogging();
+            
             app.UseRouting();
             app.UseAuthorization();
             
