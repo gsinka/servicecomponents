@@ -4,11 +4,20 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>D:\dev\servicecomponents\src\WebApplication1\WebApplication1.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\ReferenceApplication.Application\ReferenceApplication.Application.csproj" />
     <ProjectReference Include="..\ServiceComponents.AspNet\ServiceComponents.AspNet.csproj" />
-    <PackageReference Include="Serilog.Sinks.Seq" Version="5.0.0" />
     
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="WebApplication1.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

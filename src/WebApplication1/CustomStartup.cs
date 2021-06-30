@@ -12,13 +12,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using NHibernate.Tool.hbm2ddl;
 using RabbitMQ.Client;
 using ReferenceApplication.Api;
 using ReferenceApplication.Application;
+using ReferenceApplication.Application.Entities;
 using Serilog;
 using Serilog.Events;
 using ServiceComponents.AspNet.Http.Senders;
 using ServiceComponents.Core.Extensions;
+using ServiceComponents.Infrastructure.NHibernate;
 using ServiceComponents.Infrastructure.Rabbit;
 using ServiceComponents.Infrastructure.Senders;
 using Swashbuckle.AspNetCore.Filters;
@@ -43,11 +46,12 @@ namespace WebApplication1
                 .WriteTo.Seq("http://localhost:5341", LogEventLevel.Verbose)
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .MinimumLevel.Override("System", LogEventLevel.Warning)
+                .MinimumLevel.Override("NHibernate", LogEventLevel.Verbose)
+                .MinimumLevel.Override("NHibernate.SQL", LogEventLevel.Verbose)
                 .Enrich.FromLogContext()
                 ;
         }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSwaggerGen(c => {
@@ -64,8 +68,6 @@ namespace WebApplication1
                 });
                 c.OperationFilter<SecurityRequirementsOperationFilter>(true, JwtBearerDefaults.AuthenticationScheme);
             });
-
-
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
@@ -101,6 +103,12 @@ namespace WebApplication1
             builder.AddRabbitReceivers();
             builder.AddRabbitCommandSender(exchange, string.Empty, "publisher", "rabbit");
             builder.AddRabbitQuerySender(exchange, string.Empty, "publisher", "rabbit");
+
+            // NHibernate
+            builder.RegisterModule(new NhibernateModule(
+                    "Server=localhost; Port=5432; Database=ref-app; User Id=postgres; Password=postgres",
+                    map => map.FluentMappings.AddFromAssemblyOf<TestEntity>(),
+                    configuration => new SchemaUpdate(configuration).Execute(true, true)));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -130,16 +138,16 @@ namespace WebApplication1
         {
             var scope = host.Services.GetRequiredService<ILifetimeScope>();
 
-            var _channel = scope.ResolveKeyed<IModel>("publisher");
-            _channel.ExchangeDeclare("ref-app", "direct", false, true);
-            _channel.QueueDeclare("ref-app", false, false, true);
+            // Rabbit init
 
-            _channel.QueueBind("ref-app", "ref-app", "");
+            var channel = scope.ResolveKeyed<IModel>("publisher");
+            channel.ExchangeDeclare("ref-app", "direct", false, true);
+            channel.QueueDeclare("ref-app", false, false, true);
+            channel.QueueBind("ref-app", "ref-app", "");
 
             var consumer = scope.ResolveKeyed<RabbitConsumer>("consumer");
             Log.Verbose("Starting consumer consumer-{consumerId}", consumer.ConsumerTag);
             consumer.StartAsync(CancellationToken.None).Wait();
-        
         }
     }
 }

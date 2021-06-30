@@ -13,12 +13,12 @@ namespace ReferenceApplication.Application
 {
     public class TestCommandHandler : CommandHandler<TestCommand>
     {
-        //private readonly ISession _session;
+        private readonly ISession _session;
 
-        public TestCommandHandler(ILogger log, ICorrelation correlation, ISendQuery querySender, IPublishEvent eventPublisher/*, ISession session*/) 
+        public TestCommandHandler(ILogger log, ICorrelation correlation, ISendQuery querySender, IPublishEvent eventPublisher, ISession session) 
             : base(log, correlation, querySender, eventPublisher)
         {
-            //_session = session;
+            _session = session;
         }
 
         override public async Task HandleAsync(TestCommand command, CancellationToken cancellationToken = default)
@@ -28,10 +28,10 @@ namespace ReferenceApplication.Application
 
             var queryResult2 = await SendAsync(new TestQuery("from command handler 2"), cancellationToken);
 
-            //using (var tx = _session.BeginTransaction()) {
-            //    await _session.SaveAsync(new TestEntity() {Name = "Test-".AddRandomPostfix()}, cancellationToken);
-            //    await tx.CommitAsync(cancellationToken);
-            //}
+            using (var tx = _session.BeginTransaction()) {
+                await _session.SaveAsync(new TestEntity() { Name = "Test".AddRandomPostfix() }, cancellationToken);
+                await tx.CommitAsync(cancellationToken);
+            }
 
             Log.Information("{command} handled", command.DisplayName());
 

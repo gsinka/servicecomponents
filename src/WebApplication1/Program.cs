@@ -15,6 +15,8 @@ namespace WebApplication1
                 .MinimumLevel.Verbose()
                 .WriteTo.Debug()
                 .WriteTo.Console(LogEventLevel.Information)
+                .MinimumLevel.Override("NHibernate", LogEventLevel.Warning)
+                .MinimumLevel.Override("NHibernate.SQL", LogEventLevel.Warning)
                 .CreateBootstrapLogger();
 
             try {
