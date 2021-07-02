@@ -134,7 +134,7 @@ namespace ServiceComponents.Infrastructure.Monitoring
                                 name, 
                                 title, 
                                 new HistogramConfiguration {
-                                    Buckets = Histogram.LinearBuckets(exponentialHistogram.Start, exponentialHistogram.Factor, exponentialHistogram.Count)
+                                    Buckets = Histogram.ExponentialBuckets(exponentialHistogram.Start, exponentialHistogram.Factor, exponentialHistogram.Count)
                                 }));
                     }
                     _histograms[metric.GetType()].Observe(duration);
