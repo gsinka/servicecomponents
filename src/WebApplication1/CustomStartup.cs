@@ -12,16 +12,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using NHibernate.Tool.hbm2ddl;
 using RabbitMQ.Client;
 using ReferenceApplication.Api;
 using ReferenceApplication.Application;
-using ReferenceApplication.Application.Entities;
 using Serilog;
 using Serilog.Events;
-using ServiceComponents.AspNet.Http.Senders;
 using ServiceComponents.Core.Extensions;
-using ServiceComponents.Infrastructure.NHibernate;
 using ServiceComponents.Infrastructure.Rabbit;
 using ServiceComponents.Infrastructure.Senders;
 using Swashbuckle.AspNetCore.Filters;
@@ -61,7 +57,7 @@ namespace WebApplication1
 
                 c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme() {
                     Type = SecuritySchemeType.OpenIdConnect,
-                    OpenIdConnectUrl = new Uri("http://localhost:8080/auth/realms/develop/.well-known/openid-configuration"),
+                    OpenIdConnectUrl = new Uri($"{(Configuration.GetValue<string>("Swagger:Authentication:Authority") ?? Configuration.GetValue<string>("Authentication:Authority")).TrimEnd('/')}/.well-known/openid-configuration"),
                     In = ParameterLocation.Header,
                     BearerFormat = "JWT",
                     Scheme = JwtBearerDefaults.AuthenticationScheme
@@ -105,10 +101,10 @@ namespace WebApplication1
             builder.AddRabbitQuerySender(exchange, string.Empty, "publisher", "rabbit");
 
             // NHibernate
-            builder.RegisterModule(new NhibernateModule(
-                    "Server=localhost; Port=5432; Database=ref-app; User Id=postgres; Password=postgres",
-                    map => map.FluentMappings.AddFromAssemblyOf<TestEntity>(),
-                    configuration => new SchemaUpdate(configuration).Execute(true, true)));
+            //builder.RegisterModule(new NhibernateModule(
+            //        "Server=localhost; Port=5432; Database=ref-app; User Id=postgres; Password=postgres",
+            //        map => map.FluentMappings.AddFromAssemblyOf<TestEntity>(),
+            //        configuration => new SchemaUpdate(configuration).Execute(true, true)));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -116,7 +112,7 @@ namespace WebApplication1
             app.UseSerilogRequestLogging();
             app.UseSwagger(options => { });
             app.UseSwaggerUI(options => {
-                options.OAuthClientId("ref-app");
+                options.OAuthClientId(Configuration.GetValue<string>("Swagger:Authentication:Client"));
                 options.OAuthScopes("openid", "profile");
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", $"ref-app v{Assembly.GetExecutingAssembly().ProductVersion()}");
             });
