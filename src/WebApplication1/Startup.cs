@@ -1,6 +1,7 @@
 using System.Linq;
 using Autofac;
 using AutofacSerilogIntegration;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
@@ -36,25 +37,27 @@ namespace WebApplication1
     {
         private readonly CustomStartup _customStartup;
 
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
         {
             Configuration = configuration;
             _customStartup = new CustomStartup(configuration);
+            HostEnvironment = hostEnvironment;
         }
 
         public IConfiguration Configuration { get; }
+        public IHostEnvironment HostEnvironment { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers(options => {
 
-                    // Request binder to handle commands, queries and events in controller actions
-                    options.ModelBinderProviders.Insert(0, new RequestBinderProvider());
+                // Request binder to handle commands, queries and events in controller actions
+                options.ModelBinderProviders.Insert(0, new RequestBinderProvider());
 
-                    // Hide specific controllers (like metrics)
-                    options.Conventions.Add(new ActionHidingConvention(_customStartup.ActionsToHide));
-                })
+                // Hide specific controllers (like metrics)
+                options.Conventions.Add(new ActionHidingConvention(_customStartup.ActionsToHide));
+            })
                 // Newtonsoft
                 .AddNewtonsoftJson(options => {
                     options.UseCamelCasing(true);
@@ -70,7 +73,7 @@ namespace WebApplication1
 
             var healthCheckBuilder = services.AddHealthChecks();
             healthCheckBuilder.AddCheck("self", () => HealthCheckResult.Healthy(), new[] { HealthCheckConstants.LivenessTag });
-            
+
             // Do project specific health check registration
             _customStartup.ConfigureHealthCheck(healthCheckBuilder);
 
@@ -88,6 +91,17 @@ namespace WebApplication1
 
             services.AddSingleton<IMetricsService, PrometheusMetricsService>();
 
+            // Authentication
+            services.AddAuthorization();
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options => {
+                    Configuration.GetSection("Authentication").Bind(options);
+
+                    options.Audience ??= "account";
+                    options.RequireHttpsMetadata = !HostEnvironment.IsDevelopment();
+                    options.TokenValidationParameters.ValidIssuer ??= options.Authority;
+                });
+
             // Do project specific service configuration
             _customStartup.ConfigureServices(services);
         }
@@ -97,7 +111,7 @@ namespace WebApplication1
             builder.RegisterLogger();
 
             builder.RegisterType<ComputerClock>().AsImplementedInterfaces().SingleInstance();
-            
+
             builder.AddHttpRequestParser();
             builder.AddMediator(_customStartup.ApplicationAssembly);
             builder.AddValidationBehavior(_customStartup.ApiAssembly);
@@ -140,16 +154,17 @@ namespace WebApplication1
             }
 
             app.UseMiddleware<ErrorHandlingMiddleware>();
-            
+
             app.UseCors(builder => {
                 builder.AllowAnyOrigin();
                 builder.AllowAnyHeader();
                 builder.AllowAnyMethod();
             });
-            
+
             app.UseRouting();
+            app.UseAuthentication();
             app.UseAuthorization();
-            
+
             app.UseHealthChecks(HealthCheckConstants.ReadinessPath, new HealthCheckOptions {
                 Predicate = registration =>
                     registration.Tags == null || !registration.Tags.Any() ||
@@ -165,9 +180,9 @@ namespace WebApplication1
             _customStartup.Configure(app, env);
 
             app.UseEndpoints(endpoints => {
-                
+
                 endpoints.MapControllers();
-                
+
                 // Badge
                 const string badgePath = ".badge"; //TODO: move to options?
                 endpoints.MapControllerRoute(name: "badge", pattern: $"{badgePath.TrimEnd('/')}/{{name?}}", defaults: new { controller = "Badge", action = "Get" });
