@@ -26,6 +26,7 @@ using ServiceComponents.Infrastructure.Behaviors.Stopwatch;
 using ServiceComponents.Infrastructure.CorrelationContext;
 using ServiceComponents.Infrastructure.Mediator;
 using ServiceComponents.Infrastructure.Monitoring;
+using ServiceComponents.Infrastructure.Options;
 using ServiceComponents.Infrastructure.Rabbit;
 using ServiceComponents.Infrastructure.Receivers;
 using ServiceComponents.Infrastructure.Receivers.Loopback;
@@ -101,6 +102,10 @@ namespace WebApplication1
                     options.RequireHttpsMetadata = !HostEnvironment.IsDevelopment();
                     options.TokenValidationParameters.ValidIssuer ??= options.Authority;
                 });
+
+            services.AddOptions<ApplicationOptions>()
+                .BindConfiguration("Application")
+                .ValidateDataAnnotations();
 
             // Do project specific service configuration
             _customStartup.ConfigureServices(services);
