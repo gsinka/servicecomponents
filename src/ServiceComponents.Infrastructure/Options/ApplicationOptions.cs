@@ -10,7 +10,6 @@ namespace ServiceComponents.Infrastructure.Options
         [Required]
         public string ShortName { get; set; }
         public string Description { get; set; }
-        public string 
 
         public static string InformationalVersion => Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
         public static string FullSemVer => Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion.Split('+', 2)[0];

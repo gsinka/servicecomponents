@@ -55,7 +55,7 @@ namespace WebApplication1
             c.SwaggerDoc("v1", new OpenApiInfo {
                 Title = Configuration.GetValue<string>("Application:Name"),
                 Version = $"v{ApplicationOptions.InformationalVersion}",
-                Description = Configuration.GetValue<string>("Application:Description"));
+                Description = Configuration.GetValue<string>("Application:Description")});
             var appXmlDoc = Path.Combine(AppContext.BaseDirectory, $"{typeof(Program).Assembly.GetName().Name}.xml");
             if (File.Exists(appXmlDoc)) { c.IncludeXmlComments(appXmlDoc); }
 
