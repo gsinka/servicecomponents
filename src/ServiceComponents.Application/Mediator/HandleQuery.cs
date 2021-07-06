@@ -6,13 +6,13 @@ using ServiceComponents.Application.Senders;
 
 namespace ServiceComponents.Application.Mediator
 {
-    public abstract class QueryHandler<TQuery, TResult> : IHandleQuery<TQuery, TResult> where TQuery : IQuery<TResult>
+    public abstract class HandleQuery<TQuery, TResult> : IHandleQuery<TQuery, TResult> where TQuery : IQuery<TResult>
     {
         private readonly ISendQuery _querySender;
         protected ILogger Log { get; }
         protected ICorrelation Correlation { get; }
 
-        protected QueryHandler(ILogger log, ICorrelation correlation, ISendQuery querySender)
+        protected HandleQuery(ILogger log, ICorrelation correlation, ISendQuery querySender)
         {
             _querySender = querySender;
             Log = log;
