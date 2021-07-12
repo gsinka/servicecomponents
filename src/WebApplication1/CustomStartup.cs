@@ -52,28 +52,32 @@ namespace WebApplication1
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSwaggerGen(c => {
-            c.SwaggerDoc("v1", new OpenApiInfo {
-                Title = Configuration.GetValue<string>("Application:Name"),
-                Version = $"v{ApplicationOptions.InformationalVersion}",
-                Description = Configuration.GetValue<string>("Application:Description")});
-            var appXmlDoc = Path.Combine(AppContext.BaseDirectory, $"{typeof(Program).Assembly.GetName().Name}.xml");
-            if (File.Exists(appXmlDoc)) { c.IncludeXmlComments(appXmlDoc); }
-
-            var authority = Configuration.GetValue<string>("Swagger:Authentication:Authority") ?? Configuration.GetValue<string>("Authentication:Authority").TrimEnd('/');
-            if (string.IsNullOrWhiteSpace(authority)) {
-                c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme() {
-                    Type = SecuritySchemeType.OpenIdConnect,
-                    OpenIdConnectUrl = new Uri($"{authority}/.well-known/openid-configuration"),
-                    In = ParameterLocation.Header,
-                    BearerFormat = "JWT",
-                    Scheme = JwtBearerDefaults.AuthenticationScheme
+                c.SwaggerDoc("v1", new OpenApiInfo {
+                    Title = Configuration.GetValue<string>("Application:Name"),
+                    Version = $"v{ApplicationOptions.InformationalVersion}",
+                    Description = Configuration.GetValue<string>("Application:Description")
                 });
-                c.OperationFilter<SecurityRequirementsOperationFilter>(true, JwtBearerDefaults.AuthenticationScheme);
-            }
-        });
+
+                var appXmlDoc = Path.Combine(AppContext.BaseDirectory, $"{typeof(Program).Assembly.GetName().Name}.xml");
+                if (File.Exists(appXmlDoc)) { c.IncludeXmlComments(appXmlDoc); }
+
+                var authority = Configuration.GetValue<string>("Swagger:Authentication:Authority") ?? Configuration.GetValue<string>("Authentication:Authority")?.TrimEnd('/');
+
+                if (!string.IsNullOrWhiteSpace(authority)) {
+                    c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme() {
+                        Type = SecuritySchemeType.OpenIdConnect,
+                        OpenIdConnectUrl = new Uri($"{authority}/.well-known/openid-configuration"),
+                        In = ParameterLocation.Header,
+                        BearerFormat = "JWT",
+                        Scheme = JwtBearerDefaults.AuthenticationScheme
+                    });
+                    c.OperationFilter<SecurityRequirementsOperationFilter>(true, JwtBearerDefaults.AuthenticationScheme);
+                }
+            });
+
         }
 
-    public void ConfigureContainer(ContainerBuilder builder)
+        public void ConfigureContainer(ContainerBuilder builder)
     {
         //builder.AddHttpCommandSender(new Uri("http://localhost:5000/api/generic"), "http");
         //builder.AddHttpQuerySender(new Uri("http://localhost:5000/api/generic"), "http");
