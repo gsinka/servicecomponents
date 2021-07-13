@@ -37,14 +37,14 @@ namespace ServiceComponents.Application.Mediator
             return await _querySender.SendAsync(query, cancellationToken);
         }
 
-        protected async Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : IEvent
+        protected async Task PublishAsync<TEvent>(TEvent @event, IDictionary<string, string> args = default, CancellationToken cancellationToken = default) where TEvent : IEvent
         {
-            await _eventPublisher.PublishAsync(@event, cancellationToken);
+            await _eventPublisher.PublishAsync(@event, args, cancellationToken);
         }
 
-        protected async Task PublishAsync(IEnumerable<IEvent> events, CancellationToken cancellationToken = default)
+        protected async Task PublishAsync(IEnumerable<IEvent> events, IDictionary<string, string> args = default, CancellationToken cancellationToken = default)
         {
-            await _eventPublisher.PublishAsync(events, cancellationToken);
+            await _eventPublisher.PublishAsync(events, args, cancellationToken);
         }
     }
 }
