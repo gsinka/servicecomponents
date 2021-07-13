@@ -1,11 +1,6 @@
-﻿using System.Linq;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using NHibernate;
-using NHibernate.Linq;
 using ReferenceApplication.Api;
-using ReferenceApplication.Application.Entities;
 using Serilog;
 using ServiceComponents.Application;
 using ServiceComponents.Application.Mediator;
@@ -16,19 +11,21 @@ namespace ReferenceApplication.Application
 {
     public class TestQueryHandler : QueryHandler<TestQuery, string>
     {
-        private readonly ISession _session;
+        private readonly ISendCommand _commandSender;
 
-        public TestQueryHandler(ILogger log, ICorrelation correlation, ISendQuery querySender, ISession session) : base(log, correlation, querySender)
+        public TestQueryHandler(ILogger log, ICorrelation correlation, ISendQuery querySender, ISendCommand commandSender) : base(log, correlation, querySender)
         {
-            _session = session;
+            _commandSender = commandSender;
         }
 
         override public async Task<string> HandleAsync(TestQuery query, CancellationToken cancellationToken = default)
         {
             Log.Information("{query} handled", query.DisplayName());
 
-            var entities = await _session.Query<TestEntity>().ToListAsync(cancellationToken);
-            return string.Join(',', entities.Select(entity => entity.Name));
+            await _commandSender.SendAsync(new ErrorCommand(666, "Request from Test"), cancellationToken);
+            return "";
+            //var entities = await _session.Query<TestEntity>().ToListAsync(cancellationToken);
+            //return string.Join(',', entities.Select(entity => entity.Name));
         }
     }
 }

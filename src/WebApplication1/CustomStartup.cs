@@ -17,6 +17,7 @@ using ReferenceApplication.Api;
 using ReferenceApplication.Application;
 using Serilog;
 using Serilog.Events;
+using ServiceComponents.AspNet.Http.Senders;
 using ServiceComponents.Core.Extensions;
 using ServiceComponents.Infrastructure.Options;
 using ServiceComponents.Infrastructure.Rabbit;
@@ -79,7 +80,7 @@ namespace WebApplication1
 
         public void ConfigureContainer(ContainerBuilder builder)
     {
-        //builder.AddHttpCommandSender(new Uri("http://localhost:5000/api/generic"), "http");
+        //builder.AddHttpCommandSender(new Uri("https://webhook.site/a8afa95e-fc64-4f04-8c21-589ae5601947"), "webhook");
         //builder.AddHttpQuerySender(new Uri("http://localhost:5000/api/generic"), "http");
         //builder.AddHttpEventPublisher(new Uri("http://localhost:5000/api/generic"), "http");
 

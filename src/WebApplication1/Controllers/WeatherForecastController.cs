@@ -12,7 +12,7 @@ namespace WebApplication1.Controllers
     /// Test action
     /// </summary>
     [ApiController]
-    [Authorize]
+    //[Authorize]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
