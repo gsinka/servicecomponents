@@ -1,11 +1,4 @@
-﻿using System.Net;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using ReferenceApplication.Api;
-using ServiceComponents.Application.Senders;
-using ServiceComponents.Testing;
-using ServiceComponents.Testing.Extensions;
-using Xunit;
+﻿using ServiceComponents.Testing;
 using Xunit.Abstractions;
 
 namespace ReferenceApplication.Test

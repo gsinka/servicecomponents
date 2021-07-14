@@ -15,11 +15,10 @@ namespace ServiceComponents.Test
 
             var fields = metric.MetricFields().ToArray();
             
-            Assert.Equal(2, fields.Count());
+            Assert.Equal(3, fields.Count());
             Assert.Equal("namespace", fields[0]);
             Assert.Equal("name", fields[1]);
-
-
+            Assert.Equal("kind", fields[2]);
 
         }
     }
