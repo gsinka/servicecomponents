@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using ReferenceApplication.Api;
+using ServiceComponents.Application.Senders;
 using ServiceComponents.Testing;
 using ServiceComponents.Testing.Extensions;
 using Xunit;
@@ -19,9 +21,10 @@ namespace ReferenceApplication.Test
         public async Task SampleHttpRequest()
         {
             // Arrange
+            var commandSender = TestHost.Services.GetRequiredService<ISendCommand>();
 
             // Act
-            await TestHost.CommandSender.SendAsync(new TestCommand("fsdéflfásd"), default);
+            await commandSender.SendAsync(new TestCommand("fsdéflfásd"), cancellationToken: default);
 
             // Assert
             TestHost.EventPublisherMock.Published<TestEvent>();
