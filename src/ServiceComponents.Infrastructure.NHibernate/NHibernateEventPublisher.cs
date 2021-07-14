@@ -16,7 +16,7 @@ namespace ServiceComponents.Infrastructure.NHibernate
         private readonly ISession _session;
         private readonly IClock _clock;
         private readonly IPublishEvent _next;
-        private readonly IList<(IEvent evnt, IDictionary<string, string> args)> _unpublishedEvents = new List<(IEvent evnt, IDictionary<string, string> args)>();
+        private readonly IList<IEvent> _unpublishedEvents = new List<IEvent>();
 
         public NHibernateEventPublisherBehavior(ISession session, IClock clock, IPublishEvent next)
         {
@@ -25,7 +25,7 @@ namespace ServiceComponents.Infrastructure.NHibernate
             _next = next;
         }
 
-        public async Task PublishAsync<TEvent>(TEvent @event, IDictionary<string, string> args = default, CancellationToken cancellationToken = default) where TEvent : IEvent
+        public async Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : IEvent
         {
             await _session.SaveAsync(new UnpublishedEventEntity() {
          
@@ -35,20 +35,20 @@ namespace ServiceComponents.Infrastructure.NHibernate
 
             }, cancellationToken);
 
-            _unpublishedEvents.Add((@event, args));
+            _unpublishedEvents.Add(@event);
         }
 
-        public async Task PublishAsync(IEnumerable<IEvent> events, IDictionary<string, string> args = default, CancellationToken cancellationToken = default)
+        public async Task PublishAsync(IEnumerable<IEvent> events, CancellationToken cancellationToken = default)
         {
             foreach (var @event in events) {
-                await PublishAsync(@event, args, cancellationToken);
+                await PublishAsync(@event, cancellationToken);
             }
         }
 
         public void Dispose()
         {
-            foreach ((IEvent evnt, IDictionary<string, string> args) unpublishedEvent in _unpublishedEvents) {
-                _next.PublishAsync(unpublishedEvent.evnt, unpublishedEvent.args, CancellationToken.None).Wait();
+            foreach (IEvent unpublishedEvent in _unpublishedEvents) {
+                _next.PublishAsync(unpublishedEvent, CancellationToken.None).Wait();
             }
         }
     }

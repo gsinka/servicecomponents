@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ServiceComponents.Api\ServiceComponents.Api.csproj" />
+    <ProjectReference Include="..\ServiceComponents.Core\ServiceComponents.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

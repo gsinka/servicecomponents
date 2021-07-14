@@ -15,16 +15,16 @@ namespace ServiceComponents.AspNet.Http.Senders
             _next = next;
         }
 
-        public async Task PublishAsync<TEvent>(TEvent @event, IDictionary<string, string> args = default, CancellationToken cancellationToken = default) where TEvent : IEvent
+        public async Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : IEvent
         {
             await _next.PublishAsync(@event, new Dictionary<string, string>(), cancellationToken);
         }
 
-        public async Task PublishAsync(IEnumerable<IEvent> events, IDictionary<string, string> args = default, CancellationToken cancellationToken = default)
+        public async Task PublishAsync(IEnumerable<IEvent> events, CancellationToken cancellationToken = default)
         {
             foreach (var @event in events)
             {
-                await PublishAsync(@event, args, cancellationToken);
+                await PublishAsync(@event, cancellationToken);
             }
         }
     }

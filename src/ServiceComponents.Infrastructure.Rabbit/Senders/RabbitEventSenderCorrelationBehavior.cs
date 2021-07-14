@@ -17,10 +17,10 @@ namespace ServiceComponents.Infrastructure.Rabbit.Senders
             _next = next;
         }
 
-        public async Task PublishAsync<T>(T @event, IBasicProperties basicProperties, IDictionary<string, string> args = default, CancellationToken cancellationToken = default) where T : IEvent
+        public async Task PublishAsync<T>(T @event, IBasicProperties basicProperties, CancellationToken cancellationToken = default) where T : IEvent
         {
             UpdateCorrelation(basicProperties);
-            await _next.PublishAsync(@event, basicProperties, args, cancellationToken);
+            await _next.PublishAsync(@event, basicProperties, cancellationToken);
         }
     }
 }

@@ -13,6 +13,9 @@ namespace ServiceComponents.Infrastructure.Monitoring
 
         [MetricField("name")]
         public string Name { get; }
+
+        [MetricField("kind")]
+        public string Kind { get; }
         
         private RequestMetrics(object obj)
         {
@@ -20,6 +23,13 @@ namespace ServiceComponents.Infrastructure.Monitoring
 
             NameSpace = Type.Namespace;
             Name = Type.Name;
+
+            Kind = obj switch {
+                ICommand command => "command",
+                IQuery query => "query",
+                IEvent evnt => "event",
+                _ => "unknown"
+            };
         }
 
         protected RequestMetrics(ICommand command) : this((object)command)

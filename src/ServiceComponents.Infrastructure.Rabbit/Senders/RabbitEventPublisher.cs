@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac.Core;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using Serilog;
@@ -27,16 +28,18 @@ namespace ServiceComponents.Infrastructure.Rabbit.Senders
             _mandatory = mandatory;
         }
 
-        public Task PublishAsync<T>(T @event, IBasicProperties basicProperties, IDictionary<string, string> args = default, CancellationToken cancellationToken = default) where T : IEvent
+        public Task PublishAsync<T>(T @event, IBasicProperties basicProperties, CancellationToken cancellationToken = default) where T : IEvent
         {
-            _log.ForContext("event", @event, true).Verbose("Publishing {eventType} using RabbitMQ publisher to exchange '{exchange}', routing-key: '{routingKey}'", @event.DisplayName(), _exchange, _routingKey);
+            var routableEvent = (@event as RoutableEvent);
+            var evnt = routableEvent?.Event ?? @event;
+            var routingKey = routableEvent?.RoutingKey ?? _routingKey;
+            
+            _log.ForContext("event", evnt, true).Verbose("Publishing {eventType} using RabbitMQ publisher to exchange '{exchange}', routing-key: '{routingKey}'", @event.DisplayName(), _exchange, routingKey);
 
-            var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(@event, Formatting.None));
+            var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(evnt, Formatting.None));
             
             basicProperties.MessageId = @event.EventId;
-            basicProperties.Type = @event.AssemblyVersionlessQualifiedName();
-
-            var routingKey = args?["RoutingKey"] ?? _routingKey;
+            basicProperties.Type = evnt.AssemblyVersionlessQualifiedName();
 
             _model.BasicPublish(_exchange, routingKey, _mandatory, basicProperties, body);
 

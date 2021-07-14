@@ -18,20 +18,20 @@ namespace ServiceComponents.Infrastructure.Rabbit.Senders
             _rabbitSender = rabbitSender;
         }
 
-        public async Task PublishAsync<TEvent>(TEvent @event, IDictionary<string, string> args = default, CancellationToken cancellationToken = default) where TEvent : IEvent
+        public async Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : IEvent
         {
             var basicProperties = _model.CreateBasicProperties();
             basicProperties.Headers = new Dictionary<string, object>();
-
-            await _rabbitSender.PublishAsync(@event, basicProperties, args, cancellationToken);
+            
+            await _rabbitSender.PublishAsync(@event, basicProperties, cancellationToken);
 
         }
 
-        public async Task PublishAsync(IEnumerable<IEvent> events, IDictionary<string, string> args = default, CancellationToken cancellationToken = default)
+        public async Task PublishAsync(IEnumerable<IEvent> events, CancellationToken cancellationToken = default)
         {
             foreach (var @event in events)
             {
-                await PublishAsync(@events, args, cancellationToken);
+                await PublishAsync(@events, cancellationToken);
             }
         }
     }

@@ -5,6 +5,7 @@ using NHibernate;
 using ReferenceApplication.Api;
 using ReferenceApplication.Application.Entities;
 using Serilog;
+using ServiceComponents.Api.Mediator;
 using ServiceComponents.Application;
 using ServiceComponents.Application.Mediator;
 using ServiceComponents.Application.Senders;
@@ -34,7 +35,8 @@ namespace ReferenceApplication.Application
             Log.Information("{command} handled", command.DisplayName());
 
             Log.Information("Publishing event");
-            await PublishAsync(new TestEvent("event from command handler"), new Dictionary<string, string>() { {"RoutingKey", "testrk"}}, cancellationToken: cancellationToken);
+            await PublishAsync(new TestEvent("event from command handler"), cancellationToken: cancellationToken);
+            //await PublishAsync(new RoutableEvent(new TestEvent("event from command handler"), "testrk"), cancellationToken: cancellationToken);
 
         }
     }
