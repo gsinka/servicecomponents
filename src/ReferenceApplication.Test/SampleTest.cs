@@ -17,30 +17,30 @@ namespace ReferenceApplication.Test
         {
         }
 
-        [Fact(DisplayName = "Sample Http request")]
-        public async Task SampleHttpRequest()
-        {
-            // Arrange
-            var commandSender = TestHost.Services.GetRequiredService<ISendCommand>();
+        //[Fact(DisplayName = "Sample Http request")]
+        //public async Task SampleHttpRequest()
+        //{
+        //    // Arrange
+        //    var commandSender = TestHost.Services.GetRequiredService<ISendCommand>();
 
-            // Act
-            await commandSender.SendAsync(new TestCommand("fsdéflfásd"), cancellationToken: default);
+        //    // Act
+        //    await commandSender.SendAsync(new TestCommand("fsdéflfásd"), cancellationToken: default);
 
-            // Assert
-            TestHost.EventPublisherMock.Published<TestEvent>();
-        }
+        //    // Assert
+        //    TestHost.EventPublisherMock.Published<TestEvent>();
+        //}
 
-        [Fact(DisplayName = "Sample Http request 2")]
-        public async Task SampleHttpRequest2()
-        {
-            // Arrange
-            var client = TestHost.CreateClient();
+        //[Fact(DisplayName = "Sample Http request 2")]
+        //public async Task SampleHttpRequest2()
+        //{
+        //    // Arrange
+        //    var client = TestHost.CreateClient();
 
-            // Act
-            var response = await client.GetAsync("/weatherforecast");
+        //    // Act
+        //    var response = await client.GetAsync("/weatherforecast");
 
-            // Assert
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        }
+        //    // Assert
+        //    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        //}
     }
 }
