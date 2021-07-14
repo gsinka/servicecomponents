@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ServiceComponents.Api.Mediator;
@@ -13,7 +10,7 @@ namespace ServiceComponents.AspNet
 {
     public class EventRecorderService
     {
-        public async Task<T> ExecuteAndWaitFor<T>(Func<IEvent, ICorrelation, bool> filter, TimeSpan timeout) where T : IEvent
+        public async Task<T> ExecuteAndWaitFor<T>(Action action, Func<T, ICorrelation, bool> filter, CancellationToken cancellationToken) where T : IEvent
         {
             return default;
         }
@@ -41,11 +38,14 @@ namespace ServiceComponents.AspNet
         }
     }
 
+    public class TestCommand : Command
+    {
+        public TestCommand() : base(default) { }
+    }
+
     public class TestEvent : Event
     {
-        public TestEvent() : base(default)
-        {
-        }
+        public TestEvent() : base(default) { }
     }
 
     public class xxx
@@ -59,9 +59,9 @@ namespace ServiceComponents.AspNet
 
         public async Task Test()
         {
-            //await _recorder.ExecuteAndWaitFor<TestEvent>(async sender => await sender.SendAsync())
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            var awaiterTask = await _recorder.ExecuteAndWaitFor<TestEvent>(() => { }, (evnt, correlation) => false, timeout.Token);
+
         }
-
-
     }
 }
