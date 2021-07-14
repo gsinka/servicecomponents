@@ -23,19 +23,19 @@ namespace ServiceComponents.Infrastructure.Senders
             _keySelector = keySelector;
         }
 
-        public async Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : IEvent
+        public async Task PublishAsync<TEvent>(TEvent @event, IDictionary<string, string> args = default, CancellationToken cancellationToken = default) where TEvent : IEvent
         {
             var key = _keySelector(@event);
             var sender = _scope.ResolveKeyed<IPublishEvent>(key);
 
             _log.Verbose("Routing {commandType} to {senderType} based on key '{routingKey}'", @event.DisplayName(), sender.DisplayName(), key);
-            await sender.PublishAsync(@event, cancellationToken);
+            await sender.PublishAsync(@event, args, cancellationToken);
         }
 
-        public async Task PublishAsync(IEnumerable<IEvent> events, CancellationToken cancellationToken = default)
+        public async Task PublishAsync(IEnumerable<IEvent> events, IDictionary<string, string> args = default, CancellationToken cancellationToken = default)
         {
             foreach (IEvent @event in events) {
-                await PublishAsync(@event, cancellationToken);
+                await PublishAsync(@event, args, cancellationToken);
             }
         }
     }

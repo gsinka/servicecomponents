@@ -27,7 +27,7 @@ namespace ServiceComponents.Infrastructure.Rabbit.Senders
             _mandatory = mandatory;
         }
 
-        public Task PublishAsync<T>(T @event, IBasicProperties basicProperties, CancellationToken cancellationToken = default) where T : IEvent
+        public Task PublishAsync<T>(T @event, IBasicProperties basicProperties, IDictionary<string, string> args = default, CancellationToken cancellationToken = default) where T : IEvent
         {
             _log.ForContext("event", @event, true).Verbose("Publishing {eventType} using RabbitMQ publisher to exchange '{exchange}', routing-key: '{routingKey}'", @event.DisplayName(), _exchange, _routingKey);
 
@@ -36,7 +36,9 @@ namespace ServiceComponents.Infrastructure.Rabbit.Senders
             basicProperties.MessageId = @event.EventId;
             basicProperties.Type = @event.AssemblyVersionlessQualifiedName();
 
-            _model.BasicPublish(_exchange, _routingKey, _mandatory, basicProperties, body);
+            var routingKey = args?["RoutingKey"] ?? _routingKey;
+
+            _model.BasicPublish(_exchange, routingKey, _mandatory, basicProperties, body);
 
             return Task.CompletedTask;
         }

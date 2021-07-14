@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using NHibernate;
 using ReferenceApplication.Api;
@@ -33,7 +34,7 @@ namespace ReferenceApplication.Application
             Log.Information("{command} handled", command.DisplayName());
 
             Log.Information("Publishing event");
-            await PublishAsync(new TestEvent("event from command handler"), cancellationToken);
+            await PublishAsync(new TestEvent("event from command handler"), new Dictionary<string, string>() { {"RoutingKey", "testrk"}}, cancellationToken: cancellationToken);
 
         }
     }

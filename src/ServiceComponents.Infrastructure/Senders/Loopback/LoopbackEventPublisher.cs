@@ -17,13 +17,13 @@ namespace ServiceComponents.Infrastructure.Senders.Loopback
             _scope = scope;
         }
 
-        public async Task PublishAsync<TEvent>(TEvent @event, ICorrelation correlation, CancellationToken cancellationToken = default) where TEvent : IEvent
+        public async Task PublishAsync<TEvent>(TEvent @event, ICorrelation correlation, IDictionary<string, string> args = default, CancellationToken cancellationToken = default) where TEvent : IEvent
         {
             await using var scope = _scope.BeginLifetimeScope();
             await scope.Resolve<IReceiveLoopbackEvent>().ReceiveAsync(@event, correlation, cancellationToken);
         }
 
-        public async Task PublishAsync(IEnumerable<IEvent> events, ICorrelation correlation, CancellationToken cancellationToken = default)
+        public async Task PublishAsync(IEnumerable<IEvent> events, ICorrelation correlation, IDictionary<string, string> args = default, CancellationToken cancellationToken = default)
         {
             await using var scope = _scope.BeginLifetimeScope();
             var receiver = scope.Resolve<IReceiveLoopbackEvent>();
