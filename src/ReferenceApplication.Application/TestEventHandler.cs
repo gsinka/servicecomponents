@@ -5,13 +5,14 @@ using System.Threading.Tasks;
 using ReferenceApplication.Api;
 using Serilog;
 using ServiceComponents.Application;
+using ServiceComponents.Application.Mediator;
 using ServiceComponents.Application.Senders;
 
 namespace ReferenceApplication.Application
 {
-    public class TestEventHandler : ServiceComponents.Application.Mediator.EventHandler<TestEvent>
+    public class TestEventHandler : HandleEvent<TestEvent>
     {
-        public TestEventHandler(ILogger log, ICorrelation correlation, ISendCommand commandSender, ISendQuery querySender) : base(log, correlation, commandSender, querySender)
+        public TestEventHandler(ILogger log, ICorrelation correlation, ISendCommand commandSender, ISendQuery querySender, IPublishEvent eventPublisher) : base(log, correlation, commandSender, querySender, eventPublisher)
         {
         }
 
@@ -26,9 +27,9 @@ namespace ReferenceApplication.Application
         }
     }
     
-    public class TestEventHandler2 : ServiceComponents.Application.Mediator.EventHandler<TestEvent>
+    public class TestEventHandler2 : HandleEvent<TestEvent>
     {
-        public TestEventHandler2(ILogger log, ICorrelation correlation, ISendCommand commandSender, ISendQuery querySender) : base(log, correlation, commandSender, querySender)
+        public TestEventHandler2(ILogger log, ICorrelation correlation, ISendCommand commandSender, ISendQuery querySender, IPublishEvent eventPublisher) : base(log, correlation, commandSender, querySender, eventPublisher)
         {
         }
 

@@ -24,8 +24,9 @@ namespace ServiceComponents.AspNet.Wireup
             return hostBuilder.RegisterCallback((context, containerBuilder) => {
 
                 containerBuilder.AddMediator(applicationAssemblies);
-                if (addBehavior) containerBuilder.AddMediatorBehavior(applicationAssemblies);
-
+                if (addBehavior) {
+                    containerBuilder.AddMediatorBehavior(applicationAssemblies);
+                }
             });
         }
         

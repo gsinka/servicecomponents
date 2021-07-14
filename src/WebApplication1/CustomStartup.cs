@@ -19,6 +19,9 @@ using ReferenceApplication.Application;
 using ReferenceApplication.Application.Entities;
 using Serilog;
 using Serilog.Events;
+using ServiceComponents.Application.Mediator;
+using ServiceComponents.AspNet;
+using ServiceComponents.AspNet.EventRecorder;
 using ServiceComponents.AspNet.Http.Senders;
 using ServiceComponents.Core.Extensions;
 using ServiceComponents.Infrastructure.NHibernate;
@@ -120,6 +123,8 @@ namespace WebApplication1
                     "Server=localhost; Port=5432; Database=ref-app; User Id=postgres; Password=postgres",
                     map => map.FluentMappings.AddFromAssemblyOf<TestEntity>(),
                     configuration => new SchemaUpdate(configuration).Execute(true, true)));
+
+            builder.UseEventRecorder();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

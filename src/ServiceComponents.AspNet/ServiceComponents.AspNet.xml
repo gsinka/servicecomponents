@@ -4,6 +4,16 @@
         <name>ServiceComponents.AspNet</name>
     </assembly>
     <members>
+        <member name="T:ServiceComponents.AspNet.EventRecorder.EventRecorderService">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:ServiceComponents.AspNet.EventRecorder.EventRecorderService.#ctor(Serilog.ILogger,ServiceComponents.Core.Services.IClock,System.Int32)">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="M:ServiceComponents.AspNet.Monitoring.MetricsController.GetMetrics">
             <summary>
             Provides metrics
