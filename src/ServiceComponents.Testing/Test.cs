@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace ServiceComponents.Testing
 {
-    public class Test<TTestHost> : IClassFixture<TTestHost>, IDisposable
+    public class Test<TTestHost> : IClassFixture<TTestHost>
         where TTestHost : class, ITestHost
     {
         public Guid Id { get; } = Guid.NewGuid();
@@ -14,11 +14,6 @@ namespace ServiceComponents.Testing
         {
             TestHost = testHost;
             TestHost.OutputHelper = outputHelper;
-        }
-
-        public virtual void Dispose()
-        {
-            TestHost.Dispose();
         }
     }
 }

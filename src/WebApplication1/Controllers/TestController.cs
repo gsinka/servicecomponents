@@ -35,7 +35,7 @@ namespace WebApplication1.Controllers
             _correlation.CorrelationId = "awaiter";
 
             var awaiter = _eventRecorder.WaitFor<TestEvent>(
-                (evnt, correlation) => evnt is TestEvent && correlation.CorrelationId == "awaiter", 
+                (evnt, correlation) => evnt is TestEvent && correlation.CorrelationId == "awaiter",
                 TimeSpan.FromSeconds(5));
 
             var testCommand = new TestCommand("awaiterTest");

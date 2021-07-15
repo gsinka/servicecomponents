@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using ServiceComponents.Application.Senders;
 using ServiceComponents.AspNet.Http.Senders;
-using ServiceComponents.Infrastructure.Senders;
 using HttpRequestOptions = ServiceComponents.AspNet.Http.HttpRequestOptions;
 
 namespace ServiceComponents.Testing.Extensions
@@ -13,7 +12,7 @@ namespace ServiceComponents.Testing.Extensions
     {
         public static void UseTestPublisher(this ContainerBuilder builder, IPublishEvent publisher)
         {
-            builder.RegisterDecorator<IPublishEvent>((_, __, ___) => publisher);
+            builder.RegisterInstance(publisher);
         }
 
         public static void UseTestSender<TTestHost>(this ContainerBuilder builder, object key = null)

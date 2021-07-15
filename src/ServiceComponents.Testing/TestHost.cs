@@ -3,9 +3,11 @@ using System.Net.Http;
 using Autofac;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ServiceComponents.Testing.Extensions;
+using ServiceComponents.Testing.Workarounds;
 using Xunit.Abstractions;
 
 namespace ServiceComponents.Testing
@@ -15,19 +17,25 @@ namespace ServiceComponents.Testing
     {
         public ITestOutputHelper OutputHelper { get; set; }
 
-        protected override IHostBuilder CreateHostBuilder()
+        protected override IHost CreateHost(IHostBuilder builder)
         {
-            return base.CreateHostBuilder()
-                .UseOutputHelper(OutputHelper)
-                .ConfigureServices(ConfigureTestServices)
-                .ConfigureContainer<ContainerBuilder>(ConfigureTestContainer);
+            builder.UseServiceProviderFactory(new CustomServiceProviderFactory());
+            builder.UseOutputHelper(OutputHelper);
+            return base.CreateHost(builder);
         }
 
-        public abstract void ConfigureTestServices(HostBuilderContext context, IServiceCollection services);
-        public abstract void ConfigureTestContainer(HostBuilderContext context, ContainerBuilder container);
+        protected override void ConfigureWebHost(IWebHostBuilder builder)
+        {
+            builder.ConfigureTestServices(ConfigureTestServices);
+            builder.ConfigureTestContainer<ContainerBuilder>(ConfigureTestContainer);
+            base.ConfigureWebHost(builder);
+        }
+
+        public abstract void ConfigureTestServices(IServiceCollection services);
+        public abstract void ConfigureTestContainer(ContainerBuilder builder);
     }
 
-    public interface ITestHost : IDisposable
+    public interface ITestHost
     {
         ITestOutputHelper OutputHelper { set; }
         HttpClient CreateClient();
