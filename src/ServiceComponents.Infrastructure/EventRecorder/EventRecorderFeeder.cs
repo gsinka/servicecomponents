@@ -4,7 +4,7 @@ using ServiceComponents.Api.Mediator;
 using ServiceComponents.Application;
 using ServiceComponents.Application.Mediator;
 
-namespace ServiceComponents.AspNet.EventRecorder
+namespace ServiceComponents.Infrastructure.EventRecorder
 {
     public class EventRecorderFeeder : IPreHandleEvent
     {

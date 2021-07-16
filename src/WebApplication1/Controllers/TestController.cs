@@ -6,9 +6,9 @@ using ReferenceApplication.Api;
 using ServiceComponents.Application;
 using ServiceComponents.Application.Senders;
 using ServiceComponents.AspNet;
-using ServiceComponents.AspNet.EventRecorder;
 using ServiceComponents.AspNet.Http;
 using ServiceComponents.Infrastructure.CorrelationContext;
+using ServiceComponents.Infrastructure.EventRecorder;
 
 namespace WebApplication1.Controllers
 {
@@ -19,9 +19,9 @@ namespace WebApplication1.Controllers
         private readonly IReceiveHttpCommand _httpCommandReceiver;
         private readonly ISendCommand _commandSender;
         private readonly Correlation _correlation;
-        private readonly EventRecorderService _eventRecorder;
+        private readonly IEventRecorder _eventRecorder;
 
-        public TestController(IReceiveHttpCommand httpCommandReceiver, ISendCommand commandSender, Correlation correlation, EventRecorderService eventRecorder)
+        public TestController(IReceiveHttpCommand httpCommandReceiver, ISendCommand commandSender, Correlation correlation, IEventRecorder eventRecorder)
         {
             _httpCommandReceiver = httpCommandReceiver;
             _commandSender = commandSender;
@@ -29,36 +29,36 @@ namespace WebApplication1.Controllers
             _eventRecorder = eventRecorder;
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> Get(CancellationToken cancellationToken)
-        //{
-        //    _correlation.CorrelationId = "awaiter";
+        [HttpGet("get")]
+        public async Task<IActionResult> Get(CancellationToken cancellationToken)
+        {
+            _correlation.CorrelationId = "awaiter";
 
-            //var awaiter = _eventRecorder.WaitFor<TestEvent>(
-            //    (evnt, correlation) => evnt is TestEvent && correlation.CorrelationId == "awaiter",
-            //    TimeSpan.FromSeconds(5));
+            var awaiter = _eventRecorder.WaitFor<TestEvent>(
+                (evnt, correlation) => evnt is TestEvent && correlation.CorrelationId == "awaiter",
+                TimeSpan.FromSeconds(5));
 
-        //    var testCommand = new TestCommand("awaiterTest");
-        //    await _commandSender.SendAsync(testCommand, cancellationToken);
+            var testCommand = new TestCommand("awaiterTest");
+            await _commandSender.SendAsync(testCommand, cancellationToken);
 
-        //    await awaiter;
+            await awaiter;
 
-        //    return Ok();
-        //    return awaiter.IsCompletedSuccessfully ? Ok(awaiter.Result.Data) : BadRequest("Event never arrived");
-        //}
+            return Ok();
+            return awaiter.IsCompletedSuccessfully ? Ok(awaiter.Result.Data) : BadRequest("Event never arrived");
+        }
 
-        //public async Task<IActionResult> Post(TestCommand testCommand, CancellationToken cancellationToken)
-        //{
-        //    var awaiter = _eventRecorder.WaitFor<TestEvent>(
-        //        (evnt, correlation) => evnt is TestEvent && correlation.CorrelationId == HttpContext.Request.Headers["correlation-id"],
-        //        TimeSpan.FromSeconds(5));
+        public async Task<IActionResult> Post(TestCommand testCommand, CancellationToken cancellationToken)
+        {
+            var awaiter = _eventRecorder.WaitFor<TestEvent>(
+                (evnt, correlation) => evnt is TestEvent && correlation.CorrelationId == HttpContext.Request.Headers["correlation-id"],
+                TimeSpan.FromSeconds(5));
 
-        //    await _httpCommandReceiver.ReceiveAsync(testCommand, cancellationToken);
+            await _httpCommandReceiver.ReceiveAsync(testCommand, cancellationToken);
 
-        //    await awaiter;
+            await awaiter;
 
-        //    return awaiter.Result != null ? Ok() : BadRequest();
-        //}
+            return awaiter.Result != null ? Ok() : BadRequest();
+        }
 
         [HttpGet("testcor")]
         public async Task<IActionResult> TestCor(CancellationToken cancellationToken)

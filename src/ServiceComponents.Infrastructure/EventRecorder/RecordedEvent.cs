@@ -2,7 +2,7 @@
 using ServiceComponents.Api.Mediator;
 using ServiceComponents.Application;
 
-namespace ServiceComponents.AspNet.EventRecorder
+namespace ServiceComponents.Infrastructure.EventRecorder
 {
     public class RecordedEvent
     {

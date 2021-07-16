@@ -8,12 +8,12 @@ using ServiceComponents.Api.Mediator;
 using ServiceComponents.Application;
 using ServiceComponents.Core.Services;
 
-namespace ServiceComponents.AspNet.EventRecorder
+namespace ServiceComponents.Infrastructure.EventRecorder
 {
     /// <summary>
     /// 
     /// </summary>
-    public class EventRecorderService
+    public class EventRecorderService : IEventRecorder
     {
         private readonly ILogger _log;
         private readonly IClock _clock;
