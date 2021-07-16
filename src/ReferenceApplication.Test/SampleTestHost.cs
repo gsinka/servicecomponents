@@ -11,11 +11,11 @@ namespace ReferenceApplication.Test
 {
     public class SampleTestHost2 : TestHost<Program>
     {
-        public override void ConfigureTestContainer(HostBuilderContext context, ContainerBuilder container)
+        public override void ConfigureTestContainer(ContainerBuilder container)
         {
         }
 
-        public override void ConfigureTestServices(HostBuilderContext context, IServiceCollection services)
+        public override void ConfigureTestServices(IServiceCollection services)
         {
         }
     }
@@ -24,12 +24,12 @@ namespace ReferenceApplication.Test
     {
         public Mock<IPublishEvent> EventPublisherMock = new();
 
-        public override void ConfigureTestContainer(HostBuilderContext context, ContainerBuilder container)
+        public override void ConfigureTestContainer(ContainerBuilder container)
         {
             container.UseTestPublisher(EventPublisherMock.Object);
         }
 
-        public override void ConfigureTestServices(HostBuilderContext context, IServiceCollection services)
+        public override void ConfigureTestServices(IServiceCollection services)
         {
 
         }
