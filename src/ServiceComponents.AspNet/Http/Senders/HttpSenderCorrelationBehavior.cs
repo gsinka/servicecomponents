@@ -23,7 +23,7 @@ namespace ServiceComponents.AspNet.Http.Senders
             if (!string.IsNullOrEmpty(_correlation.CorrelationId)) headers.Add(_options.CorrelationIdHeaderKey, _correlation.CorrelationId);
             headers.Add(_options.CausationIdHeaderKey, _correlation.CurrentId);
 
-            _log.ForContext("correlation", new { correlationId = headers[_options.CorrelationIdHeaderKey], causationId = headers[_options.CausationIdHeaderKey] }, true).Debug("HttpHeaders updated with correlation");
+            _log.ForContext("correlation", new { correlationId = _correlation.CorrelationId, causationId = _correlation.CausationId }, true).Debug("HttpHeaders updated with correlation");
         }
     }
 }

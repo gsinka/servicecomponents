@@ -86,11 +86,11 @@ namespace WebApplication1
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            //builder.AddHttpCommandSender(new Uri("http://localhost:5000/api/generic"), "http");
+            builder.AddHttpCommandSender(new Uri("http://localhost:5000/api/generic"), "http");
             //builder.AddHttpQuerySender(new Uri("http://localhost:5000/api/generic"), "http");
             //builder.AddHttpEventPublisher(new Uri("http://localhost:5000/api/generic"), "http");
 
-            builder.AddCommandRouter(command => "_loopback");
+            builder.AddCommandRouter(command => "http");
             builder.AddQueryRouter(command => "_loopback");
             builder.AddEventRouter(command => "rabbit");
 
