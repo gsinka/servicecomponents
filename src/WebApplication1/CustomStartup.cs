@@ -149,7 +149,7 @@ namespace WebApplication1
 
         public Assembly ApiAssembly => typeof(TestCommand).Assembly;
 
-        public Assembly ApplicationAssembly => typeof(TestCommandHandler).Assembly;
+        public Assembly[] ApplicationAssembly => new []{ typeof(TestCommandHandler).Assembly };
 
         public static void Initialize(IHost host)
         {
