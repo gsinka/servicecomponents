@@ -1,4 +1,6 @@
-﻿namespace ServiceComponents.Application.Monitoring
+﻿using System;
+
+namespace ServiceComponents.Application.Monitoring
 {
     public interface IMetricsService
     {
