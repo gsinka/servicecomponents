@@ -66,7 +66,7 @@ namespace ServiceComponents.Infrastructure.Rabbit
                 }
             }
             catch (Exception exception) {
-                
+                _log.Error(exception, "Exception during receiving message from RabbitMQ queue '{queue}'", _queue);
                 _model.BasicReject(e.DeliveryTag, false);
             }
         }
