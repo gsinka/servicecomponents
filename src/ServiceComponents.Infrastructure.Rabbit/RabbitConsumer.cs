@@ -35,22 +35,23 @@ namespace ServiceComponents.Infrastructure.Rabbit
         private void ConsumerOnReceived(object sender, BasicDeliverEventArgs e)
         {
             var consumer = sender as EventingBasicConsumer;
-            
+
             _log.Verbose("Receiving message from RabbitMQ queue '{queue}'", _queue);
 
             using var scope = _rootScope.BeginLifetimeScope();
 
             try {
                 var payload = Encoding.UTF8.GetString(e.Body.ToArray());
-            
+
                 object queryResult = null;
-            
+
                 new RequestParser().ParseAsync(
-                    payload, 
+                    payload,
                     e.BasicProperties.Type,
-                    async (command, token) => { await scope.Resolve<IReceiveRabbitCommand>().ReceiveAsync(command, e, CancellationToken.None);},
-                    async (query, token) => { queryResult = await scope.Resolve<IReceiveRabbitQuery>().ReceiveAsync((dynamic)query, e, CancellationToken.None);}, 
-                    async (@event, token) => { await scope.Resolve<IReceiveRabbitEvent>().ReceiveAsync(@event, e, CancellationToken.None);}, 
+                    async (command, token) => { await scope.Resolve<IReceiveRabbitCommand>().ReceiveAsync(command, e, CancellationToken.None); },
+                    async (query, token) => { queryResult = await scope.Resolve<IReceiveRabbitQuery>().ReceiveAsync((dynamic)query, e, CancellationToken.None); },
+                    async (@event, token) => { await scope.Resolve<IReceiveRabbitEvent>().ReceiveAsync(@event, e, CancellationToken.None); },
+                    async (payload, token) => { await scope.Resolve<IReceiveRabbitMessage>().ReceiveAsync(payload, e, CancellationToken.None); },
                     CancellationToken.None).Wait();
 
                 _model.BasicAck(e.DeliveryTag, false);
@@ -58,7 +59,8 @@ namespace ServiceComponents.Infrastructure.Rabbit
                 if (queryResult != null) {
                     if (string.IsNullOrEmpty(e.BasicProperties.ReplyTo)) {
                         _log.Error("Received query on RabbitMQ but no reply_to address defined for sending query result");
-                    } else {
+                    }
+                    else {
                         var replyProps = _model.CreateBasicProperties();
                         replyProps.CorrelationId = e.BasicProperties.CorrelationId;
                         _model.BasicPublish("", e.BasicProperties.ReplyTo, false, replyProps, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(queryResult, Formatting.None)));
@@ -71,7 +73,7 @@ namespace ServiceComponents.Infrastructure.Rabbit
             }
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public void Start()
         {
             if (ConsumerTag == default) {
                 ConsumerTag = _model.BasicConsume(_queue, false, _consumer);

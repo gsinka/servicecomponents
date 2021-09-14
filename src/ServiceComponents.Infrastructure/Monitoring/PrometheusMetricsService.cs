@@ -10,7 +10,6 @@ namespace ServiceComponents.Infrastructure.Monitoring
 {
     public class PrometheusMetricsService : IMetricsService
     {
-        private readonly IClock _clock;
         private readonly Dictionary<object, Counter> _counters = new();
         private readonly Dictionary<object, Summary> _summaries = new();
         private readonly Dictionary<object, Histogram> _histograms = new();

@@ -35,7 +35,7 @@ namespace ServiceComponents.AspNet.Http
             // Get domain type
             var domainType = httpRequest.Headers[_options.DomainTypeHeaderKey].ToString();
 
-            await new RequestParser().ParseAsync(json, domainType, commandAction, queryAction, eventAction, cancellationToken);
+            await new RequestParser().ParseAsync(json, domainType, commandAction, queryAction, eventAction, null, cancellationToken);
         }
     }
 }

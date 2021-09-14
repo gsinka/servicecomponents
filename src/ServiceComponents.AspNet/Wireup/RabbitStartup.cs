@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
+﻿using System.Collections.Generic;
 using Autofac;
-using Autofac.Core;
-using Microsoft.Extensions.Configuration;
 using RabbitMQ.Client;
 using Serilog;
 using ServiceComponents.Infrastructure.Rabbit;
@@ -20,7 +15,6 @@ namespace ServiceComponents.AspNet.Wireup
         private readonly string _exchange;
         private readonly string _routingKey;
         private readonly int[] _retryIntervals;
-        private readonly IConfiguration _configuration;
 
         public RabbitStartup(ILogger log, ILifetimeScope scope, IModel channel, string queue, string exchange, string routingKey = "", int[] retryIntervals = default)
         {
@@ -51,7 +45,7 @@ namespace ServiceComponents.AspNet.Wireup
             foreach (var consumer in consumers) {
 
                 _log.Verbose("Starting consumer consumer-{consumerId}", consumer.ConsumerTag);
-                consumer.StartAsync(CancellationToken.None).Wait();
+                consumer.Start();
             }
         }
     }

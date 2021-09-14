@@ -9,8 +9,6 @@ namespace ServiceComponents.Infrastructure.Receivers.Loopback
     {
         private readonly ILogger _log;
         private readonly Correlation _correlation;
-        private string _causationId;
-        private string _currentId;
 
         protected LoopbackReceiverCorrelationBehavior(ILogger log, Correlation correlation)
         {

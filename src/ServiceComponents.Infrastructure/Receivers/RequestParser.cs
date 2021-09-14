@@ -8,7 +8,7 @@ namespace ServiceComponents.Infrastructure.Receivers
 {
     public class RequestParser
     {
-        private readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All, TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple };
+        private readonly JsonSerializerSettings _jsonSerializerSettings = new() { TypeNameHandling = TypeNameHandling.All, TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple };
 
         public async Task ParseAsync(
             string payload, 
@@ -16,6 +16,7 @@ namespace ServiceComponents.Infrastructure.Receivers
             Func<ICommand, CancellationToken, Task> commandAction,
             Func<IQuery, CancellationToken, Task> queryAction,
             Func<IEvent, CancellationToken, Task> eventAction,
+            Func<string, CancellationToken, Task> messageAction = null,
             CancellationToken cancellationToken = default)
         {
             // Get body
@@ -41,7 +42,14 @@ namespace ServiceComponents.Infrastructure.Receivers
                     break;
 
                 default:
-                    throw new InvalidOperationException($"Unknown request type: {request.GetType().FullName} (not a command, query or event)");
+
+                    if (messageAction != null) {
+                        await messageAction(payload, cancellationToken);
+                        break;
+                    }
+                    else {
+                        throw new InvalidOperationException($"Unknown request type: {request.GetType().FullName} (not a command, query or event)");
+                    }
             }
         }
     }

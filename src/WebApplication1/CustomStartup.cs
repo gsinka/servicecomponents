@@ -164,7 +164,7 @@ namespace WebApplication1
 
             var consumer = scope.ResolveKeyed<RabbitConsumer>("consumer");
             Log.Verbose("Starting consumer consumer-{consumerId}", consumer.ConsumerTag);
-            consumer.StartAsync(CancellationToken.None).Wait();
+            consumer.Start();
         }
     }
 }
