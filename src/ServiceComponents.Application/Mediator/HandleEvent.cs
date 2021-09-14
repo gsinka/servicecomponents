@@ -37,7 +37,7 @@ namespace ServiceComponents.Application.Mediator
             return await _querySender.SendAsync(query, cancellationToken);
         }
 
-        protected async Task PublishAsync<TEvent2>(TEvent @event, CancellationToken cancellationToken = default) where TEvent2 : IEvent
+        protected async Task PublishAsync<TEvent2>(TEvent2 @event, CancellationToken cancellationToken = default) where TEvent2 : IEvent
         {
             await _eventPublisher.PublishAsync(@event, cancellationToken);
         }
