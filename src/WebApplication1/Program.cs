@@ -1,9 +1,11 @@
 using System;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
+using ServiceComponents.Infrastructure.CouchDB;
 
 namespace WebApplication1
 {
@@ -35,6 +37,13 @@ namespace WebApplication1
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+
+                //// CouchDB configuration
+                //.ConfigureAppConfiguration((context, config) => {
+                //    var temp = config.Build();
+                //    var serviceConfiguration = temp.GetSection("ServiceConfiguration").Get<ServiceConfigurationOptions>();
+                //    config.Sources.Insert(0, new CouchDbConfigurationSource(serviceConfiguration));
+                //})
 
                 // Autofac service provider
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())

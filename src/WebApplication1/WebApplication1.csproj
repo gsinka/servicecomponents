@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ReferenceApplication.Application\ReferenceApplication.Application.csproj" />
     <ProjectReference Include="..\ServiceComponents.AspNet\ServiceComponents.AspNet.csproj" />
+    <ProjectReference Include="..\ServiceComponents.Infrastructure.CouchDB\ServiceComponents.Infrastructure.CouchDB.csproj" />
     
   </ItemGroup>
 

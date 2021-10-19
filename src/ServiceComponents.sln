@@ -35,7 +35,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceComponents.Testing",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{BDF73F74-F0C5-42B5-8311-EF086FA2F0D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReferenceApplication.Test", "ReferenceApplication.Test\ReferenceApplication.Test.csproj", "{C1019D56-45AE-4589-B41C-30B66DE8E7DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReferenceApplication.Test", "ReferenceApplication.Test\ReferenceApplication.Test.csproj", "{C1019D56-45AE-4589-B41C-30B66DE8E7DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceComponents.Infrastructure.CouchDB", "ServiceComponents.Infrastructure.CouchDB\ServiceComponents.Infrastructure.CouchDB.csproj", "{6CEA4C4E-9AA1-49AB-BA1E-E74EFA151855}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -107,6 +109,10 @@ Global
 		{C1019D56-45AE-4589-B41C-30B66DE8E7DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1019D56-45AE-4589-B41C-30B66DE8E7DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C1019D56-45AE-4589-B41C-30B66DE8E7DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CEA4C4E-9AA1-49AB-BA1E-E74EFA151855}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CEA4C4E-9AA1-49AB-BA1E-E74EFA151855}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CEA4C4E-9AA1-49AB-BA1E-E74EFA151855}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CEA4C4E-9AA1-49AB-BA1E-E74EFA151855}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
