@@ -6,6 +6,8 @@ namespace ServiceComponents.Api.Mediator
     {
         public string CommandId { get; }
 
+        protected Command() : this(default) { }
+
         protected Command(string commandId)
         {
             CommandId = commandId ?? Guid.NewGuid().ToString();

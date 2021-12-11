@@ -3,6 +3,7 @@ using Autofac;
 using Microsoft.Extensions.Options;
 using Serilog;
 using ServiceComponents.Application.Senders;
+using ServiceComponents.AspNet.Exceptions;
 using ServiceComponents.AspNet.Http.Senders;
 using HttpRequestOptions = ServiceComponents.AspNet.Http.HttpRequestOptions;
 
@@ -24,12 +25,14 @@ namespace ServiceComponents.Testing.Extensions
                 context.Resolve<ILogger>(),
                 testHost.CreateClient(),
                 new Uri("http://command-sender-mock.com"),
-                context.Resolve<IOptions<HttpRequestOptions>>()));
+                context.Resolve<IOptions<HttpRequestOptions>>(), 
+                context.Resolve<IExceptionMapperService>()));
             var queryenderRegistration = builder.Register(context => new HttpQuerySender(
                  context.Resolve<ILogger>(),
                  testHost.CreateClient(),
                  new Uri("http://command-sender-mock.com"),
-                 context.Resolve<IOptions<HttpRequestOptions>>()));
+                 context.Resolve<IOptions<HttpRequestOptions>>(),
+                 context.Resolve<IExceptionMapperService>()));
 
             if (key == default) {
                 commandSenderRegistration.As<ISendHttpCommand>();

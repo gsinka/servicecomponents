@@ -4,6 +4,7 @@ using Autofac;
 using Microsoft.Extensions.Options;
 using Serilog;
 using ServiceComponents.Application.Senders;
+using ServiceComponents.AspNet.Exceptions;
 
 namespace ServiceComponents.AspNet.Http.Senders
 {
@@ -17,7 +18,8 @@ namespace ServiceComponents.AspNet.Http.Senders
                 context.Resolve<ILogger>(),
                 context.Resolve<IHttpClientFactory>().CreateClient(),
                 requestUri,
-                context.Resolve<IOptions<HttpRequestOptions>>()));
+                context.Resolve<IOptions<HttpRequestOptions>>(),
+                context.Resolve<IExceptionMapperService>()));
 
             if (key == default) {
                 proxyRegistration.As<ISendCommand>();
@@ -39,7 +41,8 @@ namespace ServiceComponents.AspNet.Http.Senders
                 context.Resolve<ILogger>(),
                 context.Resolve<IHttpClientFactory>().CreateClient(),
                 requestUri,
-                context.Resolve<IOptions<HttpRequestOptions>>()));
+                context.Resolve<IOptions<HttpRequestOptions>>(), 
+                context.Resolve<IExceptionMapperService>()));
 
             if (key == default) {
                 proxyRegistration.As<ISendQuery>();
@@ -61,7 +64,8 @@ namespace ServiceComponents.AspNet.Http.Senders
                 context.Resolve<ILogger>(),
                 context.Resolve<IHttpClientFactory>().CreateClient(),
                 requestUri,
-                context.Resolve<IOptions<HttpRequestOptions>>()));
+                context.Resolve<IOptions<HttpRequestOptions>>(), 
+                context.Resolve<IExceptionMapperService>()));
 
             if (key == default) {
                 proxyRegistration.As<IPublishEvent>();

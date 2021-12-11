@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Serilog;
+using ServiceComponents.AspNet.Exceptions;
 using ServiceComponents.Core.Extensions;
 
 namespace ServiceComponents.AspNet.Http.Senders
@@ -16,13 +17,15 @@ namespace ServiceComponents.AspNet.Http.Senders
         private readonly ILogger _log;
         private readonly HttpClient _httpClient;
         protected readonly Uri RequestUri;
+        private readonly IExceptionMapperService _exceptionMapperService;
         private readonly HttpRequestOptions _options;
 
-        protected HttpSender(ILogger log, HttpClient httpClient, Uri requestUri, IOptions<HttpRequestOptions> options)
+        protected HttpSender(ILogger log, HttpClient httpClient, Uri requestUri, IOptions<HttpRequestOptions> options, IExceptionMapperService exceptionMapperService)
         {
             _log = log;
             _httpClient = httpClient;
             RequestUri = requestUri;
+            _exceptionMapperService = exceptionMapperService;
             _options = options.Value;
         }
 
@@ -44,7 +47,7 @@ namespace ServiceComponents.AspNet.Http.Senders
             _httpClient.DefaultRequestHeaders.Add("accept", "application/json");
 
             var result = await _httpClient.PostAsync(RequestUri, content, cancellationToken);
-            result.EnsureSuccessStatusCode();
+            await _exceptionMapperService.ThrowExceptionIfNeeded(result);
             return result;
         }
     }

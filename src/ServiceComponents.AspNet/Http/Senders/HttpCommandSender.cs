@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Serilog;
 using ServiceComponents.Api.Mediator;
+using ServiceComponents.AspNet.Exceptions;
 
 namespace ServiceComponents.AspNet.Http.Senders
 {
@@ -13,7 +14,8 @@ namespace ServiceComponents.AspNet.Http.Senders
     {
         private readonly ILogger _log;
 
-        public HttpCommandSender(ILogger log, HttpClient httpClient, Uri requestUri, IOptions<HttpRequestOptions> options) : base(log, httpClient, requestUri, options)
+        public HttpCommandSender(ILogger log, HttpClient httpClient, Uri requestUri, IOptions<HttpRequestOptions> options, IExceptionMapperService exceptionMapperService) 
+            : base(log, httpClient, requestUri, options, exceptionMapperService)
         {
             _log = log;
         }

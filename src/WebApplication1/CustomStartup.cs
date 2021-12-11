@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Reflection;
-using System.Threading;
 using Autofac;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -19,10 +19,9 @@ using ReferenceApplication.Application;
 using ReferenceApplication.Application.Entities;
 using Serilog;
 using Serilog.Events;
-using ServiceComponents.Application.Mediator;
-using ServiceComponents.AspNet;
+using ServiceComponents.AspNet.Exceptions;
 using ServiceComponents.AspNet.Http.Senders;
-using ServiceComponents.Core.Extensions;
+using ServiceComponents.Core.Exceptions;
 using ServiceComponents.Infrastructure.EventRecorder;
 using ServiceComponents.Infrastructure.NHibernate;
 using ServiceComponents.Infrastructure.Options;
@@ -82,16 +81,37 @@ namespace WebApplication1
                 }
             });
 
+            services.AddSingleton<IExceptionMapperService, JsonExceptionMapper>(provider => new JsonExceptionMapper(
+
+                exception => {
+
+                    return exception switch {
+                        NotFoundException notFoundException => new ErrorResponse(HttpStatusCode.NotFound, notFoundException.ErrorCode, notFoundException.Message),
+                        BusinessException businessException => new ErrorResponse(HttpStatusCode.BadRequest, businessException.ErrorCode, businessException.Message),
+                        InvalidOperationException invalidOperationException => new ErrorResponse(HttpStatusCode.BadRequest, 0, exception.Message),
+                        _ => new ErrorResponse(HttpStatusCode.InternalServerError, 0, "Something really bad happened")
+                    };
+
+                }, errorResponse => {
+
+                    return (errorResponse switch {
+
+                        ErrorResponse { StatusCode: HttpStatusCode.NotFound } => new NotFoundException(errorResponse.ErrorMessage),
+                        ErrorResponse { StatusCode: HttpStatusCode.BadRequest, ErrorCode: > 0 } => new BusinessException(errorResponse.ErrorCode, errorResponse.ErrorMessage),
+                        ErrorResponse { StatusCode: HttpStatusCode.BadRequest, ErrorCode: 0 } => new InvalidOperationException(errorResponse.ErrorMessage),
+                        _ => null
+                    })!;
+                }));
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
             builder.AddHttpCommandSender(new Uri("http://localhost:5000/api/generic"), "http");
-            //builder.AddHttpQuerySender(new Uri("http://localhost:5000/api/generic"), "http");
+            builder.AddHttpQuerySender(new Uri("http://localhost:5000/api/generic"), "http");
             //builder.AddHttpEventPublisher(new Uri("http://localhost:5000/api/generic"), "http");
 
             builder.AddCommandRouter(command => "http");
-            builder.AddQueryRouter(command => "_loopback");
+            builder.AddQueryRouter(command => "http");
             builder.AddEventRouter(command => "rabbit");
 
 
@@ -118,11 +138,11 @@ namespace WebApplication1
             builder.AddRabbitCommandSender(exchange, string.Empty, "publisher", "rabbit");
             builder.AddRabbitQuerySender(exchange, string.Empty, "publisher", "rabbit");
 
-            //NHibernate
-            builder.RegisterModule(new NhibernateModule(
-                    "Server=localhost; Port=5432; Database=ref-app; User Id=postgres; Password=postgres",
-                    map => map.FluentMappings.AddFromAssemblyOf<TestEntity>(),
-                    configuration => new SchemaUpdate(configuration).Execute(true, true)));
+            ////NHibernate
+            //builder.RegisterModule(new NhibernateModule(
+            //        "Server=localhost; Port=5432; Database=ref-app; User Id=postgres; Password=postgres",
+            //        map => map.FluentMappings.AddFromAssemblyOf<TestEntity>(),
+            //        configuration => new SchemaUpdate(configuration).Execute(true, true)));
 
             builder.UseEventRecorder();
         }
@@ -149,7 +169,7 @@ namespace WebApplication1
 
         public Assembly ApiAssembly => typeof(TestCommand).Assembly;
 
-        public Assembly[] ApplicationAssembly => new []{ typeof(TestCommandHandler).Assembly };
+        public Assembly[] ApplicationAssembly => new[] { typeof(TestCommandHandler).Assembly };
 
         public static void Initialize(IHost host)
         {
