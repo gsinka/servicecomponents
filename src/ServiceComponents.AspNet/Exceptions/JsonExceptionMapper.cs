@@ -29,6 +29,8 @@ namespace ServiceComponents.AspNet.Exceptions
 
         public async Task ThrowExceptionIfNeeded(HttpResponseMessage httpResponse)
         {
+            if (httpResponse.IsSuccessStatusCode) return;
+
             var errorResponse = JsonConvert.DeserializeAnonymousType(await httpResponse.Content.ReadAsStringAsync(), new { errorCode = 1, errorMessage = ""});
             var exception = _exceptionMapper(new ErrorResponse(httpResponse.StatusCode, errorResponse.errorCode, errorResponse.errorMessage));
             
