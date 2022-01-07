@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using Autofac;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,18 +15,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using NHibernate.Tool.hbm2ddl;
+using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
 using ReferenceApplication.Api;
 using ReferenceApplication.Application;
-using ReferenceApplication.Application.Entities;
 using Serilog;
 using Serilog.Events;
 using ServiceComponents.AspNet.Exceptions;
 using ServiceComponents.AspNet.Http.Senders;
 using ServiceComponents.Core.Exceptions;
 using ServiceComponents.Infrastructure.EventRecorder;
-using ServiceComponents.Infrastructure.NHibernate;
 using ServiceComponents.Infrastructure.Options;
 using ServiceComponents.Infrastructure.Rabbit;
 using ServiceComponents.Infrastructure.Senders;
@@ -81,27 +82,7 @@ namespace WebApplication1
                 }
             });
 
-            services.AddSingleton<IExceptionMapperService, JsonExceptionMapper>(provider => new JsonExceptionMapper(
-
-                exception => {
-
-                    return exception switch {
-                        NotFoundException notFoundException => new ErrorResponse(HttpStatusCode.NotFound, notFoundException.ErrorCode, notFoundException.Message),
-                        BusinessException businessException => new ErrorResponse(HttpStatusCode.BadRequest, businessException.ErrorCode, businessException.Message),
-                        InvalidOperationException invalidOperationException => new ErrorResponse(HttpStatusCode.BadRequest, 0, exception.Message),
-                        _ => new ErrorResponse(HttpStatusCode.InternalServerError, 0, "Something really bad happened")
-                    };
-
-                }, errorResponse => {
-
-                    return (errorResponse switch {
-
-                        ErrorResponse { StatusCode: HttpStatusCode.NotFound } => new NotFoundException(errorResponse.ErrorMessage),
-                        ErrorResponse { StatusCode: HttpStatusCode.BadRequest, ErrorCode: > 0 } => new BusinessException(errorResponse.ErrorCode, errorResponse.ErrorMessage),
-                        ErrorResponse { StatusCode: HttpStatusCode.BadRequest, ErrorCode: 0 } => new InvalidOperationException(errorResponse.ErrorMessage),
-                        _ => null
-                    })!;
-                }));
+            services.AddSingleton<IExceptionMapperService, JsonExceptionMapper>(provider => new JsonExceptionMapper());
         }
 
         public void ConfigureContainer(ContainerBuilder builder)

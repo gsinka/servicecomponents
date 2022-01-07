@@ -4,6 +4,18 @@
         <name>ServiceComponents.AspNet</name>
     </assembly>
     <members>
+        <member name="M:ServiceComponents.AspNet.Exceptions.JsonExceptionMapper.#ctor">
+            <summary>
+            Exception mapper with built-in mapping
+            </summary>
+        </member>
+        <member name="M:ServiceComponents.AspNet.Exceptions.JsonExceptionMapper.#ctor(System.Func{System.Exception,System.ValueTuple{System.Int32,ServiceComponents.AspNet.Exceptions.IErrorResponse}},System.Func{System.Net.HttpStatusCode,System.Net.Http.HttpContent,System.Exception})">
+            <summary>
+            Exception mapper with custom mapping
+            </summary>
+            <param name="responseMapper"></param>
+            <param name="exceptionMapper"></param>
+        </member>
         <member name="M:ServiceComponents.AspNet.Monitoring.MetricsController.GetMetrics">
             <summary>
             Provides metrics

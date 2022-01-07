@@ -22,6 +22,7 @@ namespace ReferenceApplication.Application
 
         override public async Task HandleAsync(TestCommand command, CancellationToken cancellationToken = default)
         {
+            //var queryResult = await SendAsync(new TestQuery(""), cancellationToken);
             var queryResult = await SendAsync(new TestQuery("from command handler"), cancellationToken);
             Log.Information("Query called from command handler with result: {queryResult}", queryResult);
 
