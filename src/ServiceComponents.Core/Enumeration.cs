@@ -17,7 +17,10 @@ namespace ServiceComponents.Core
             Name = name;
         }
 
-        public override string ToString() => Name;
+        override public string ToString()
+        {
+            return Name;
+        }
 
         public static IEnumerable<T> GetAll<T>() where T : Enumeration
         {
@@ -34,6 +37,32 @@ namespace ServiceComponents.Core
 
             return typeMatches && valueMatches;
         }
+
+        public static T FromId<T>(int id) where T : Enumeration, new()
+    {
+        var matchingItem = parse<T, int>(id, "ID", item => item.Id == id);
+        return matchingItem;
+    }
+
+    public static T FromName<T>(string name) where T : Enumeration, new()
+    {
+        var matchingItem = parse<T, string>(name, "name", item => item.Name == name);
+        return matchingItem;
+    }
+
+    private static T parse<T, K>(K value, string description, Func<T, bool> predicate) where T : Enumeration, new()
+    {
+        var matchingItem = GetAll<T>().FirstOrDefault(predicate);
+
+        if (matchingItem == null)
+        {
+            var message = string.Format("'{0}' is not a valid {1} in {2}", value, description, typeof(T));
+            throw new ApplicationException(message);
+        }
+
+        return matchingItem;
+    }
+
 
         public override int GetHashCode()
         {
