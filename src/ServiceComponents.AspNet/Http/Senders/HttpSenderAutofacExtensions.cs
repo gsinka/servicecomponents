@@ -10,13 +10,13 @@ namespace ServiceComponents.AspNet.Http.Senders
 {
     public static class HttpSenderAutofacExtensions
     {
-        public static ContainerBuilder AddHttpCommandSender(this ContainerBuilder builder, Uri requestUri, object key = default)
+        public static ContainerBuilder AddHttpCommandSender(this ContainerBuilder builder, Uri requestUri, object key = default, string httpClientKey = default)
         {
             var proxyRegistration = builder.Register(context => new HttpCommandSenderProxy(key == default ? context.Resolve<ISendHttpCommand>() : context.ResolveKeyed<ISendHttpCommand>(key))).InstancePerDependency();
 
             var senderRegistration = builder.Register(context => new HttpCommandSender(
                 context.Resolve<ILogger>(),
-                context.Resolve<IHttpClientFactory>().CreateClient(),
+                httpClientKey == default ? context.Resolve<IHttpClientFactory>().CreateClient() : context.Resolve<IHttpClientFactory>().CreateClient(httpClientKey),
                 requestUri,
                 context.Resolve<IOptions<HttpRequestOptions>>(),
                 context.Resolve<IExceptionMapperService>()));
@@ -33,13 +33,13 @@ namespace ServiceComponents.AspNet.Http.Senders
             return builder;
         }
 
-        public static ContainerBuilder AddHttpQuerySender(this ContainerBuilder builder, Uri requestUri, object key = default)
+        public static ContainerBuilder AddHttpQuerySender(this ContainerBuilder builder, Uri requestUri, object key = default, string httpClientKey = default)
         {
             var proxyRegistration = builder.Register(context => new HttpQuerySenderProxy(key == default ? context.Resolve<ISendHttpQuery>() : context.ResolveKeyed<ISendHttpQuery>(key))).InstancePerDependency();
 
             var senderRegistration = builder.Register(context => new HttpQuerySender(
                 context.Resolve<ILogger>(),
-                context.Resolve<IHttpClientFactory>().CreateClient(),
+                httpClientKey == default ? context.Resolve<IHttpClientFactory>().CreateClient() : context.Resolve<IHttpClientFactory>().CreateClient(httpClientKey),
                 requestUri,
                 context.Resolve<IOptions<HttpRequestOptions>>(), 
                 context.Resolve<IExceptionMapperService>()));
@@ -56,13 +56,13 @@ namespace ServiceComponents.AspNet.Http.Senders
             return builder;
         }
 
-        public static ContainerBuilder AddHttpEventPublisher(this ContainerBuilder builder, Uri requestUri, object key = default)
+        public static ContainerBuilder AddHttpEventPublisher(this ContainerBuilder builder, Uri requestUri, object key = default, string httpClientKey = default)
         {
             var proxyRegistration = builder.Register(context => new HttpEventPublisherProxy(key == default ? context.Resolve<IPublishHttpEvent>() : context.ResolveKeyed<IPublishHttpEvent>(key))).InstancePerDependency();
 
             var senderRegistration = builder.Register(context => new HttpEventPublisher(
                 context.Resolve<ILogger>(),
-                context.Resolve<IHttpClientFactory>().CreateClient(),
+                httpClientKey == default ? context.Resolve<IHttpClientFactory>().CreateClient() : context.Resolve<IHttpClientFactory>().CreateClient(httpClientKey),
                 requestUri,
                 context.Resolve<IOptions<HttpRequestOptions>>(), 
                 context.Resolve<IExceptionMapperService>()));

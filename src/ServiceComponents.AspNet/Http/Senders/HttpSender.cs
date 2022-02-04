@@ -37,7 +37,6 @@ namespace ServiceComponents.AspNet.Http.Senders
             var content = new StringContent(objectJson);
             
             content.Headers.Add(_options.DomainTypeHeaderKey, request.AssemblyVersionlessQualifiedName());
-            
 
             foreach (var (key, value) in header)
             {
