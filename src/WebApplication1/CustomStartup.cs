@@ -23,6 +23,7 @@ using ReferenceApplication.Application;
 using Serilog;
 using Serilog.Events;
 using ServiceComponents.AspNet.Exceptions;
+using ServiceComponents.AspNet.Http;
 using ServiceComponents.AspNet.Http.Senders;
 using ServiceComponents.Core.Exceptions;
 using ServiceComponents.Infrastructure.EventRecorder;
@@ -97,6 +98,8 @@ namespace WebApplication1
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
+            //builder.AddHttpReceiverAuthorizationBehavior();
+
             builder.AddHttpCommandSender(new Uri("api/generic", UriKind.Relative), "http", "rads-service");
             builder.AddHttpQuerySender(new Uri("api/generic", UriKind.Relative), "http", "rads-service");
             //builder.AddHttpEventPublisher(new Uri("http://localhost:5000/api/generic"), "http");

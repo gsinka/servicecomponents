@@ -12,5 +12,13 @@ namespace ServiceComponents.AspNet.Http
 
             return builder;
         }
+
+        public static ContainerBuilder AddHttpReceiverAuthorizationBehavior(this ContainerBuilder builder)
+        {
+            builder.RegisterDecorator<HttpCommandAuthorizationBehavior, IReceiveHttpCommand>();
+            builder.RegisterDecorator<HttpQueryAuthorizationBehavior, IReceiveHttpQuery>();
+
+            return builder;
+        }
     }
 }
