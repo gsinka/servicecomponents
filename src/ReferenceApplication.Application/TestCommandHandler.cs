@@ -13,7 +13,7 @@ using ServiceComponents.Core.Extensions;
 
 namespace ReferenceApplication.Application
 {
-    public class TestCommandHandler : CommandHandler<TestCommand>
+    public class TestCommandHandler : HandleCommand<TestCommand>
     {
         public TestCommandHandler(ILogger log, ICorrelation correlation, ISendQuery querySender, IPublishEvent eventPublisher) 
             : base(log, correlation, querySender, eventPublisher)
@@ -23,8 +23,8 @@ namespace ReferenceApplication.Application
 
         override public async Task HandleAsync(TestCommand command, CancellationToken cancellationToken = default)
         {
-            var queryResult = await SendAsync(new TestQuery(""), cancellationToken);
-            //var queryResult = await SendAsync(new TestQuery("from command handler"), cancellationToken);
+            //var queryResult = await SendAsync(new TestQuery(""), cancellationToken);
+            var queryResult = await SendAsync(new TestQuery("from command handler"), cancellationToken);
             Log.Information("Query called from command handler with result: {queryResult}", queryResult);
 
             //var queryResult2 = await SendAsync(new TestQuery("from command handler 2"), cancellationToken);

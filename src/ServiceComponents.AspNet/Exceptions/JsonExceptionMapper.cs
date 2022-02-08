@@ -24,6 +24,7 @@ namespace ServiceComponents.AspNet.Exceptions
         public JsonExceptionMapper() : this (exception => {
 
             return exception switch {
+                UnauthorizedAccessException unauthorizedAccessException => ((int)HttpStatusCode.Unauthorized, new SecurityErrorResponse(unauthorizedAccessException.Message)),
                 NotImplementedException notImplementedException => ((int)HttpStatusCode.NotImplemented, new GenericErrorResponse(notImplementedException.Message)),
                 NotFoundException notFoundException => new((int)HttpStatusCode.NotFound, new GenericErrorResponse(notFoundException.Message)),
                 BusinessException businessException => new((int)HttpStatusCode.BadRequest, new BusinessErrorResponse(businessException.ErrorCode, businessException.Message)),
@@ -44,6 +45,7 @@ namespace ServiceComponents.AspNet.Exceptions
             };
 
             return (statusCode, errorResponse) switch {
+                (HttpStatusCode.Unauthorized, {} response) => new UnauthorizedAccessException(response.ErrorMessage),
                 (HttpStatusCode.NotImplemented, {} response) => new NotImplementedException(response.ErrorMessage),
                 (HttpStatusCode.NotFound, { } response) => new NotFoundException(response.ErrorMessage),
                 (HttpStatusCode.BadRequest, BusinessErrorResponse response) => new BusinessException(response.ErrorCode, response.ErrorMessage),

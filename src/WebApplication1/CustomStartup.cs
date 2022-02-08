@@ -86,16 +86,19 @@ namespace WebApplication1
             services.AddSingleton<IExceptionMapperService, JsonExceptionMapper>(provider => new JsonExceptionMapper());
 
             services.AddHttpClient("rads-service", (provider, client) => {
+
+                client.BaseAddress = new Uri("http://localhost:5000/");
+
                 var httpContextAccessor = provider.GetRequiredService<IHttpContextAccessor>();
-                var bearerToken = httpContextAccessor.HttpContext.Request.Headers["Authorization"].FirstOrDefault(h => h.StartsWith("bearer ", StringComparison.InvariantCultureIgnoreCase));
+                var bearerToken = httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].FirstOrDefault(h => h.StartsWith("bearer ", StringComparison.InvariantCultureIgnoreCase));
                 if (bearerToken != null) client.DefaultRequestHeaders.Add("Authorization", bearerToken);
             });
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            builder.AddHttpCommandSender(new Uri("http://localhost:5000/api/generic"), "http", "rads-service");
-            builder.AddHttpQuerySender(new Uri("http://localhost:5000/api/generic"), "http", "rads-service");
+            builder.AddHttpCommandSender(new Uri("api/generic", UriKind.Relative), "http", "rads-service");
+            builder.AddHttpQuerySender(new Uri("api/generic", UriKind.Relative), "http", "rads-service");
             //builder.AddHttpEventPublisher(new Uri("http://localhost:5000/api/generic"), "http");
 
             builder.AddCommandRouter(command => "http");

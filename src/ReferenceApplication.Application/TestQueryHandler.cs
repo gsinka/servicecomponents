@@ -27,7 +27,7 @@ namespace ReferenceApplication.Application
 
         override public async Task<string> HandleAsync(TestQuery query, CancellationToken cancellationToken = default)
         {
-            throw new InvalidOperationException("query failed");
+            //throw new InvalidOperationException("query failed");
             Log.Information("{query} handled", query.DisplayName());
 
             //await _commandSender.SendAsync(new ErrorCommand(666, "Request from Test"), cancellationToken);

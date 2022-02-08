@@ -1,11 +1,11 @@
 ﻿namespace ServiceComponents.AspNet.Exceptions
 {
-    public class GenericErrorResponse : IErrorResponse
+    public class SecurityErrorResponse : IErrorResponse
     {
-        public string Type => "generic";
+        public string Type => "security";
         public string ErrorMessage { get; }
 
-        public GenericErrorResponse(string errorMessage)
+        public SecurityErrorResponse(string errorMessage)
         {
             ErrorMessage = errorMessage;
         }
