@@ -38,8 +38,10 @@ namespace ServiceComponents.AspNet.Exceptions
             var jsonObject = JObject.Parse(httpContent.ReadAsStringAsync().Result);
 
             var errorResponse = jsonObject.GetValue("type", StringComparison.OrdinalIgnoreCase)!.Value<string>() switch {
+                
                 "business" => jsonObject.ToObject<BusinessErrorResponse>(),
                 "validation" => jsonObject.ToObject<ValidationErrorResponse>(),
+                "security" => jsonObject.ToObject<SecurityErrorResponse>(),
                 "generic" => jsonObject.ToObject<GenericErrorResponse>(),
                 _ => null
             };

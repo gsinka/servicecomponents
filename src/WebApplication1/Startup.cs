@@ -119,6 +119,7 @@ namespace WebApplication1
 
             builder.AddHttpRequestParser();
             builder.AddMediator(_customStartup.ApplicationAssembly);
+            
             builder.AddMediatorBehavior(_customStartup.ApplicationAssembly);
             builder.AddValidationBehavior(_customStartup.ApiAssembly);
             builder.AddLogBehavior();
