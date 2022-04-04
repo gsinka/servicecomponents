@@ -10,7 +10,7 @@ namespace ServiceComponents.Domain
     }
     public interface IEventSourceAggregateRepository<T> where T : IEventSourceAggregateRoot
     {
-        Task<T> GetById(string aggregateId, CancellationToken cancellation);
-        Task Save(T aggregateRoot, CancellationToken cancellationToken);
+        Task<T> GetByIdAsync(string aggregateId, CancellationToken cancellation);
+        Task SaveAsync(T aggregateRoot, CancellationToken cancellationToken);
     }
 }

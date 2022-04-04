@@ -3,12 +3,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ReferenceApplication.Api;
+using Serilog;
 using ServiceComponents.Application;
 using ServiceComponents.Application.Senders;
-using ServiceComponents.AspNet;
 using ServiceComponents.AspNet.Http;
+using ServiceComponents.AspNet.Services;
 using ServiceComponents.Infrastructure.CorrelationContext;
-using ServiceComponents.Infrastructure.EventRecorder;
 
 namespace WebApplication1.Controllers
 {
@@ -20,13 +20,15 @@ namespace WebApplication1.Controllers
         private readonly ISendCommand _commandSender;
         private readonly Correlation _correlation;
         private readonly IEventRecorder _eventRecorder;
+        private readonly IBackgroundTaskQueue _taskQueue;
 
-        public TestController(IReceiveHttpCommand httpCommandReceiver, ISendCommand commandSender, Correlation correlation, IEventRecorder eventRecorder)
+        public TestController(IReceiveHttpCommand httpCommandReceiver, ISendCommand commandSender, Correlation correlation, IEventRecorder eventRecorder, IBackgroundTaskQueue taskQueue)
         {
             _httpCommandReceiver = httpCommandReceiver;
             _commandSender = commandSender;
             _correlation = correlation;
             _eventRecorder = eventRecorder;
+            _taskQueue = taskQueue;
         }
 
         [HttpGet("get")]
@@ -65,6 +67,20 @@ namespace WebApplication1.Controllers
         {
             await _commandSender.SendAsync(new TestCommand("testcor"), cancellationToken);
             return Ok();
+        }
+
+        [HttpPost("queueTask")]
+        public async Task<IActionResult> AddBackgroundTask(CancellationToken cancellationToken)
+        {
+            await _taskQueue.QueueBackgroundWorkItemAsync(async token => {
+
+                var taskId = Guid.NewGuid().ToString();
+                Log.Logger.Information($"Task {taskId} started");
+                await Task.Delay(5000, cancellationToken);
+                Log.Logger.Information($"Task {taskId} finished");
+            });
+
+            return Accepted();
         }
 
     }

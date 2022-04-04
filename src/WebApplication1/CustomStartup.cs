@@ -25,6 +25,7 @@ using Serilog.Events;
 using ServiceComponents.AspNet.Exceptions;
 using ServiceComponents.AspNet.Http;
 using ServiceComponents.AspNet.Http.Senders;
+using ServiceComponents.AspNet.Services;
 using ServiceComponents.Core.Exceptions;
 using ServiceComponents.Infrastructure.EventRecorder;
 using ServiceComponents.Infrastructure.Options;
@@ -94,6 +95,10 @@ namespace WebApplication1
                 var bearerToken = httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].FirstOrDefault(h => h.StartsWith("bearer ", StringComparison.InvariantCultureIgnoreCase));
                 if (bearerToken != null) client.DefaultRequestHeaders.Add("Authorization", bearerToken);
             });
+
+            services.AddHostedService<QueuedHostedService>();
+            services.AddSingleton<IBackgroundTaskQueue>(provider => new BackgroundTaskQueue(10));
+
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
