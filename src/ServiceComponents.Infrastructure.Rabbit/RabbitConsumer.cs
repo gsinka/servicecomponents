@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Autofac;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
@@ -12,14 +11,22 @@ using ServiceComponents.Infrastructure.Receivers;
 
 namespace ServiceComponents.Infrastructure.Rabbit
 {
-    public class RabbitConsumer
+    public interface IRabbitConsumer
+    {
+        public string ConsumerTag { get; }
+        public bool IsLive { get; }
+    }
+
+    public class RabbitConsumer : IRabbitConsumer
     {
         private readonly ILogger _log;
         private readonly ILifetimeScope _rootScope;
         private readonly IModel _model;
         private readonly string _queue;
-        public string ConsumerTag;
         private readonly EventingBasicConsumer _consumer;
+
+        public string ConsumerTag { get; private set; }
+        public bool IsLive => _consumer.IsRunning;
 
         public RabbitConsumer(ILogger log, ILifetimeScope rootScope, IModel model, string queue, string consumerTag = default)
         {

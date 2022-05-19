@@ -81,6 +81,7 @@ namespace ServiceComponents.Infrastructure.Rabbit
                     channelKey == default ? context.Resolve<IModel>() : context.ResolveKeyed<IModel>(channelKey),
                     queue, 
                     consumerTag))
+                .AsImplementedInterfaces()
                 .SingleInstance();
 
             if (consumerKey == default) {
