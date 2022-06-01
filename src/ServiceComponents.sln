@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30907.101
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32519.379
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceComponents.Application", "ServiceComponents.Application\ServiceComponents.Application.csproj", "{837D616D-E8AF-4771-930B-0D32D59EA029}"
 EndProject
@@ -37,7 +37,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication1", "WebAppli
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReferenceApplication.Test", "ReferenceApplication.Test\ReferenceApplication.Test.csproj", "{C1019D56-45AE-4589-B41C-30B66DE8E7DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceComponents.Infrastructure.CouchDB", "ServiceComponents.Infrastructure.CouchDB\ServiceComponents.Infrastructure.CouchDB.csproj", "{6CEA4C4E-9AA1-49AB-BA1E-E74EFA151855}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceComponents.Infrastructure.CouchDB", "ServiceComponents.Infrastructure.CouchDB\ServiceComponents.Infrastructure.CouchDB.csproj", "{6CEA4C4E-9AA1-49AB-BA1E-E74EFA151855}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
