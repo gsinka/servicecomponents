@@ -89,5 +89,10 @@ namespace ServiceComponents.Infrastructure.Rabbit
                 _model.BasicConsume(_queue, false, ConsumerTag, _consumer);
             }
         }
+
+        public void Stop()
+        {
+            _model.BasicCancel(ConsumerTag);
+        }
     }
 }
