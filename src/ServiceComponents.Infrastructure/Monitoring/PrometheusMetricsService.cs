@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Prometheus;
@@ -10,36 +11,36 @@ namespace ServiceComponents.Infrastructure.Monitoring
 {
     public class PrometheusMetricsService : IMetricsService
     {
-        private readonly Dictionary<object, Counter> _counters = new();
-        private readonly Dictionary<object, Summary> _summaries = new();
-        private readonly Dictionary<object, Histogram> _histograms = new();
-        private readonly Dictionary<object, Gauge> _gauges = new();
+        private readonly ConcurrentDictionary<object, Counter> _counters = new();
+        private readonly ConcurrentDictionary<object, Summary> _summaries = new();
+        private readonly ConcurrentDictionary<object, Histogram> _histograms = new();
+        private readonly ConcurrentDictionary<object, Gauge> _gauges = new();
 
         public void Increment(object metric, double increment = 1)
         {
-            var metricType = metric.GetType();
+            Type metricType = metric.GetType();
             var metricKind = metricType.GetCustomAttributes(true).FirstOrDefault();
 
             switch (metricKind) {
                 
                 case CounterMetric counter:
 
-                    if (!_counters.ContainsKey(metric.GetType())) {
+                    if (!_counters.ContainsKey(metricType)) {
 
                         var (name, title) = metric.MetricDescription();
-                        _counters.Add(metric.GetType(), Metrics.CreateCounter(name, title, new CounterConfiguration() { LabelNames = metric.MetricFields().ToArray() }));
+                        _counters.TryAdd(metricType, Metrics.CreateCounter(name, title, new CounterConfiguration() { LabelNames = metric.MetricFields().ToArray() }));
                     }
-                    _counters[metric.GetType()].WithLabels(metric.MetricValues().ToArray()).Inc(increment);
+                    _counters[metricType].WithLabels(metric.MetricValues().ToArray()).Inc(increment);
                     break;
 
                 case GaugeMetric gauge:
 
-                    if (!_gauges.ContainsKey(metric.GetType())) {
+                    if (!_gauges.ContainsKey(metricType)) {
 
                         var (name, title) = metric.MetricDescription();
-                        _gauges.Add(metric.GetType(), Metrics.CreateGauge(name, title, new GaugeConfiguration { LabelNames = metric.MetricFields().ToArray() }));
+                        _gauges.TryAdd(metricType, Metrics.CreateGauge(name, title, new GaugeConfiguration { LabelNames = metric.MetricFields().ToArray() }));
                     }
-                    _gauges[metric.GetType()].WithLabels(metric.MetricValues().ToArray()).Inc(increment);
+                    _gauges[metricType].WithLabels(metric.MetricValues().ToArray()).Inc(increment);
                     break;
 
                 default:
@@ -49,19 +50,19 @@ namespace ServiceComponents.Infrastructure.Monitoring
         
         public void Decrement(object metric, double decrement = 1)
         {
-            var metricType = metric.GetType();
+            Type metricType = metric.GetType();
             var metricKind = metricType.GetCustomAttributes(true).FirstOrDefault();
 
             switch (metricKind) {
                 
                 case GaugeMetric gauge:
 
-                    if (!_gauges.ContainsKey(metric.GetType())) {
+                    if (!_gauges.ContainsKey(metricType)) {
 
                         var (name, title) = metric.MetricDescription();
-                        _gauges.Add(metric.GetType(), Metrics.CreateGauge(name, title, new GaugeConfiguration { LabelNames = metric.MetricFields().ToArray() }));
+                        _gauges.TryAdd(metricType, Metrics.CreateGauge(name, title, new GaugeConfiguration { LabelNames = metric.MetricFields().ToArray() }));
                     }
-                    _gauges[metric.GetType()].WithLabels(metric.MetricValues().ToArray()).Dec(decrement);
+                    _gauges[metricType].WithLabels(metric.MetricValues().ToArray()).Dec(decrement);
                     break;
 
                 default:
@@ -71,19 +72,19 @@ namespace ServiceComponents.Infrastructure.Monitoring
         
         public void Set(object metric, double target)
         {
-            var metricType = metric.GetType();
+            Type metricType = metric.GetType();
             var metricKind = metricType.GetCustomAttributes(true).FirstOrDefault();
 
             switch (metricKind) {
                 
                 case GaugeMetric gauge:
 
-                    if (!_gauges.ContainsKey(metric.GetType())) {
+                    if (!_gauges.ContainsKey(metricType)) {
 
                         var (name, title) = metric.MetricDescription();
-                        _gauges.Add(metric.GetType(), Metrics.CreateGauge(name, title, new GaugeConfiguration { LabelNames = metric.MetricFields().ToArray() }));
+                        _gauges.TryAdd(metricType, Metrics.CreateGauge(name, title, new GaugeConfiguration { LabelNames = metric.MetricFields().ToArray() }));
                     }
-                    _gauges[metric.GetType()].WithLabels(metric.MetricValues().ToArray()).Set(target);
+                    _gauges[metricType].WithLabels(metric.MetricValues().ToArray()).Set(target);
                     break;
 
                 default:
@@ -93,18 +94,18 @@ namespace ServiceComponents.Infrastructure.Monitoring
 
         public void Observe(object metric, double duration)
         {
-            var metricType = metric.GetType();
+            Type metricType = metric.GetType();
             var metricKind = metricType.GetCustomAttributes(true).FirstOrDefault();
 
             switch (metricKind) {
                 
                 case SummaryMetric summary:
 
-                    if (!_summaries.ContainsKey(metric.GetType())) {
+                    if (!_summaries.ContainsKey(metricType)) {
                         var (name, title) = metric.MetricDescription();
-                        _summaries.Add(metric.GetType(), Metrics.CreateSummary(name, title, new SummaryConfiguration() { LabelNames = metric.MetricFields().ToArray() }));
+                        _summaries.TryAdd(metricType, Metrics.CreateSummary(name, title, new SummaryConfiguration() { LabelNames = metric.MetricFields().ToArray() }));
                     }
-                    _summaries[metric.GetType()].WithLabels(metric.MetricValues().ToArray()).Observe(duration);
+                    _summaries[metricType].WithLabels(metric.MetricValues().ToArray()).Observe(duration);
 
                     break;
 
@@ -112,8 +113,8 @@ namespace ServiceComponents.Infrastructure.Monitoring
 
                     if (!_histograms.ContainsKey(metric.GetType())) {
                         var (name, title) = metric.MetricDescription();
-                        _histograms.Add(
-                            metric.GetType(), 
+                        _histograms.TryAdd(
+                            metricType, 
                             Metrics.CreateHistogram(
                                 name, 
                                 title, 
@@ -121,7 +122,7 @@ namespace ServiceComponents.Infrastructure.Monitoring
                                     Buckets = Histogram.LinearBuckets(linearHistogram.Start, linearHistogram.Width, linearHistogram.Count)
                                 }));
                     }
-                    _histograms[metric.GetType()].Observe(duration);
+                    _histograms[metricType].Observe(duration);
 
                     break;
             
@@ -129,8 +130,8 @@ namespace ServiceComponents.Infrastructure.Monitoring
 
                     if (!_histograms.ContainsKey(metric.GetType())) {
                         var (name, title) = metric.MetricDescription();
-                        _histograms.Add(
-                            metric.GetType(), 
+                        _histograms.TryAdd(
+                            metricType, 
                             Metrics.CreateHistogram(
                                 name, 
                                 title, 
@@ -138,7 +139,7 @@ namespace ServiceComponents.Infrastructure.Monitoring
                                     Buckets = Histogram.ExponentialBuckets(exponentialHistogram.Start, exponentialHistogram.Factor, exponentialHistogram.Count)
                                 }));
                     }
-                    _histograms[metric.GetType()].Observe(duration);
+                    _histograms[metricType].Observe(duration);
 
                     break;
 
@@ -149,17 +150,17 @@ namespace ServiceComponents.Infrastructure.Monitoring
 
         public void Observe(object metric, double val, long count)
         {
-            var metricType = metric.GetType();
+            Type metricType = metric.GetType();
             var metricKind = metricType.GetCustomAttributes(true).FirstOrDefault();
 
             switch (metricKind) {
                 
                 case LinearHistogramMetric linearHistogram:
 
-                    if (!_histograms.ContainsKey(metric.GetType())) {
+                    if (!_histograms.ContainsKey(metricType)) {
                         var (name, title) = metric.MetricDescription();
-                        _histograms.Add(
-                            metric.GetType(),
+                        _histograms.TryAdd(
+                            metricType,
                             Metrics.CreateHistogram(
                                 name,
                                 title,
@@ -167,7 +168,7 @@ namespace ServiceComponents.Infrastructure.Monitoring
                                     Buckets = Histogram.LinearBuckets(linearHistogram.Start, linearHistogram.Width, linearHistogram.Count)
                                 }));
                     }
-                    _histograms[metric.GetType()].WithLabels(metric.MetricValues().ToArray()).Observe(val, count);
+                    _histograms[metricType].WithLabels(metric.MetricValues().ToArray()).Observe(val, count);
 
                     break;
 
@@ -175,8 +176,8 @@ namespace ServiceComponents.Infrastructure.Monitoring
 
                     if (!_histograms.ContainsKey(metric.GetType())) {
                         var (name, title) = metric.MetricDescription();
-                        _histograms.Add(
-                            metric.GetType(),
+                        _histograms.TryAdd(
+                            metricType,
                             Metrics.CreateHistogram(
                                 name,
                                 title,
@@ -184,7 +185,7 @@ namespace ServiceComponents.Infrastructure.Monitoring
                                     Buckets = Histogram.LinearBuckets(exponentialHistogram.Start, exponentialHistogram.Factor, exponentialHistogram.Count)
                                 }));
                     }
-                    _histograms[metric.GetType()].WithLabels(metric.MetricValues().ToArray()).Observe(val, count);
+                    _histograms[metricType].WithLabels(metric.MetricValues().ToArray()).Observe(val, count);
 
                     break;
 
