@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using Prometheus;
 using ServiceComponents.Application.Monitoring;
 using ServiceComponents.Core.Extensions;
-using ServiceComponents.Core.Services;
 
 namespace ServiceComponents.Infrastructure.Monitoring
 {
@@ -18,11 +16,11 @@ namespace ServiceComponents.Infrastructure.Monitoring
 
         public void Increment(object metric, double increment = 1)
         {
-            Type metricType = metric.GetType();
-            var metricKind = metricType.GetCustomAttributes(true).FirstOrDefault();
+            var metricType = metric.GetType();
+            var metricKind = metricType.GetCustomAttributes(true).OfType<MetricAttribute>().FirstOrDefault();
 
             switch (metricKind) {
-                
+
                 case CounterMetric counter:
 
                     if (!_counters.ContainsKey(metricType)) {
@@ -47,14 +45,14 @@ namespace ServiceComponents.Infrastructure.Monitoring
                     throw new InvalidOperationException($"Increment cannot be used on metric annotated as {metricKind.DisplayName()}");
             }
         }
-        
+
         public void Decrement(object metric, double decrement = 1)
         {
             Type metricType = metric.GetType();
-            var metricKind = metricType.GetCustomAttributes(true).FirstOrDefault();
+            var metricKind = metricType.GetCustomAttributes(true).OfType<MetricAttribute>().FirstOrDefault();
 
             switch (metricKind) {
-                
+
                 case GaugeMetric gauge:
 
                     if (!_gauges.ContainsKey(metricType)) {
@@ -69,14 +67,14 @@ namespace ServiceComponents.Infrastructure.Monitoring
                     throw new InvalidOperationException($"Decrement cannot be used on metric annotated as {metricKind.DisplayName()}");
             }
         }
-        
+
         public void Set(object metric, double target)
         {
             Type metricType = metric.GetType();
-            var metricKind = metricType.GetCustomAttributes(true).FirstOrDefault();
+            var metricKind = metricType.GetCustomAttributes(true).OfType<MetricAttribute>().FirstOrDefault();
 
             switch (metricKind) {
-                
+
                 case GaugeMetric gauge:
 
                     if (!_gauges.ContainsKey(metricType)) {
@@ -95,10 +93,10 @@ namespace ServiceComponents.Infrastructure.Monitoring
         public void Observe(object metric, double duration)
         {
             Type metricType = metric.GetType();
-            var metricKind = metricType.GetCustomAttributes(true).FirstOrDefault();
+            var metricKind = metricType.GetCustomAttributes(true).OfType<MetricAttribute>().FirstOrDefault();
 
             switch (metricKind) {
-                
+
                 case SummaryMetric summary:
 
                     if (!_summaries.ContainsKey(metricType)) {
@@ -125,7 +123,7 @@ namespace ServiceComponents.Infrastructure.Monitoring
                     _histograms[metricType].Observe(duration);
 
                     break;
-            
+
                 case ExponentialHistogramMetric exponentialHistogram:
 
                     if (!_histograms.ContainsKey(metric.GetType())) {
@@ -151,10 +149,10 @@ namespace ServiceComponents.Infrastructure.Monitoring
         public void Observe(object metric, double val, long count)
         {
             Type metricType = metric.GetType();
-            var metricKind = metricType.GetCustomAttributes(true).FirstOrDefault();
+            var metricKind = metricType.GetCustomAttributes(true).OfType<MetricAttribute>().FirstOrDefault();
 
             switch (metricKind) {
-                
+
                 case LinearHistogramMetric linearHistogram:
 
                     if (!_histograms.ContainsKey(metricType)) {
@@ -190,7 +188,7 @@ namespace ServiceComponents.Infrastructure.Monitoring
                     break;
 
                 default:
-                    
+
                     throw new InvalidOperationException($"Observe cannot be used on metric annotated as {metricKind.DisplayName()}");
             }
         }
