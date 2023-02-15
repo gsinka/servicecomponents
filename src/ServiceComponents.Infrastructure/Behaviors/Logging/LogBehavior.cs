@@ -2,8 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
-using Serilog.Context;
-using Serilog.Events;
 using ServiceComponents.Api.Mediator;
 using ServiceComponents.Application.Mediator;
 using ServiceComponents.Core.Extensions;
@@ -16,12 +14,10 @@ namespace ServiceComponents.Infrastructure.Behaviors.Logging
         IPreHandleEvent, IPostHandleEvent, IHandleEventFailure
     {
         private readonly ILogger _log;
-        private readonly LogEventLevel _level;
 
-        public LogBehavior(ILogger log, LogEventLevel level)
+        public LogBehavior(ILogger log)
         {
             _log = log;
-            _level = level;
         }
 
         public Task PreHandleAsync(ICommand command, CancellationToken cancellationToken = default)
@@ -38,7 +34,7 @@ namespace ServiceComponents.Infrastructure.Behaviors.Logging
 
         public Task HandleFailureAsync(ICommand command, Exception exception, CancellationToken cancellationToken = default)
         {
-            _log.Error("Handling {commandType} failed: {error}", command.DisplayName(), exception.Message);
+            _log.Error(exception, "Handling {commandType} failed", command.DisplayName());
             return Task.CompletedTask;
         }
 
@@ -56,7 +52,7 @@ namespace ServiceComponents.Infrastructure.Behaviors.Logging
 
         public Task HandleFailureAsync(IQuery query, Exception exception, CancellationToken cancellationToken = default)
         {
-            _log.Error("Handling {queryType} failed: {error}", query.DisplayName(), exception.Message);
+            _log.Error(exception, "Handling {queryType} failed", query.DisplayName());
             return Task.CompletedTask;
         }
 
@@ -74,7 +70,7 @@ namespace ServiceComponents.Infrastructure.Behaviors.Logging
 
         public Task HandleFailureAsync(IEvent @event, Exception exception, CancellationToken cancellationToken = default)
         {
-            _log.Error("Handling {eventType} failed: {error}", @event.DisplayName(), exception.Message);
+            _log.Error(exception, "Handling {eventType} failed", @event.DisplayName());
             return Task.CompletedTask;
         }
     }
