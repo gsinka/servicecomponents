@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -23,10 +24,17 @@ namespace ServiceComponents.Infrastructure.Receivers
             if (string.IsNullOrEmpty(payload)) payload = "{}";
             
             // Deserialize object
-            dynamic request = string.IsNullOrEmpty(typeName)
-                ? JsonConvert.DeserializeObject(payload, _jsonSerializerSettings) ??
-                  throw new InvalidOperationException("Unable to deserialize request")
-                : JsonConvert.DeserializeObject(payload, Type.GetType(typeName));
+            dynamic request;
+            try {
+
+                request = string.IsNullOrEmpty(typeName)
+                    ? JsonConvert.DeserializeObject(payload, _jsonSerializerSettings) ??
+                      throw new InvalidOperationException("Unable to deserialize request")
+                    : JsonConvert.DeserializeObject(payload, Type.GetType(typeName));
+            }
+            catch (JsonReaderException) {
+                request = String.Empty;
+            }
 
             switch (request) {
                 case ICommand command:
