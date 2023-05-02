@@ -41,17 +41,17 @@ namespace ServiceComponents.Infrastructure.Mediator
             builder.RegisterDecorator<QueryDispatchBehavior, IDispatchQuery>();
             builder.RegisterDecorator<EventDispatchBehavior, IDispatchEvent>();
 
-            builder.RegisterAssemblyTypes(assemblies).Where(type => type.IsAssignableTo<IPreHandleCommand>()).AsImplementedInterfaces().InstancePerDependency();
-            builder.RegisterAssemblyTypes(assemblies).Where(type => type.IsAssignableTo<IPreHandleQuery>()).AsImplementedInterfaces().InstancePerDependency();
-            builder.RegisterAssemblyTypes(assemblies).Where(type => type.IsAssignableTo<IPreHandleEvent>()).AsImplementedInterfaces().InstancePerDependency();
+            builder.RegisterAssemblyTypes(assemblies).Where(type => type.IsAssignableTo<IPreHandleCommand>()).As<IPreHandleCommand>().InstancePerDependency();
+            builder.RegisterAssemblyTypes(assemblies).Where(type => type.IsAssignableTo<IPreHandleQuery>()).As<IPreHandleQuery>().InstancePerDependency();
+            builder.RegisterAssemblyTypes(assemblies).Where(type => type.IsAssignableTo<IPreHandleEvent>()).As<IPreHandleEvent>().InstancePerDependency();
 
-            builder.RegisterAssemblyTypes(assemblies).Where(type => type.IsAssignableTo<IPostHandleCommand>()).AsImplementedInterfaces().InstancePerDependency();
-            builder.RegisterAssemblyTypes(assemblies).Where(type => type.IsAssignableTo<IPostHandleQuery>()).AsImplementedInterfaces().InstancePerDependency();
-            builder.RegisterAssemblyTypes(assemblies).Where(type => type.IsAssignableTo<IPostHandleEvent>()).AsImplementedInterfaces().InstancePerDependency();
+            builder.RegisterAssemblyTypes(assemblies).Where(type => type.IsAssignableTo<IPostHandleCommand>()).As<IPostHandleCommand>().InstancePerDependency();
+            builder.RegisterAssemblyTypes(assemblies).Where(type => type.IsAssignableTo<IPostHandleQuery>()).As<IPostHandleQuery>().InstancePerDependency();
+            builder.RegisterAssemblyTypes(assemblies).Where(type => type.IsAssignableTo<IPostHandleEvent>()).As<IPostHandleEvent>().InstancePerDependency();
 
-            builder.RegisterAssemblyTypes(assemblies).Where(type => type.IsAssignableTo<IHandleCommandFailure>()).AsImplementedInterfaces().InstancePerDependency();
-            builder.RegisterAssemblyTypes(assemblies).Where(type => type.IsAssignableTo<IHandleQueryFailure>()).AsImplementedInterfaces().InstancePerDependency();
-            builder.RegisterAssemblyTypes(assemblies).Where(type => type.IsAssignableTo<IHandleEventFailure>()).AsImplementedInterfaces().InstancePerDependency();
+            builder.RegisterAssemblyTypes(assemblies).Where(type => type.IsAssignableTo<IHandleCommandFailure>()).As<IHandleCommandFailure>().InstancePerDependency();
+            builder.RegisterAssemblyTypes(assemblies).Where(type => type.IsAssignableTo<IHandleQueryFailure>()).As<IHandleQueryFailure>().InstancePerDependency();
+            builder.RegisterAssemblyTypes(assemblies).Where(type => type.IsAssignableTo<IHandleEventFailure>()).As<IHandleEventFailure>().InstancePerDependency();
 
             builder.RegisterAssemblyTypes(assemblies).AsClosedTypesOf(typeof(IPreHandleCommand<>)).InstancePerDependency();
             builder.RegisterAssemblyTypes(assemblies).AsClosedTypesOf(typeof(IPreHandleQuery<,>)).InstancePerDependency();
