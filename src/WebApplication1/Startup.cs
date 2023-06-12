@@ -5,16 +5,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json.Converters;
-using Serilog;
 using ServiceComponents.Application.Monitoring;
 using ServiceComponents.AspNet;
-using ServiceComponents.AspNet.Badge;
 using ServiceComponents.AspNet.Exceptions;
 using ServiceComponents.AspNet.Http;
 using ServiceComponents.AspNet.Http.Senders;
@@ -63,10 +60,7 @@ namespace WebApplication1
                 .AddNewtonsoftJson(options => {
                     options.UseCamelCasing(true);
                     options.SerializerSettings.Converters.Add(new StringEnumConverter());
-                })
-
-                // Badge
-                .PartManager.ApplicationParts.Add(new AssemblyPart(typeof(BadgeController).Assembly));
+                });
 
             services.AddHttpContextAccessor();
             services.AddHttpClient();
@@ -79,16 +73,6 @@ namespace WebApplication1
             _customStartup.ConfigureHealthCheck(healthCheckBuilder);
 
             services.AddSwaggerGenNewtonsoftSupport();
-
-            // Badge
-
-            services.AddSingleton(provider => {
-                var badgeService = new BadgeService(provider.GetRequiredService<HealthCheckService>());
-                badgeService.RegistrateVersionBadge();
-                badgeService.RegistrateLivenessBadge();
-                badgeService.RegistrateReadinessBadge();
-                return badgeService;
-            });
 
             services.AddSingleton<IMetricsService, PrometheusMetricsService>();
 
@@ -119,7 +103,7 @@ namespace WebApplication1
 
             builder.AddHttpRequestParser();
             builder.AddMediator(_customStartup.ApplicationAssembly);
-            
+
             builder.AddMediatorBehavior(_customStartup.ApplicationAssembly);
             builder.AddValidationBehavior(_customStartup.ApiAssembly);
             builder.AddLogBehavior();

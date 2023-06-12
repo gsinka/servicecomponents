@@ -16,7 +16,6 @@ using Serilog.Events;
 using ServiceComponents.AspNet.Exceptions;
 using ServiceComponents.AspNet.Monitoring;
 using ServiceComponents.AspNet.Wireup;
-using ServiceComponents.Infrastructure.Behaviors.CommandConstraints;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace ReferenceApplication2.AspNet
@@ -33,7 +32,7 @@ namespace ReferenceApplication2.AspNet
         private static IHostBuilder CreateHostBuilder(string[] args)
         {
             return new ServiceComponentsHostBuilder()
-                
+
                 .UseDefault(
 
                     new[] { typeof(TestCommand).Assembly },
@@ -75,7 +74,7 @@ namespace ReferenceApplication2.AspNet
                 .AddOpenApi(
                     (configuration, options) => {
                         options.SwaggerDoc("v1", new OpenApiInfo {
-                            Title = "Reference Application", 
+                            Title = "Reference Application",
                             Version = "v1"
                         });
 
@@ -97,7 +96,7 @@ namespace ReferenceApplication2.AspNet
 
                     },
                     (configuration, options) => {
-                        
+
                         options.OAuthClientId("reference-app");
                         options.OAuthScopes("openid", "profile");
 
@@ -158,8 +157,6 @@ namespace ReferenceApplication2.AspNet
                     configuration => new SchemaUpdate(configuration).Execute(true, true))
 
                 .AddPrometheusMetrics()
-
-                .AddBadge()
 
                 .CreateHostBuilder(args);
         }
