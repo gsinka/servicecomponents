@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
 	  <PublishRepositoryUrl>true</PublishRepositoryUrl>
 	  <EmbedUntrackedSources>true</EmbedUntrackedSources>
 	  <IncludeSymbols>true</IncludeSymbols>
@@ -10,11 +10,11 @@
 
 
   <ItemGroup>
-    <PackageReference Include="FluentNHibernate" Version="3.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="5.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="FluentNHibernate" Version="3.2.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NHibernate.Logging.Serilog" Version="5.1.4" />
-    <PackageReference Include="Npgsql" Version="5.0.4" />
+    <PackageReference Include="Npgsql" Version="7.0.4" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
 	    <PrivateAssets>all</PrivateAssets>
 	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NHibernate" Version="5.3.8" />
+    <PackageReference Include="NHibernate" Version="5.4.2" />
   </ItemGroup>
 
   <ItemGroup>
