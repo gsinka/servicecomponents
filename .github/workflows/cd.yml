@@ -1,4 +1,4 @@
-name: Continous Delivery
+name: Continuous Delivery
 
 on:
   push:
@@ -14,20 +14,10 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
                
-    - name: Setup .NET v6.0
+    - name: Setup .NET v8.0
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '6.0.x'
-               
-    - name: Setup .NET v5.0
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '5.0.x'
-          
-    - name: Setup .NET Core v3.1
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '3.1.x'
+        dotnet-version: '8.0.x'
     
     - name: Get version
       run:  echo "app_version=`git describe --tags`" >> $GITHUB_ENV      
