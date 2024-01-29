@@ -12,6 +12,6 @@ namespace ServiceComponents.Api.Mediator
         {
             CommandId = commandId ?? Guid.NewGuid().ToString();
         }
-        
+
     }
 }
