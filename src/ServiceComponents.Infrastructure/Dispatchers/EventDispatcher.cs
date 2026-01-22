@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
@@ -26,11 +27,11 @@ namespace ServiceComponents.Infrastructure.Dispatchers
         {
             var handlers = (IEnumerable<dynamic>)_scope.ResolveOptional(typeof(IEnumerable<>).MakeGenericType(typeof(IHandleEvent<>).MakeGenericType(@event.GetType())));
 
-            foreach (dynamic handler in handlers) {
-                _log.Verbose("Dispatching {eventType} to {handlerType}", @event.DisplayName(), TypeExtensions.DisplayName(handler));
-                await handler.HandleAsync((dynamic)@event, cancellationToken);
-            }
-            
+            var tasks = handlers.Select(h => {
+                _log.Verbose("Dispatching {eventType} to {handlerType}", @event.DisplayName(), TypeExtensions.DisplayName(h));
+                return h.HandleAsync((dynamic)@event, cancellationToken);
+            });
+            await Task.WhenAll((IEnumerable<Task>)tasks);            
         }
     }
 }
