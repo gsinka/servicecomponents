@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Newtonsoft.Json.Converters;
 using NHibernate.Tool.hbm2ddl;
 using ReferenceApplication.Api;
@@ -107,7 +107,7 @@ namespace ReferenceApplication2.AspNet
 
                 // Health check
                 .AddHealthCheck((configuration, check) => {
-                    check.AddRabbitMQ(rabbitConnectionString: "amqp://localhost:5672");
+                    check.AddRabbitMQ(sp => new RabbitMQ.Client.ConnectionFactory { Uri = new Uri("amqp://localhost:5672") }.CreateConnectionAsync().GetAwaiter().GetResult());
                     check.AddRedis("localhost");
                 })
 
