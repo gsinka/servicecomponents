@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Threading.Tasks;
 using Autofac;
 using FluentValidation;
 using FluentValidation.Results;
@@ -170,20 +171,20 @@ namespace WebApplication1
 
         public Assembly[] ApplicationAssembly => new[] { typeof(TestCommandHandler).Assembly };
 
-        public static void Initialize(IHost host)
+        public static async Task Initialize(IHost host)
         {
             var scope = host.Services.GetRequiredService<ILifetimeScope>();
 
             // Rabbit init
 
-            var channel = scope.ResolveKeyed<IModel>("publisher");
-            channel.ExchangeDeclare("ref-app", ExchangeType.Topic, false, true);
-            channel.QueueDeclare("ref-app", false, false, true);
-            channel.QueueBind("ref-app", "ref-app", "#");
+            var channel = scope.ResolveKeyed<IChannel>("publisher");
+            await channel.ExchangeDeclareAsync("ref-app", ExchangeType.Topic, false, true);
+            await channel.QueueDeclareAsync("ref-app", false, false, true);
+            await channel.QueueBindAsync("ref-app", "ref-app", "#");
 
             var consumer = scope.ResolveKeyed<RabbitConsumer>("consumer");
             Log.Verbose("Starting consumer consumer-{consumerId}", consumer.ConsumerTag);
-            consumer.Start();
+            await consumer.StartAsync();
         }
     }
 }

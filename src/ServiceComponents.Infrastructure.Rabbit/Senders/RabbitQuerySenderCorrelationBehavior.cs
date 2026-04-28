@@ -17,7 +17,7 @@ namespace ServiceComponents.Infrastructure.Rabbit.Senders
             _next = next;
         }
 
-        public async Task<TResult> SendAsync<TResult>(IQuery<TResult> query, IBasicProperties basicProperties, CancellationToken cancellationToken = default)
+        public async Task<TResult> SendAsync<TResult>(IQuery<TResult> query, BasicProperties basicProperties, CancellationToken cancellationToken = default)
         {
             UpdateCorrelation(basicProperties);
             return await _next.SendAsync(query, basicProperties, cancellationToken);

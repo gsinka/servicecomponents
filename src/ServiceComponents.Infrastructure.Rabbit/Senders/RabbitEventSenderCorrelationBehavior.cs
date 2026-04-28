@@ -17,7 +17,7 @@ namespace ServiceComponents.Infrastructure.Rabbit.Senders
             _next = next;
         }
 
-        public async Task PublishAsync<T>(T @event, IBasicProperties basicProperties, CancellationToken cancellationToken = default) where T : IEvent
+        public async Task PublishAsync<T>(T @event, BasicProperties basicProperties, CancellationToken cancellationToken = default) where T : IEvent
         {
             UpdateCorrelation(basicProperties);
             await _next.PublishAsync(@event, basicProperties, cancellationToken);

@@ -7,6 +7,6 @@ namespace ServiceComponents.Infrastructure.Rabbit.Senders
 {
     public interface ISendRabbitQuery
     {
-        Task<TResult> SendAsync<TResult>(IQuery<TResult> query, IBasicProperties basicProperties, CancellationToken cancellationToken = default);
+        Task<TResult> SendAsync<TResult>(IQuery<TResult> query, BasicProperties basicProperties, CancellationToken cancellationToken = default);
     }
 }

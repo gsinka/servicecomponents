@@ -16,7 +16,7 @@ namespace ServiceComponents.Infrastructure.Rabbit.Senders
             _next = next;
         }
 
-        public async Task SendAsync<T>(T command, IBasicProperties basicProperties, CancellationToken cancellationToken) where T : ICommand
+        public async Task SendAsync<T>(T command, BasicProperties basicProperties, CancellationToken cancellationToken) where T : ICommand
         {
             UpdateCorrelation(basicProperties);
             await _next.SendAsync(command, basicProperties, cancellationToken);

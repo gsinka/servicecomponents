@@ -9,22 +9,23 @@ namespace ServiceComponents.Infrastructure.Rabbit.Senders
 {
     public class RabbitQuerySenderProxy : ISendQuery
     {
-        private readonly IModel _model;
+        private readonly IChannel _channel;
         private readonly ISendRabbitQuery _rabbitSender;
 
-        public RabbitQuerySenderProxy(IModel model, ISendRabbitQuery rabbitSender)
+        public RabbitQuerySenderProxy(IChannel channel, ISendRabbitQuery rabbitSender)
         {
-            _model = model;
+            _channel = channel;
             _rabbitSender = rabbitSender;
         }
 
         public async Task<TResult> SendAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default)
         {
-            var basicProperties = _model.CreateBasicProperties();
-            basicProperties.Headers = new Dictionary<string, object>();
+            var basicProperties = new BasicProperties
+            {
+                Headers = new Dictionary<string, object>()
+            };
 
             return await _rabbitSender.SendAsync(query, basicProperties, cancellationToken);
-
         }
     }
 }
