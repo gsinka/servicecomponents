@@ -21,7 +21,7 @@ namespace ServiceComponents.Infrastructure.Rabbit
                 AutomaticRecoveryEnabled = true,
                 ClientProvidedName = clientName,
 
-            }.CreateConnection()).SingleInstance();
+            }.CreateConnectionAsync().GetAwaiter().GetResult()).SingleInstance();
 
             if (key == default) {
                 registrtion.As<IConnection>();
@@ -35,29 +35,29 @@ namespace ServiceComponents.Infrastructure.Rabbit
 
         public static ContainerBuilder AddRabbitChannel(this ContainerBuilder builder, object connectionKey = default, object key = default)
         {
-            var channelRegistration = builder.Register(context => connectionKey == default ? context.Resolve<IConnection>().CreateModel() : context.ResolveKeyed<IConnection>(connectionKey).CreateModel())
+            var channelRegistration = builder.Register(context => connectionKey == default ? context.Resolve<IConnection>().CreateChannelAsync().GetAwaiter().GetResult() : context.ResolveKeyed<IConnection>(connectionKey).CreateChannelAsync().GetAwaiter().GetResult())
                 .SingleInstance();
 
             if (key == default) {
-                channelRegistration.As<IModel>();
+                channelRegistration.As<IChannel>();
             }
             else {
-                channelRegistration.Keyed<IModel>(key);
+                channelRegistration.Keyed<IChannel>(key);
             }
 
             return builder;
         }
 
-        public static ContainerBuilder AddRabbitEventPublisher(this ContainerBuilder builder, string exchange, string routingKey, bool mandatory = false, IBasicProperties basicProperties = null, object channelKey = default, string key = default)
+        public static ContainerBuilder AddRabbitEventPublisher(this ContainerBuilder builder, string exchange, string routingKey, bool mandatory = false, BasicProperties basicProperties = null, object channelKey = default, string key = default)
         {
             var proxyRegistration = builder.Register(context => new RabbitEventPublisherProxy(
-                channelKey == default ? context.Resolve<IModel>() : context.ResolveKeyed<IModel>(channelKey),
+                channelKey == default ? context.Resolve<IChannel>() : context.ResolveKeyed<IChannel>(channelKey),
                 key == default ? context.Resolve<IPublishRabbitEvent>() : context.ResolveKeyed<IPublishRabbitEvent>(key)
             )).InstancePerDependency();
 
             var senderRegistration = builder.Register(context => new RabbitEventPublisher(
                     context.Resolve<ILogger>(),
-                    channelKey == default ? context.Resolve<IModel>() : context.ResolveKeyed<IModel>(channelKey),
+                    channelKey == default ? context.Resolve<IChannel>() : context.ResolveKeyed<IChannel>(channelKey),
                     exchange, routingKey))
                 .InstancePerLifetimeScope();
 
@@ -78,7 +78,7 @@ namespace ServiceComponents.Infrastructure.Rabbit
             var registration = builder.Register(context => new RabbitConsumer(
                     context.Resolve<ILogger>(),
                     context.Resolve<ILifetimeScope>(),
-                    channelKey == default ? context.Resolve<IModel>() : context.ResolveKeyed<IModel>(channelKey),
+                    channelKey == default ? context.Resolve<IChannel>() : context.ResolveKeyed<IChannel>(channelKey),
                     queue, 
                     consumerTag))
                 .AsImplementedInterfaces()
@@ -108,13 +108,13 @@ namespace ServiceComponents.Infrastructure.Rabbit
         public static ContainerBuilder AddRabbitCommandSender(this ContainerBuilder builder, string exchange, string routingKey = default, object channelKey = default, string key = default)
         {
             var proxyRegistration = builder.Register(context => new RabbitCommandSenderProxy(
-                channelKey == default ? context.Resolve<IModel>() : context.ResolveKeyed<IModel>(channelKey),
+                channelKey == default ? context.Resolve<IChannel>() : context.ResolveKeyed<IChannel>(channelKey),
                 key == default ? context.Resolve<ISendRabbitCommand>() : context.ResolveKeyed<ISendRabbitCommand>(key)
             )).InstancePerDependency();
 
             var senderRegistration = builder.Register(context => new RabbitCommandSender(
                     context.Resolve<ILogger>(),
-                    channelKey == default ? context.Resolve<IModel>() : context.ResolveKeyed<IModel>(channelKey),
+                    channelKey == default ? context.Resolve<IChannel>() : context.ResolveKeyed<IChannel>(channelKey),
                     exchange, routingKey))
                 .InstancePerLifetimeScope();
 
@@ -133,13 +133,13 @@ namespace ServiceComponents.Infrastructure.Rabbit
         public static ContainerBuilder AddRabbitQuerySender(this ContainerBuilder builder, string exchange, string routingKey = default, object channelKey = default, string key = default)
         {
             var proxyRegistration = builder.Register(context => new RabbitQuerySenderProxy(
-                channelKey == default ? context.Resolve<IModel>() : context.ResolveKeyed<IModel>(channelKey),
+                channelKey == default ? context.Resolve<IChannel>() : context.ResolveKeyed<IChannel>(channelKey),
                 key == default ? context.Resolve<ISendRabbitQuery>() : context.ResolveKeyed<ISendRabbitQuery>(key)
             )).InstancePerDependency();
 
             var senderRegistration = builder.Register(context => new RabbitQuerySender(
                     context.Resolve<ILogger>(),
-                    channelKey == default ? context.Resolve<IModel>() : context.ResolveKeyed<IModel>(channelKey),
+                    channelKey == default ? context.Resolve<IChannel>() : context.ResolveKeyed<IChannel>(channelKey),
                     exchange, routingKey))
                 .InstancePerLifetimeScope();
 
@@ -185,26 +185,26 @@ namespace ServiceComponents.Infrastructure.Rabbit
             return builder;
         }
 
-        public static IModel AddRabbitRetry(this IModel channel, ILifetimeScope scope, string queue, int [] ttls)
+        public static IChannel AddRabbitRetry(this IChannel channel, ILifetimeScope scope, string queue, int [] ttls)
         {
-            channel.QueueDeclare(queue, false, false, true, new Dictionary<string, object>() { { "x-dead-letter-exchange", $"{queue}-dlx-wait-{ttls[0]}" } });
+            channel.QueueDeclareAsync(queue, false, false, true, new Dictionary<string, object>() { { "x-dead-letter-exchange", $"{queue}-dlx-wait-{ttls[0]}" } }).GetAwaiter().GetResult();
 
             for (var i = 0; i < ttls.Length; i++) {
 
-                channel.ExchangeDeclare($"{queue}-dlx-wait-{ttls[i]}", "direct", false, true, null);
-                channel.ExchangeDeclare($"{queue}-dlx-retry-{ttls[i]}", "direct", false, true, null);
+                channel.ExchangeDeclareAsync($"{queue}-dlx-wait-{ttls[i]}", "direct", false, true, null).GetAwaiter().GetResult();
+                channel.ExchangeDeclareAsync($"{queue}-dlx-retry-{ttls[i]}", "direct", false, true, null).GetAwaiter().GetResult();
 
-                channel.QueueDeclare($"{queue}-wait-{ttls[i]}", false, false, true, new Dictionary<string, object>() { { "x-message-ttl", ttls[i] }, { "x-dead-letter-exchange", $"{queue}-dlx-retry-{ttls[i]}" }});
-                channel.QueueDeclare($"{queue}-retry-{ttls[i]}", false, false, true, new Dictionary<string, object>() { { "x-dead-letter-exchange", i == ttls.Length - 1 ? $"{queue}-dlx" : $"{queue}-dlx-wait-{ttls[i + 1]}" } });
-                channel.QueueBind($"{queue}-wait-{ttls[i]}", $"{queue}-dlx-wait-{ttls[i]}", string.Empty);
-                channel.QueueBind($"{queue}-retry-{ttls[i]}", $"{queue}-dlx-retry-{ttls[i]}", string.Empty);
+                channel.QueueDeclareAsync($"{queue}-wait-{ttls[i]}", false, false, true, new Dictionary<string, object>() { { "x-message-ttl", ttls[i] }, { "x-dead-letter-exchange", $"{queue}-dlx-retry-{ttls[i]}" }}).GetAwaiter().GetResult();
+                channel.QueueDeclareAsync($"{queue}-retry-{ttls[i]}", false, false, true, new Dictionary<string, object>() { { "x-dead-letter-exchange", i == ttls.Length - 1 ? $"{queue}-dlx" : $"{queue}-dlx-wait-{ttls[i + 1]}" } }).GetAwaiter().GetResult();
+                channel.QueueBindAsync($"{queue}-wait-{ttls[i]}", $"{queue}-dlx-wait-{ttls[i]}", string.Empty).GetAwaiter().GetResult();
+                channel.QueueBindAsync($"{queue}-retry-{ttls[i]}", $"{queue}-dlx-retry-{ttls[i]}", string.Empty).GetAwaiter().GetResult();
 
                 //scope.ResolveKeyed<RabbitConsumer>($"consumer-retry-{ttls[i]}").StartAsync(CancellationToken.None).Wait();
             }
 
-            channel.ExchangeDeclare($"{queue}-dlx", "direct", false, true, null);
-            channel.QueueDeclare($"{queue}-dlx", false, false, true);
-            channel.QueueBind($"{queue}-dlx", $"{queue}-dlx", string.Empty);
+            channel.ExchangeDeclareAsync($"{queue}-dlx", "direct", false, true, null).GetAwaiter().GetResult();
+            channel.QueueDeclareAsync($"{queue}-dlx", false, false, true).GetAwaiter().GetResult();
+            channel.QueueBindAsync($"{queue}-dlx", $"{queue}-dlx", string.Empty).GetAwaiter().GetResult();
             
             return channel;
         }

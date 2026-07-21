@@ -8,6 +8,6 @@ namespace ServiceComponents.Infrastructure.Rabbit.Senders
 {
     public interface IPublishRabbitEvent
     {
-        Task PublishAsync<T>(T @event, IBasicProperties basicProperties, CancellationToken cancellationToken = default) where T : IEvent;
+        Task PublishAsync<T>(T @event, BasicProperties basicProperties, CancellationToken cancellationToken = default) where T : IEvent;
     }
 }

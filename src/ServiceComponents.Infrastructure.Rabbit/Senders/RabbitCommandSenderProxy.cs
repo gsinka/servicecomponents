@@ -10,19 +10,21 @@ namespace ServiceComponents.Infrastructure.Rabbit.Senders
 {
     public class RabbitCommandSenderProxy : ISendCommand
     {
-        private readonly IModel _model;
+        private readonly IChannel _channel;
         private readonly ISendRabbitCommand _rabbitSender;
 
-        public RabbitCommandSenderProxy(IModel model, ISendRabbitCommand rabbitSender)
+        public RabbitCommandSenderProxy(IChannel channel, ISendRabbitCommand rabbitSender)
         {
-            _model = model;
+            _channel = channel;
             _rabbitSender = rabbitSender;
         }
 
         public async Task SendAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default) where TCommand : ICommand
         {
-            var basicProperties = _model.CreateBasicProperties();
-            basicProperties.Headers = new Dictionary<string, object>();
+            var basicProperties = new BasicProperties
+            {
+                Headers = new Dictionary<string, object>()
+            };
 
             await _rabbitSender.SendAsync(command, basicProperties, cancellationToken);
         }

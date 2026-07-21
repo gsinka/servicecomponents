@@ -17,7 +17,7 @@ namespace ServiceComponents.Infrastructure.Rabbit.Senders
             Correlation = correlation;
         }
 
-        protected void UpdateCorrelation(IBasicProperties basicProperties)
+        protected void UpdateCorrelation(BasicProperties basicProperties)
         {
             basicProperties.CorrelationId = string.IsNullOrWhiteSpace(Correlation.CorrelationId) ? Guid.NewGuid().ToString() : Correlation.CorrelationId;
             if (!string.IsNullOrWhiteSpace(Correlation.CurrentId)) basicProperties.Headers.Add("causation_id", Correlation.CurrentId);

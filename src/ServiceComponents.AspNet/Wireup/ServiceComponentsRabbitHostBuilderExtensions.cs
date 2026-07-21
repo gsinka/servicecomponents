@@ -67,7 +67,7 @@ namespace ServiceComponents.AspNet.Wireup
                 containerBuilder.Register(context => new RabbitStartup(
                     context.Resolve<ILogger>(),
                     context.Resolve<ILifetimeScope>(),
-                    context.Resolve<IModel>(),
+                    context.Resolve<IChannel>(),
                     queue, exchange, routingKey,
                     retryIntervals)).AsImplementedInterfaces();
 

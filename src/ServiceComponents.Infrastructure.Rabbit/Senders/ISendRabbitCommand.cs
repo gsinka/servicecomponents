@@ -7,6 +7,6 @@ namespace ServiceComponents.Infrastructure.Rabbit.Senders
 {
     public interface ISendRabbitCommand
     {
-        Task SendAsync<T>(T command, IBasicProperties basicProperties, CancellationToken cancellationToken = default) where T : ICommand;
+        Task SendAsync<T>(T command, BasicProperties basicProperties, CancellationToken cancellationToken = default) where T : ICommand;
     }
 }
