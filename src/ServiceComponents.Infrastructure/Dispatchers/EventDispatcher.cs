@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,7 +24,9 @@ namespace ServiceComponents.Infrastructure.Dispatchers
 
         public async Task DispatchAsync<T>(T @event, CancellationToken cancellationToken = default) where T : IEvent
         {
-            var handlers = (IEnumerable<dynamic>)_scope.ResolveOptional(typeof(IEnumerable<>).MakeGenericType(typeof(IHandleEvent<>).MakeGenericType(@event.GetType())));
+            using var scope = _scope.BeginLifetimeScope();
+
+            var handlers = (IEnumerable<dynamic>)scope.ResolveOptional(typeof(IEnumerable<>).MakeGenericType(typeof(IHandleEvent<>).MakeGenericType(@event.GetType())));
 
             if (handlers == null) return;
 
