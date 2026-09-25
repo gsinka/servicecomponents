@@ -50,7 +50,9 @@ namespace ServiceComponents.AspNet.Wireup
 
                 // Add consumers for queue
                 var consumerCount = Environment.ProcessorCount - (retryIntervals?.Length ?? 0);
-                if (consumerCount < 1) consumerCount = 1;
+                if (consumerCount < 1) {
+                    consumerCount = 1;
+                }
 
                 for (var i = 0; i < consumerCount; i++) {
 

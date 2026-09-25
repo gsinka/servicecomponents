@@ -18,9 +18,14 @@ namespace ServiceComponents.Infrastructure.Behaviors.Logging
 
         protected void Enrich(string currentProperty, string currentId)
         {
-            if (!string.IsNullOrEmpty(Correlation.CorrelationId)) LogContext.PushProperty(Options.CorrelationIdPropertyName, Correlation.CorrelationId);
-            if (!string.IsNullOrEmpty(Correlation.CausationId)) LogContext.PushProperty(Options.CausationIdPropertyName, Correlation.CausationId);
-            
+            if (!string.IsNullOrEmpty(Correlation.CorrelationId)) {
+                LogContext.PushProperty(Options.CorrelationIdPropertyName, Correlation.CorrelationId);
+            }
+
+            if (!string.IsNullOrEmpty(Correlation.CausationId)) {
+                LogContext.PushProperty(Options.CausationIdPropertyName, Correlation.CausationId);
+            }
+
             LogContext.PushProperty(currentProperty, currentId);
         }
     }

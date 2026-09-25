@@ -31,7 +31,9 @@ namespace ServiceComponents.Core.Extensions
         {
             var timeIntervals = source as ITimeInterval[] ?? source.ToArray();
 
-            if (!timeIntervals.Any()) yield break;
+            if (!timeIntervals.Any()) {
+                yield break;
+            }
 
             if (timeIntervals.Count() == 1)
             {

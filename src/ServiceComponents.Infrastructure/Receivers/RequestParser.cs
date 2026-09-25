@@ -20,8 +20,10 @@ namespace ServiceComponents.Infrastructure.Receivers
             CancellationToken cancellationToken = default)
         {
             // Get body
-            if (string.IsNullOrEmpty(payload)) payload = "{}";
-            
+            if (string.IsNullOrEmpty(payload)) {
+                payload = "{}";
+            }
+
             // Deserialize object
             dynamic request;
             try {

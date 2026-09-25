@@ -30,7 +30,9 @@ namespace ServiceComponents.AspNet.Http
             // Get body
             using var reader = new StreamReader(httpRequest.Body, Encoding.UTF8);
             var json = await reader.ReadToEndAsync();
-            if (string.IsNullOrEmpty(json)) json = "{}";
+            if (string.IsNullOrEmpty(json)) {
+                json = "{}";
+            }
 
             // Get domain type
             var domainType = httpRequest.Headers[_options.DomainTypeHeaderKey].ToString();

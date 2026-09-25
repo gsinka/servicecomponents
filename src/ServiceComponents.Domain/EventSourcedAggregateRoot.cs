@@ -15,13 +15,19 @@ namespace ServiceComponents.Domain
 
         protected EventSourcedAggregateRoot(string aggregateId)
         {
-            if (string.IsNullOrEmpty(aggregateId)) throw new ArgumentNullException(nameof(aggregateId));
+            if (string.IsNullOrEmpty(aggregateId)) {
+                throw new ArgumentNullException(nameof(aggregateId));
+            }
+
             AggregateId = aggregateId;
         }
 
         protected EventSourcedAggregateRoot(IEnumerable<IEvent> events)
         {
-            if (events == null) throw new ArgumentException(nameof(events));
+            if (events == null) {
+                throw new ArgumentException(nameof(events));
+            }
+
             foreach (IEvent @event in events) { ApplyEvent(@event); }
         }
 

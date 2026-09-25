@@ -87,7 +87,9 @@ namespace WebApplication1
 
                 var httpContextAccessor = provider.GetRequiredService<IHttpContextAccessor>();
                 var bearerToken = httpContextAccessor.HttpContext?.Request?.Headers["Authorization"].FirstOrDefault(h => h.StartsWith("bearer ", StringComparison.InvariantCultureIgnoreCase));
-                if (bearerToken != null) client.DefaultRequestHeaders.Add("Authorization", bearerToken);
+                if (bearerToken != null) {
+                    client.DefaultRequestHeaders.Add("Authorization", bearerToken);
+                }
             });
 
             services.AddHostedService<QueuedHostedService>();

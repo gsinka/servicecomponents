@@ -21,7 +21,9 @@ namespace ServiceComponents.Infrastructure.Rabbit.HealthCheck
             foreach (var consumer in _consumers) {
                 cancellationToken.ThrowIfCancellationRequested();
                 data.Add(consumer.ConsumerTag, consumer.IsLive ? "Healthy" : "Unhealthy");
-                if (!consumer.IsLive) result = HealthCheckResult.Unhealthy("One or more consumer is not healthy", data: data);
+                if (!consumer.IsLive) {
+                    result = HealthCheckResult.Unhealthy("One or more consumer is not healthy", data: data);
+                }
             }
             return Task.FromResult(result);
         }

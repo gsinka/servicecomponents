@@ -31,7 +31,9 @@ namespace ServiceComponents.AspNet.Http
             if (policy != null)
             {
                 var authorizationResult = await _authorizationService.AuthorizeAsync(_httpContextAccessor?.HttpContext?.User!, null, policy);
-                if (!authorizationResult.Succeeded) throw new UnauthorizedAccessException(string.Join("\r\n", authorizationResult.Failure.FailedRequirements.Select(requirement => requirement.ToString())));
+                if (!authorizationResult.Succeeded) {
+                    throw new UnauthorizedAccessException(string.Join("\r\n", authorizationResult.Failure.FailedRequirements.Select(requirement => requirement.ToString())));
+                }
             }
         }
     }

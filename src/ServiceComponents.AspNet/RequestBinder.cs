@@ -32,7 +32,9 @@ namespace ServiceComponents.AspNet
     {
         public async Task BindModelAsync(ModelBindingContext bindingContext)
         {
-            if (!bindingContext.ModelType.IsRequest()) bindingContext.Result = ModelBindingResult.Failed();
+            if (!bindingContext.ModelType.IsRequest()) {
+                bindingContext.Result = ModelBindingResult.Failed();
+            }
 
             using var reader = new StreamReader(bindingContext.HttpContext.Request.Body, Encoding.UTF8);
             var json = await reader.ReadToEndAsync();
