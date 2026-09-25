@@ -1,6 +1,5 @@
 ﻿using Autofac;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Moq;
 using ServiceComponents.Application.Senders;
 using ServiceComponents.Testing;

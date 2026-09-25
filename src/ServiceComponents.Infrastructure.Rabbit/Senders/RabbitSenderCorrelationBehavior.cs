@@ -1,5 +1,4 @@
 ﻿using System;
-using Autofac;
 using RabbitMQ.Client;
 using Serilog;
 using ServiceComponents.Application;

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -55,9 +54,8 @@ namespace ServiceComponents.Infrastructure.Receivers
                         await messageAction(payload, cancellationToken);
                         break;
                     }
-                    else {
-                        throw new InvalidOperationException($"Unknown request type: {request.GetType().FullName} (not a command, query or event)");
-                    }
+
+                    throw new InvalidOperationException($"Unknown request type: {request.GetType().FullName} (not a command, query or event)");
             }
         }
     }

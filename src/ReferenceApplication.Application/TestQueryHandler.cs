@@ -1,11 +1,7 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using NHibernate;
-using NHibernate.Linq;
 using ReferenceApplication.Api;
-using ReferenceApplication.Application.Entities;
 using Serilog;
 using ServiceComponents.Application;
 using ServiceComponents.Application.Mediator;

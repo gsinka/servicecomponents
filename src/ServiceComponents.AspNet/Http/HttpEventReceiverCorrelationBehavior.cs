@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Serilog;
 using ServiceComponents.Api.Mediator;
+using ServiceComponents.Infrastructure.CorrelationContext;
 
 namespace ServiceComponents.AspNet.Http
 {
@@ -11,7 +12,7 @@ namespace ServiceComponents.AspNet.Http
     {
         private readonly IReceiveHttpEvent _next;
 
-        public HttpEventReceiverCorrelationBehavior(ILogger log, IHttpContextAccessor httpContextAccessor, IOptions<HttpRequestOptions> httpRequestOptions, Infrastructure.CorrelationContext.Correlation correlation, IReceiveHttpEvent next) 
+        public HttpEventReceiverCorrelationBehavior(ILogger log, IHttpContextAccessor httpContextAccessor, IOptions<HttpRequestOptions> httpRequestOptions, Correlation correlation, IReceiveHttpEvent next) 
             : base(log, httpContextAccessor, httpRequestOptions, correlation)
         {
             _next = next;

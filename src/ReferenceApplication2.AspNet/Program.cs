@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi;
 using Newtonsoft.Json.Converters;
 using NHibernate.Tool.hbm2ddl;
+using RabbitMQ.Client;
 using ReferenceApplication.Api;
 using ReferenceApplication.Application;
 using ReferenceApplication.Application.Entities;
@@ -64,7 +65,7 @@ namespace ReferenceApplication2.AspNet
                 // Use serilog for logging
                 .UseSerilog((context, log) => log
                     .WriteTo.Console(LogEventLevel.Information)
-                    .WriteTo.Seq("http://localhost:5341", LogEventLevel.Verbose)
+                    .WriteTo.Seq("http://localhost:5341")
                     .Enrich.FromLogContext()
                     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                     .MinimumLevel.Override("NHibernate", LogEventLevel.Warning)
@@ -84,7 +85,7 @@ namespace ReferenceApplication2.AspNet
                         var aspNetXmlDoc = Path.Combine(AppContext.BaseDirectory, $"{typeof(MetricsController).Assembly.GetName().Name}.xml");
                         options.IncludeXmlComments(aspNetXmlDoc);
 
-                        options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme() {
+                        options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme {
                             Type = SecuritySchemeType.OpenIdConnect,
                             OpenIdConnectUrl = new Uri("http://localhost:8080/auth/realms/develop/.well-known/openid-configuration"),
                             In = ParameterLocation.Header,
@@ -107,7 +108,7 @@ namespace ReferenceApplication2.AspNet
 
                 // Health check
                 .AddHealthCheck((configuration, check) => {
-                    check.AddRabbitMQ(sp => new RabbitMQ.Client.ConnectionFactory { Uri = new Uri("amqp://localhost:5672") }.CreateConnectionAsync().GetAwaiter().GetResult());
+                    check.AddRabbitMQ(sp => new ConnectionFactory { Uri = new Uri("amqp://localhost:5672") }.CreateConnectionAsync().GetAwaiter().GetResult());
                     check.AddRedis("localhost");
                 })
 

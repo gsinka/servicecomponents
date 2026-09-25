@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 using Autofac;
-using FluentValidation;
-using FluentValidation.Results;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -17,23 +14,19 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi;
-using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
 using ReferenceApplication.Api;
 using ReferenceApplication.Application;
 using Serilog;
 using Serilog.Events;
 using ServiceComponents.AspNet.Exceptions;
-using ServiceComponents.AspNet.Http;
 using ServiceComponents.AspNet.Http.Senders;
 using ServiceComponents.AspNet.Services;
-using ServiceComponents.Core.Exceptions;
 using ServiceComponents.Infrastructure.EventRecorder;
 using ServiceComponents.Infrastructure.Options;
 using ServiceComponents.Infrastructure.Rabbit;
 using ServiceComponents.Infrastructure.Senders;
 using Swashbuckle.AspNetCore.Filters;
-
 
 namespace WebApplication1
 {
@@ -51,7 +44,7 @@ namespace WebApplication1
             config
                 .MinimumLevel.Verbose()
                 .WriteTo.Console(LogEventLevel.Information, outputTemplate: "[{Timestamp:HH:mm:ss+fff}{EventType:x8} {Level:u3}] {Message:lj} [{SourceContext}]{NewLine}{Exception}")
-                .WriteTo.Seq("http://localhost:5341", LogEventLevel.Verbose)
+                .WriteTo.Seq("http://localhost:5341")
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .MinimumLevel.Override("System", LogEventLevel.Warning)
                 .MinimumLevel.Override("NHibernate", LogEventLevel.Verbose)
@@ -75,7 +68,7 @@ namespace WebApplication1
                 var authority = Configuration.GetValue<string>("Swagger:Authentication:Authority") ?? Configuration.GetValue<string>("Authentication:Authority")?.TrimEnd('/');
 
                 if (!string.IsNullOrWhiteSpace(authority)) {
-                    c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme() {
+                    c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme {
                         Type = SecuritySchemeType.OpenIdConnect,
                         OpenIdConnectUrl = new Uri($"{authority}/.well-known/openid-configuration"),
                         In = ParameterLocation.Header,
@@ -131,8 +124,8 @@ namespace WebApplication1
             // Consumers
 
             builder.AddRabbitConnection(rabbitUri, $"{rabbitClientName}-consumer", "consumer");
-            builder.AddRabbitChannel(connectionKey: "consumer", key: $"consumer");
-            builder.AddRabbitConsumer(queue, $"{rabbitClientName}-consumer", $"consumer", $"consumer");
+            builder.AddRabbitChannel(connectionKey: "consumer", key: "consumer");
+            builder.AddRabbitConsumer(queue, $"{rabbitClientName}-consumer", "consumer", "consumer");
 
             builder.AddRabbitReceivers();
             builder.AddRabbitCommandSender(exchange, string.Empty, "publisher", "rabbit");

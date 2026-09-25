@@ -77,7 +77,7 @@ namespace ServiceComponents.AspNet.Wireup
 
         public static ServiceComponentsHostBuilder AddRabbit(this ServiceComponentsHostBuilder hostBuilder, string connectionString, string clientName, string queue, string exchange, string routingKey = "", int[] retryIntervals = default)
         {
-            return AddRabbit(hostBuilder, configuration => connectionString, configuration => clientName,
+            return hostBuilder.AddRabbit(configuration => connectionString, configuration => clientName,
                 configuration => queue, configuration => exchange, configuration => routingKey,
                 configuration => retryIntervals);
         }

@@ -36,7 +36,7 @@ namespace ServiceComponents.Infrastructure.EventRecorder
         {
             using var cancellationTokenSource = new CancellationTokenSource(timeOut);
             
-            return await WaitFor<T>(filter, cancellationTokenSource.Token);
+            return await WaitFor(filter, cancellationTokenSource.Token);
         }
 
         public Task<T> WaitFor<T>(Func<T, ICorrelation, bool> filter, CancellationToken cancellationToken = default) where T : IEvent

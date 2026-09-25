@@ -26,7 +26,7 @@ namespace ServiceComponents.Infrastructure.Monitoring
                     if (!_counters.ContainsKey(metricType)) {
 
                         var (name, title) = metric.MetricDescription();
-                        _counters.TryAdd(metricType, Metrics.CreateCounter(name, title, new CounterConfiguration() { LabelNames = metric.MetricFields().ToArray() }));
+                        _counters.TryAdd(metricType, Metrics.CreateCounter(name, title, new CounterConfiguration { LabelNames = metric.MetricFields().ToArray() }));
                     }
                     _counters[metricType].WithLabels(metric.MetricValues().ToArray()).Inc(increment);
                     break;
@@ -101,7 +101,7 @@ namespace ServiceComponents.Infrastructure.Monitoring
 
                     if (!_summaries.ContainsKey(metricType)) {
                         var (name, title) = metric.MetricDescription();
-                        _summaries.TryAdd(metricType, Metrics.CreateSummary(name, title, new SummaryConfiguration() { LabelNames = metric.MetricFields().ToArray() }));
+                        _summaries.TryAdd(metricType, Metrics.CreateSummary(name, title, new SummaryConfiguration { LabelNames = metric.MetricFields().ToArray() }));
                     }
                     _summaries[metricType].WithLabels(metric.MetricValues().ToArray()).Observe(duration);
 

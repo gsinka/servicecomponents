@@ -1,11 +1,9 @@
 using System;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
-using ServiceComponents.Infrastructure.CouchDB;
 
 namespace WebApplication1
 {

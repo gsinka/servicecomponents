@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using Autofac;
-using Autofac.Features.ResolveAnything;
 using RabbitMQ.Client;
 using Serilog;
 using ServiceComponents.Application.Senders;
@@ -15,7 +12,7 @@ namespace ServiceComponents.Infrastructure.Rabbit
     {
         public static ContainerBuilder AddRabbitConnection(this ContainerBuilder builder, Uri endpointUri, string clientName, object key = default)
         {
-            var registrtion = builder.Register(context => new ConnectionFactory() {
+            var registrtion = builder.Register(context => new ConnectionFactory {
 
                 Uri = endpointUri,
                 AutomaticRecoveryEnabled = true,
@@ -176,10 +173,10 @@ namespace ServiceComponents.Infrastructure.Rabbit
 
         public static ContainerBuilder AddRabbitRetryConsumers(this ContainerBuilder builder, string connectionKey, string queue, IEnumerable<int> ttls, string clientName)
         {
-            builder.AddRabbitChannel(connectionKey: connectionKey, key: $"consumer-retry");
+            builder.AddRabbitChannel(connectionKey: connectionKey, key: "consumer-retry");
             
             foreach (var ttl in ttls) {
-                builder.AddRabbitConsumer($"{queue}-retry-{ttl}", $"{clientName}-consumer-retry-{ttl}", $"consumer-retry", $"consumer-retry-{ttl}");
+                builder.AddRabbitConsumer($"{queue}-retry-{ttl}", $"{clientName}-consumer-retry-{ttl}", "consumer-retry", $"consumer-retry-{ttl}");
             }
 
             return builder;
@@ -187,22 +184,22 @@ namespace ServiceComponents.Infrastructure.Rabbit
 
         public static IChannel AddRabbitRetry(this IChannel channel, ILifetimeScope scope, string queue, int [] ttls)
         {
-            channel.QueueDeclareAsync(queue, false, false, true, new Dictionary<string, object>() { { "x-dead-letter-exchange", $"{queue}-dlx-wait-{ttls[0]}" } }).GetAwaiter().GetResult();
+            channel.QueueDeclareAsync(queue, false, false, true, new Dictionary<string, object> { { "x-dead-letter-exchange", $"{queue}-dlx-wait-{ttls[0]}" } }).GetAwaiter().GetResult();
 
             for (var i = 0; i < ttls.Length; i++) {
 
-                channel.ExchangeDeclareAsync($"{queue}-dlx-wait-{ttls[i]}", "direct", false, true, null).GetAwaiter().GetResult();
-                channel.ExchangeDeclareAsync($"{queue}-dlx-retry-{ttls[i]}", "direct", false, true, null).GetAwaiter().GetResult();
+                channel.ExchangeDeclareAsync($"{queue}-dlx-wait-{ttls[i]}", "direct", false, true).GetAwaiter().GetResult();
+                channel.ExchangeDeclareAsync($"{queue}-dlx-retry-{ttls[i]}", "direct", false, true).GetAwaiter().GetResult();
 
-                channel.QueueDeclareAsync($"{queue}-wait-{ttls[i]}", false, false, true, new Dictionary<string, object>() { { "x-message-ttl", ttls[i] }, { "x-dead-letter-exchange", $"{queue}-dlx-retry-{ttls[i]}" }}).GetAwaiter().GetResult();
-                channel.QueueDeclareAsync($"{queue}-retry-{ttls[i]}", false, false, true, new Dictionary<string, object>() { { "x-dead-letter-exchange", i == ttls.Length - 1 ? $"{queue}-dlx" : $"{queue}-dlx-wait-{ttls[i + 1]}" } }).GetAwaiter().GetResult();
+                channel.QueueDeclareAsync($"{queue}-wait-{ttls[i]}", false, false, true, new Dictionary<string, object> { { "x-message-ttl", ttls[i] }, { "x-dead-letter-exchange", $"{queue}-dlx-retry-{ttls[i]}" }}).GetAwaiter().GetResult();
+                channel.QueueDeclareAsync($"{queue}-retry-{ttls[i]}", false, false, true, new Dictionary<string, object> { { "x-dead-letter-exchange", i == ttls.Length - 1 ? $"{queue}-dlx" : $"{queue}-dlx-wait-{ttls[i + 1]}" } }).GetAwaiter().GetResult();
                 channel.QueueBindAsync($"{queue}-wait-{ttls[i]}", $"{queue}-dlx-wait-{ttls[i]}", string.Empty).GetAwaiter().GetResult();
                 channel.QueueBindAsync($"{queue}-retry-{ttls[i]}", $"{queue}-dlx-retry-{ttls[i]}", string.Empty).GetAwaiter().GetResult();
 
                 //scope.ResolveKeyed<RabbitConsumer>($"consumer-retry-{ttls[i]}").StartAsync(CancellationToken.None).Wait();
             }
 
-            channel.ExchangeDeclareAsync($"{queue}-dlx", "direct", false, true, null).GetAwaiter().GetResult();
+            channel.ExchangeDeclareAsync($"{queue}-dlx", "direct", false, true).GetAwaiter().GetResult();
             channel.QueueDeclareAsync($"{queue}-dlx", false, false, true).GetAwaiter().GetResult();
             channel.QueueBindAsync($"{queue}-dlx", $"{queue}-dlx", string.Empty).GetAwaiter().GetResult();
             

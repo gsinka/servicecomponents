@@ -18,7 +18,7 @@ namespace ServiceComponents.Infrastructure.CouchDB
 
         public override IConfigurationProvider Build(IConfigurationBuilder builder)
         {
-            using var httpClient = new HttpClient() { BaseAddress = _options.Uri };
+            using var httpClient = new HttpClient { BaseAddress = _options.Uri };
             var response = httpClient.GetAsync($"{_options.Database}/{_options.Document}").Result.Content.ReadAsStringAsync().Result;
 
             var json = JObject.Parse(response);

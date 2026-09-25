@@ -1,11 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
-using NHibernate;
 using ReferenceApplication.Api;
-using ReferenceApplication.Application.Entities;
 using Serilog;
-using ServiceComponents.Api.Mediator;
 using ServiceComponents.Application;
 using ServiceComponents.Application.Mediator;
 using ServiceComponents.Application.Senders;

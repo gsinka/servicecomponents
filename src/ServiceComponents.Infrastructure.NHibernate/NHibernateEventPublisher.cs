@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -27,11 +26,11 @@ namespace ServiceComponents.Infrastructure.NHibernate
 
         public async Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : IEvent
         {
-            await _session.SaveAsync(new UnpublishedEventEntity() {
+            await _session.SaveAsync(new UnpublishedEventEntity {
          
                 TimeStamp = _clock.UtcNow,
                 EventType = @event.GetType().ToString(),
-                EventBody = JsonConvert.SerializeObject(@event, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All })
+                EventBody = JsonConvert.SerializeObject(@event, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All })
 
             }, cancellationToken);
 

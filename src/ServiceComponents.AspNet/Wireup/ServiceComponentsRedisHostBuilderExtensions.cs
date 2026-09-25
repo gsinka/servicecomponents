@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Win32.SafeHandles;
-using ServiceComponents.Api.Mediator;
 using ServiceComponents.Infrastructure.Redis;
 using StackExchange.Redis;
 

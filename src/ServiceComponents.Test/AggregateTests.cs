@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using ServiceComponents.Api.Mediator;
 using ServiceComponents.Domain;
 using Xunit;
@@ -33,8 +31,8 @@ namespace ServiceComponents.Test
 
     public class TestAR : EventSourcedAggregateRoot
     {
-        public bool Flag = false;
-        public bool Flag2 = false;
+        public bool Flag;
+        public bool Flag2;
 
 
         public TestAR(string aggregateId) : base(aggregateId)

@@ -9,7 +9,6 @@ using RabbitMQ.Client.Events;
 using Serilog;
 using ServiceComponents.Infrastructure.Receivers;
 
-
 namespace ServiceComponents.Infrastructure.Rabbit
 {
     public interface IRabbitConsumer

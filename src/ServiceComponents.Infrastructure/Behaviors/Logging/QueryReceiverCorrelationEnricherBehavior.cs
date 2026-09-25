@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using ServiceComponents.Api.Mediator;
+using ServiceComponents.Infrastructure.CorrelationContext;
 using ServiceComponents.Infrastructure.Receivers;
 
 namespace ServiceComponents.Infrastructure.Behaviors.Logging
@@ -10,7 +11,7 @@ namespace ServiceComponents.Infrastructure.Behaviors.Logging
     {
         private readonly IReceiveQuery _next;
 
-        public QueryReceiverCorrelationEnricherBehavior(IOptions<CorrelationLogOptions> options, CorrelationContext.Correlation correlation, IReceiveQuery next) 
+        public QueryReceiverCorrelationEnricherBehavior(IOptions<CorrelationLogOptions> options, Correlation correlation, IReceiveQuery next) 
             : base(options, correlation)
         {
             _next = next;

@@ -77,7 +77,7 @@ namespace ServiceComponents.Infrastructure.Behaviors.CommandConstraints
                 {
                     value++;
                     await _cache.SetAsync(key, BitConverter.GetBytes(value),
-                        new DistributedCacheEntryOptions() {AbsoluteExpirationRelativeToNow = _expiry(key)}, cancellationToken);
+                        new DistributedCacheEntryOptions {AbsoluteExpirationRelativeToNow = _expiry(key)}, cancellationToken);
                 }
                 else
                 {

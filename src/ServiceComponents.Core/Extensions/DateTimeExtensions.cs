@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace ServiceComponents.Core.Extensions
 {
@@ -18,7 +19,7 @@ namespace ServiceComponents.Core.Extensions
 
         public static DateTime StartOfWeek(this DateTime date)
         {
-            return StartOfWeek(date, System.Threading.Thread.CurrentThread.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
+            return date.StartOfWeek(Thread.CurrentThread.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
         }
 
         public static DateTime StartOfWeek(this DateTime date, DayOfWeek startOfWeek)

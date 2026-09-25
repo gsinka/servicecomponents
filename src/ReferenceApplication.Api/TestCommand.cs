@@ -1,5 +1,4 @@
-﻿using System;
-using FluentValidation;
+﻿using FluentValidation;
 using ServiceComponents.Api.Mediator;
 
 namespace ReferenceApplication.Api

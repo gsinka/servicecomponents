@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Threading;
 using ServiceComponents.Core.Extensions;
 using Xunit;
 
@@ -9,7 +10,7 @@ namespace ServiceComponents.Test
     {
         public UnitTest1()
         {
-            System.Threading.Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;    
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;    
         }
 
         [Fact]

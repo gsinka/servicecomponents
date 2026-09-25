@@ -42,7 +42,7 @@ namespace ReferenceApplication2.AspNet.Controllers
                 async (@event, ct) => await _eventReceiver.ReceiveAsync(@event, ct),
                 cancellationToken);
 
-            return result == null ? (IActionResult)Ok() : Ok(result);
+            return result == null ? Ok() : Ok(result);
         }
     }
 }
