@@ -110,30 +110,6 @@ namespace ServiceComponents.Infrastructure.Rabbit
 
             return options;
         }
-
-        /// <summary>
-        /// Creates RabbitConnectionOptions from the "RabbitMQ" section of configuration.
-        /// This is a convenience method for the common pattern where configuration looks like:
-        /// {
-        ///   "RabbitMQ": {
-        ///     "EndpointUri": "amqp://...",
-        ///     "ClientName": "myapp",
-        ///     "AutomaticRecoveryEnabled": true,
-        ///     "HandshakeContinuationTimeout": 120000
-        ///   }
-        /// }
-        /// </summary>
-        /// <param name="configuration">The configuration instance.</param>
-        /// <returns>Configured RabbitConnectionOptions instance.</returns>
-        public static RabbitConnectionOptions LoadFromRabbitMQSection(this IConfiguration configuration)
-        {
-            return LoadFromConfigurationPaths(
-                configuration,
-                endpointUriPath: "RabbitMQ:EndpointUri",
-                clientNamePath: "RabbitMQ:ClientName",
-                automaticRecoveryEnabledPath: "RabbitMQ:AutomaticRecoveryEnabled",
-                handshakeContinuationTimeoutPath: "RabbitMQ:HandshakeContinuationTimeout");
-        }
     }
 }
 
