@@ -8,15 +8,15 @@ namespace ServiceComponents.Infrastructure.Rabbit
     /// </summary>
     public static class RabbitConnectionOptionsExtensions
     {
-        private const string DefaultConfigurationSection = "RabbitConnection";
+        private const string DefaultConfigurationSection = "ServiceComponents:RabbitConnectionOptions";
 
         /// <summary>
         /// Creates RabbitConnectionOptions from IConfiguration.
-        /// Attempts to load from the specified section (or default "RabbitConnection" section).
+        /// Attempts to load from the specified section (or default "ServiceComponents:RabbitConnectionOptions" section).
         /// Falls back to provided defaults or default values for any missing properties.
         /// </summary>
         /// <param name="configuration">The configuration instance.</param>
-        /// <param name="sectionName">The configuration section name. Defaults to "RabbitConnection".</param>
+        /// <param name="sectionName">The configuration section name. Defaults to "ServiceComponents:RabbitConnectionOptions".</param>
         /// <param name="defaultOptions">Optional default options to use as fallback. If null, built-in defaults are used.</param>
         /// <returns>Configured RabbitConnectionOptions instance.</returns>
         public static RabbitConnectionOptions LoadFromConfiguration(

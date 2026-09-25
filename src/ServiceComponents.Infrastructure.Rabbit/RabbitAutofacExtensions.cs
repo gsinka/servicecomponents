@@ -36,7 +36,7 @@ namespace ServiceComponents.Infrastructure.Rabbit
                 try
                 {
                     var configuration = context.Resolve<IConfiguration>();
-                    var configOptions = configuration.LoadFromConfiguration(nameof(RabbitConnectionOptions));
+                    var configOptions = configuration.LoadFromConfiguration();
                     // Merge configuration settings (keep provided Uri and ClientName, but use config for other properties)
                     options.AutomaticRecoveryEnabled = configOptions.AutomaticRecoveryEnabled;
                     options.HandshakeContinuationTimeout = configOptions.HandshakeContinuationTimeout;
@@ -91,7 +91,7 @@ namespace ServiceComponents.Infrastructure.Rabbit
         {
             var registration = builder.Register(context => {
                 var config = configuration ?? context.Resolve<IConfiguration>();
-                var options = config.LoadFromConfiguration(nameof(RabbitConnectionOptions));
+                var options = config.LoadFromConfiguration("ServiceComponents:RabbitConnectionOptions");
                 return new ConnectionFactory
                 {
                     Uri = options.EndpointUri,
