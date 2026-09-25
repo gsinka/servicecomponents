@@ -13,8 +13,10 @@ namespace ServiceComponents.Infrastructure.Rabbit;
 
 public static class RabbitAutofacExtensions
 {
-    /// This method is provided for backward compatibility with existing applications.
+    /// <summary>
+    /// Registers a RabbitMQ connection. This method is provided for backward compatibility with existing applications.
     /// If IConfiguration is available in the container, it will be used for additional settings.
+    /// Consider using <see cref="AddRabbitConnectionAsync"/> instead for better async/await support.
     /// </summary>
     public static ContainerBuilder AddRabbitConnection(this ContainerBuilder builder, Uri endpointUri,
         string clientName, object key = default)
@@ -46,7 +48,8 @@ public static class RabbitAutofacExtensions
         return builder;
     }
 
-    /// This method is provided for backward compatibility with existing applications.
+    /// <summary>
+    /// Registers a RabbitMQ connection with async/await support. This method is provided for backward compatibility with existing applications.
     /// If IConfiguration is available in the container, it will be used for additional settings.
     /// </summary>
     public static async Task<ContainerBuilder> AddRabbitConnectionAsync(this ContainerBuilder builder, Uri endpointUri,
@@ -81,6 +84,7 @@ public static class RabbitAutofacExtensions
 
     /// <summary>
     /// Registers a RabbitMQ channel.
+    /// Consider using <see cref="AddRabbitChannelAsync"/> instead for better async/await support.
     /// </summary>
     public static ContainerBuilder AddRabbitChannel(this ContainerBuilder builder, object connectionKey = default,
         object key = default)
@@ -96,7 +100,7 @@ public static class RabbitAutofacExtensions
     }
 
     /// <summary>
-    /// Registers a RabbitMQ channel.
+    /// Registers a RabbitMQ channel with async/await support.
     /// </summary>
     public static async Task<ContainerBuilder> AddRabbitChannelAsync(this ContainerBuilder builder,
         object connectionKey = default,
@@ -276,7 +280,7 @@ public static class RabbitAutofacExtensions
 
     /// <summary>
     /// Adds retry configuration to a RabbitMQ channel.
-    /// Use AddRabbitRetryAsync for async/await support.
+    /// Consider using <see cref="AddRabbitRetryAsync"/> instead for better async/await support.
     /// </summary>
     public static IChannel AddRabbitRetry(this IChannel channel, ILifetimeScope scope, string queue, int[] ttls)
     {
