@@ -2,8 +2,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using ServiceComponents.Infrastructure.Rabbit;
 
-namespace ServiceComponents.Infrastructure.Rabbit.HealthCheck
+namespace ServiceComponents.AspNet.HealthCheck
 {
     public class RabbitMQConsumerChecker : IHealthCheck
     {
