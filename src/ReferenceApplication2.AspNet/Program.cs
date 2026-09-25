@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Reflection;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,178 +19,139 @@ using ServiceComponents.AspNet.Monitoring;
 using ServiceComponents.AspNet.Wireup;
 using Swashbuckle.AspNetCore.Filters;
 
-namespace ReferenceApplication2.AspNet
+namespace ReferenceApplication2.AspNet;
+
+public class Program
 {
-    public class Program
+    public static void Main(string[] args)
     {
-        public static async Task Main(string[] args)
-        {
-            var host = CreateHostBuilder(args).Build();
-            Log.Information("Starting service");
-            
-            // Initialize health check asynchronously
-            await InitializeHealthCheckAsync(host.Services);
-            
-            await host.RunAsync();
-        }
+        var host = CreateHostBuilder(args).Build();
+        Log.Information("Starting service");
+        host.Run();
+    }
 
-        /// <summary>
-        /// Initializes health checks asynchronously.
-        /// </summary>
-        private static async Task InitializeHealthCheckAsync(IServiceProvider services)
-        {
-            try
-            {
-                // Initialize RabbitMQ health check asynchronously
-                var connectionFactory = new ConnectionFactory { Uri = new Uri("amqp://localhost:5672") };
-                using var connection = await connectionFactory.CreateConnectionAsync();
-                Log.Information("RabbitMQ health check initialized successfully");
-            }
-            catch (Exception ex)
-            {
-                Log.Warning(ex, "Failed to initialize RabbitMQ health check asynchronously, falling back to synchronous");
-                try
-                {
-                    var connectionFactory = new ConnectionFactory { Uri = new Uri("amqp://localhost:5672") };
-                    using var connection = connectionFactory.CreateConnectionAsync().GetAwaiter().GetResult();
+    private static IHostBuilder CreateHostBuilder(string[] args)
+    {
+        return new ServiceComponentsHostBuilder()
+            .UseDefault(
+                new[] { typeof(TestCommand).Assembly },
+                new[] { typeof(TestCommandHandler).Assembly })
+            .ConfigureApp((configuration, environment, app) => {
+                if (environment.IsDevelopment()) {
+                    app.UseDeveloperExceptionPage();
                 }
-                catch (Exception innerEx)
-                {
-                    Log.Error(innerEx, "RabbitMQ health check initialization failed");
-                }
-            }
-        }
 
-        private static IHostBuilder CreateHostBuilder(string[] args)
-        {
-            return new ServiceComponentsHostBuilder()
+                app.UseMiddleware<ErrorHandlingMiddleware>();
 
-                .UseDefault(
+                app.UseCors(builder => {
+                    builder.AllowAnyOrigin();
+                    builder.AllowAnyHeader();
+                    builder.AllowAnyMethod();
+                });
 
-                    new[] { typeof(TestCommand).Assembly },
-                    new[] { typeof(TestCommandHandler).Assembly })
+                app.UseRouting();
 
-                .ConfigureApp((configuration, environment, app) => {
+                app.UseAuthentication();
+                app.UseAuthorization();
+            })
 
-                    if (environment.IsDevelopment()) {
-                        app.UseDeveloperExceptionPage();
-                    }
+            // Add endpoints
+            .AddEndpoints()
 
-                    app.UseMiddleware<ErrorHandlingMiddleware>();
+            // Use serilog for logging
+            .UseSerilog((context, log) => log
+                .WriteTo.Console(LogEventLevel.Information)
+                .WriteTo.Seq("http://localhost:5341", LogEventLevel.Verbose)
+                .Enrich.FromLogContext()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Override("NHibernate", LogEventLevel.Warning)
+                .MinimumLevel.Verbose())
 
-                    app.UseCors(builder => {
-                        builder.AllowAnyOrigin();
-                        builder.AllowAnyHeader();
-                        builder.AllowAnyMethod();
+            // Add OpenApi
+            .AddOpenApi(
+                (configuration, options) => {
+                    options.SwaggerDoc("v1", new OpenApiInfo {
+                        Title = "Reference Application",
+                        Version = "v1"
                     });
 
-                    app.UseRouting();
+                    var appXmlDoc = Path.Combine(AppContext.BaseDirectory,
+                        $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
+                    options.IncludeXmlComments(appXmlDoc);
 
-                    app.UseAuthentication();
-                    app.UseAuthorization();
+                    var aspNetXmlDoc = Path.Combine(AppContext.BaseDirectory,
+                        $"{typeof(MetricsController).Assembly.GetName().Name}.xml");
+                    options.IncludeXmlComments(aspNetXmlDoc);
+
+                    options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme {
+                        Type = SecuritySchemeType.OpenIdConnect,
+                        OpenIdConnectUrl =
+                            new Uri("http://localhost:8080/auth/realms/develop/.well-known/openid-configuration"),
+                        In = ParameterLocation.Header,
+                        BearerFormat = "JWT",
+                        Scheme = JwtBearerDefaults.AuthenticationScheme
+                    });
+
+                    options.OperationFilter<SecurityRequirementsOperationFilter>(true,
+                        JwtBearerDefaults.AuthenticationScheme);
+                },
+                (configuration, options) => {
+                    options.OAuthClientId("reference-app");
+                    options.OAuthScopes("openid", "profile");
+
+                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Reference Application v1");
                 })
+            .RegisterCallback((configuration, services) => services.AddSwaggerGenNewtonsoftSupport())
 
-                // Add endpoints
-                .AddEndpoints()
+            // Health check
+            .AddHealthCheck((configuration, check) => {
+                check.AddRabbitMQ(sp =>
+                    new ConnectionFactory { Uri = new Uri("amqp://localhost:5672") }.CreateConnectionAsync()
+                        .GetAwaiter().GetResult());
+                check.AddRedis("localhost");
+            })
 
-                // Use serilog for logging
-                .UseSerilog((context, log) => log
-                    .WriteTo.Console(LogEventLevel.Information)
-                    .WriteTo.Seq("http://localhost:5341")
-                    .Enrich.FromLogContext()
-                    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-                    .MinimumLevel.Override("NHibernate", LogEventLevel.Warning)
-                    .MinimumLevel.Verbose())
+            // Add http sender
+            .AddHttpSender(new Uri("http://localhost:5000/api/generic"), "http")
 
-                // Add OpenApi
-                .AddOpenApi(
-                    (configuration, options) => {
-                        options.SwaggerDoc("v1", new OpenApiInfo {
-                            Title = "Reference Application",
-                            Version = "v1"
-                        });
+            // Routing
+            .AddCommandRouter(command => "loopback")
+            .AddQueryRouter(query => "loopback")
+            .AddEventRouter(evnt => "loopback")
 
-                        var appXmlDoc = Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
-                        options.IncludeXmlComments(appXmlDoc);
+            // Redis
+            //.AddRedis(configuration => "localhost:6379")
 
-                        var aspNetXmlDoc = Path.Combine(AppContext.BaseDirectory, $"{typeof(MetricsController).Assembly.GetName().Name}.xml");
-                        options.IncludeXmlComments(aspNetXmlDoc);
+            // Rabbit
+            //.AddRabbit("amqp://guest:guest@localhost:5672", "test2", "test-queue", "test-exchange", retryIntervals: new[] { 1000, 3000, 5000 })
+            .AddRabbit("amqp://guest:guest@localhost:5672", "test2", "test-queue", "test-exchange")
+            .ConfigureMvc(builder => builder.AddNewtonsoftJson(options => {
+                options.UseCamelCasing(true);
+                options.SerializerSettings.Converters.Add(new StringEnumConverter());
+            }))
+            .AddRedisDistributedCache("localhost")
+            .ConfigureContainer((context, builder) => {
+                //builder.AddRequestConstraints(request => request switch {
 
-                        options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme {
-                            Type = SecuritySchemeType.OpenIdConnect,
-                            OpenIdConnectUrl = new Uri("http://localhost:8080/auth/realms/develop/.well-known/openid-configuration"),
-                            In = ParameterLocation.Header,
-                            BearerFormat = "JWT",
-                            Scheme = JwtBearerDefaults.AuthenticationScheme
-                        });
+                //    LongCommand longCommand => new[] { "test1", "test2" },
+                //    TestCommand testCommand => new[] { "test2" },
+                //    _ => default
 
-                        options.OperationFilter<SecurityRequirementsOperationFilter>(true, JwtBearerDefaults.AuthenticationScheme);
+                //}, (key, count) => (key, count) switch {
 
-                    },
-                    (configuration, options) => {
+                //    ("test1", _) when count > 0 => false,
+                //    ("test2", _) when count > 0 => false,
+                //    (_, _) => true
 
-                        options.OAuthClientId("reference-app");
-                        options.OAuthScopes("openid", "profile");
+                //}, (key) => TimeSpan.FromSeconds(30));
+            })
 
-                        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Reference Application v1");
-                    })
-
-                .RegisterCallback((configuration, services) => services.AddSwaggerGenNewtonsoftSupport())
-
-                // Health check
-                .AddHealthCheck((configuration, check) => {
-                    // RabbitMQ health check is now initialized asynchronously in InitializeHealthCheckAsync()
-                    check.AddRedis("localhost");
-                })
-
-                // Add http sender
-                .AddHttpSender(new Uri("http://localhost:5000/api/generic"), "http")
-
-                // Routing
-                .AddCommandRouter(command => "loopback")
-                .AddQueryRouter(query => "loopback")
-                .AddEventRouter(evnt => "loopback")
-
-                // Redis
-                //.AddRedis(configuration => "localhost:6379")
-
-                // Rabbit
-                //.AddRabbit("amqp://guest:guest@localhost:5672", "test2", "test-queue", "test-exchange", retryIntervals: new[] { 1000, 3000, 5000 })
-                .AddRabbit("amqp://guest:guest@localhost:5672", "test2", "test-queue", "test-exchange")
-
-                .ConfigureMvc(builder => builder.AddNewtonsoftJson(options => {
-                    options.UseCamelCasing(true);
-                    options.SerializerSettings.Converters.Add(new StringEnumConverter());
-                }))
-
-                .AddRedisDistributedCache("localhost")
-
-                .ConfigureContainer((context, builder) => {
-
-                    //builder.AddRequestConstraints(request => request switch {
-
-                    //    LongCommand longCommand => new[] { "test1", "test2" },
-                    //    TestCommand testCommand => new[] { "test2" },
-                    //    _ => default
-
-                    //}, (key, count) => (key, count) switch {
-
-                    //    ("test1", _) when count > 0 => false,
-                    //    ("test2", _) when count > 0 => false,
-                    //    (_, _) => true
-
-                    //}, (key) => TimeSpan.FromSeconds(30));
-                })
-
-                // NHibernate
-                .AddNHibernate(
-                    configuration => "Server=localhost; Port=5432; Database=ref-app; User Id=postgres; Password=postgres",
-                    map => map.FluentMappings.AddFromAssemblyOf<TestEntity>(),
-                    configuration => new SchemaUpdate(configuration).Execute(true, true))
-
-                .AddPrometheusMetrics()
-
-                .CreateHostBuilder(args);
-        }
+            // NHibernate
+            .AddNHibernate(
+                configuration => "Server=localhost; Port=5432; Database=ref-app; User Id=postgres; Password=postgres",
+                map => map.FluentMappings.AddFromAssemblyOf<TestEntity>(),
+                configuration => new SchemaUpdate(configuration).Execute(true, true))
+            .AddPrometheusMetrics()
+            .CreateHostBuilder(args);
     }
 }
