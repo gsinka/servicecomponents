@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Autofac;
+using Microsoft.Extensions.Configuration;
 using RabbitMQ.Client;
 using Serilog;
 using ServiceComponents.Application.Senders;
@@ -10,25 +11,190 @@ namespace ServiceComponents.Infrastructure.Rabbit
 {
     public static class RabbitAutofacExtensions
     {
+         /// <summary>
+        /// Registers a RabbitMQ connection using IConfiguration with the "RabbitMQ" section.
+        /// This method is provided for backward compatibility with existing applications.
+        /// If IConfiguration is available in the container, it will be used for additional settings.
+        /// </summary>
+        /// <param name="builder">The Autofac container builder.</param>
+        /// <param name="endpointUri">The RabbitMQ endpoint URI.</param>
+        /// <param name="clientName">The client-provided name for identification.</param>
+        /// <param name="key">Optional key for keyed registration.</param>
+        /// <returns>The container builder for chaining.</returns>
         public static ContainerBuilder AddRabbitConnection(this ContainerBuilder builder, Uri endpointUri, string clientName, object key = default)
         {
-            var registrtion = builder.Register(context => new ConnectionFactory {
+            var registration = builder.Register(context => {
+                var options = new RabbitConnectionOptions
+                {
+                    EndpointUri = endpointUri,
+                    ClientName = clientName,
+                    AutomaticRecoveryEnabled = true,
+                    HandshakeContinuationTimeout = TimeSpan.FromSeconds(120)
+                };
 
-                Uri = endpointUri,
-                AutomaticRecoveryEnabled = true,
-                ClientProvidedName = clientName,
+                // Try to load from configuration if available to get additional settings
+                try
+                {
+                    var configuration = context.Resolve<IConfiguration>();
+                    var configOptions = configuration.LoadFromConfiguration(nameof(RabbitConnectionOptions));
+                    // Merge configuration settings (keep provided Uri and ClientName, but use config for other properties)
+                    options.AutomaticRecoveryEnabled = configOptions.AutomaticRecoveryEnabled;
+                    options.HandshakeContinuationTimeout = configOptions.HandshakeContinuationTimeout;
+                    options.RequestedHeartbeat = configOptions.RequestedHeartbeat;
+                    options.RequestedChannelMax = configOptions.RequestedChannelMax;
+                    options.NetworkRecoveryInterval = configOptions.NetworkRecoveryInterval;
+                    options.Ssl = configOptions.Ssl;
+                    options.VirtualHost = configOptions.VirtualHost;
+                }
+                catch
+                {
+                    // Configuration not available or doesn't contain settings, just use defaults
+                }
 
-            }.CreateConnectionAsync().GetAwaiter().GetResult()).SingleInstance();
+                return new ConnectionFactory
+                {
+                    Uri = options.EndpointUri,
+                    AutomaticRecoveryEnabled = options.AutomaticRecoveryEnabled,
+                    ClientProvidedName = options.ClientName,
+                    HandshakeContinuationTimeout = options.HandshakeContinuationTimeout,
+                    RequestedHeartbeat = options.RequestedHeartbeat,
+                    RequestedChannelMax = options.RequestedChannelMax,
+                    NetworkRecoveryInterval = options.NetworkRecoveryInterval,
+                    Ssl = new SslOption { Enabled = options.Ssl },
+                    VirtualHost = options.VirtualHost
+                }.CreateConnectionAsync().GetAwaiter().GetResult();
+            }).SingleInstance();
 
-            if (key == default) {
-                registrtion.As<IConnection>();
+            if (key == default)
+            {
+                registration.As<IConnection>();
             }
-            else {
-                registrtion.Keyed<IConnection>(key);
+            else
+            {
+                registration.Keyed<IConnection>(key);
             }
 
             return builder;
         }
+        
+        /// <summary>
+        /// Registers a RabbitMQ connection using IConfiguration.
+        /// Automatically loads configuration from appsettings using the "RabbitConnectionOptions" section.
+        /// The IConfiguration is resolved from the container if not provided explicitly.
+        /// For backward compatibility, can also accept Uri and clientName parameters directly.
+        /// </summary>
+        /// <param name="builder">The Autofac container builder.</param>
+        /// <param name="configuration">Optional: explicit IConfiguration instance. If null, will be resolved from container.</param>
+        /// <param name="key">Optional key for keyed registration.</param>
+        /// <returns>The container builder for chaining.</returns>
+        public static ContainerBuilder AddRabbitConnection(this ContainerBuilder builder, IConfiguration configuration = null, object key = default)
+        {
+            var registration = builder.Register(context => {
+                var config = configuration ?? context.Resolve<IConfiguration>();
+                var options = config.LoadFromConfiguration(nameof(RabbitConnectionOptions));
+                return new ConnectionFactory
+                {
+                    Uri = options.EndpointUri,
+                    AutomaticRecoveryEnabled = options.AutomaticRecoveryEnabled,
+                    ClientProvidedName = options.ClientName,
+                    HandshakeContinuationTimeout = options.HandshakeContinuationTimeout,
+                    RequestedHeartbeat = options.RequestedHeartbeat,
+                    RequestedChannelMax = options.RequestedChannelMax,
+                    NetworkRecoveryInterval = options.NetworkRecoveryInterval,
+                    Ssl = new SslOption { Enabled = options.Ssl },
+                    VirtualHost = options.VirtualHost
+                }.CreateConnectionAsync().GetAwaiter().GetResult();
+            }).SingleInstance();
+
+            if (key == default)
+            {
+                registration.As<IConnection>();
+            }
+            else
+            {
+                registration.Keyed<IConnection>(key);
+            }
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers a RabbitMQ connection using options class.
+        /// This method allows configuration via appsettings or IOptions pattern.
+        /// </summary>
+        public static ContainerBuilder AddRabbitConnection(this ContainerBuilder builder, RabbitConnectionOptions options, object key = default)
+        {
+            if (options == null) {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            options.Validate();
+
+            var registration = builder.Register(context => new ConnectionFactory
+            {
+                Uri = options.EndpointUri,
+                AutomaticRecoveryEnabled = options.AutomaticRecoveryEnabled,
+                ClientProvidedName = options.ClientName,
+                HandshakeContinuationTimeout = options.HandshakeContinuationTimeout,
+                RequestedHeartbeat = options.RequestedHeartbeat,
+                RequestedChannelMax = options.RequestedChannelMax,
+                NetworkRecoveryInterval = options.NetworkRecoveryInterval,
+                Ssl = new SslOption { Enabled = options.Ssl },
+                VirtualHost = options.VirtualHost
+            }.CreateConnectionAsync().GetAwaiter().GetResult()).SingleInstance();
+
+            if (key == default)
+            {
+                registration.As<IConnection>();
+            }
+            else
+            {
+                registration.Keyed<IConnection>(key);
+            }
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers a RabbitMQ connection using IConfiguration with the "RabbitMQ" section.
+        /// This method is a convenience for existing applications that use the "RabbitMQ" configuration section.
+        /// The IConfiguration is resolved from the container if not provided explicitly.
+        /// </summary>
+        /// <param name="builder">The Autofac container builder.</param>
+        /// <param name="configuration">Optional: explicit IConfiguration instance. If null, will be resolved from container.</param>
+        /// <param name="key">Optional key for keyed registration.</param>
+        /// <returns>The container builder for chaining.</returns>
+        public static ContainerBuilder AddRabbitConnectionFromRabbitMQSection(this ContainerBuilder builder, IConfiguration configuration = null, object key = default)
+        {
+            var registration = builder.Register(context => {
+                var config = configuration ?? context.Resolve<IConfiguration>();
+                var options = config.LoadFromRabbitMQSection();
+                return new ConnectionFactory
+                {
+                    Uri = options.EndpointUri,
+                    AutomaticRecoveryEnabled = options.AutomaticRecoveryEnabled,
+                    ClientProvidedName = options.ClientName,
+                    HandshakeContinuationTimeout = options.HandshakeContinuationTimeout,
+                    RequestedHeartbeat = options.RequestedHeartbeat,
+                    RequestedChannelMax = options.RequestedChannelMax,
+                    NetworkRecoveryInterval = options.NetworkRecoveryInterval,
+                    Ssl = new SslOption { Enabled = options.Ssl },
+                    VirtualHost = options.VirtualHost
+                }.CreateConnectionAsync().GetAwaiter().GetResult();
+            }).SingleInstance();
+
+            if (key == default)
+            {
+                registration.As<IConnection>();
+            }
+            else
+            {
+                registration.Keyed<IConnection>(key);
+            }
+
+            return builder;
+        }
+
 
         public static ContainerBuilder AddRabbitChannel(this ContainerBuilder builder, object connectionKey = default, object key = default)
         {
