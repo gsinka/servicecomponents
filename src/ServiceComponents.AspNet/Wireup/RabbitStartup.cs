@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Autofac;
 using RabbitMQ.Client;
 using Serilog;
@@ -27,6 +29,11 @@ namespace ServiceComponents.AspNet.Wireup
             _retryIntervals = retryIntervals;
         }
 
+        /// <summary>
+        /// Starts the RabbitMQ initialization.
+        /// Use StartAsync for async/await support.
+        /// </summary>
+        [Obsolete("Use StartAsync for async/await support. This method is maintained for backward compatibility.")]
         public void Start()
         {
             _channel.ExchangeDeclareAsync(_exchange, "direct", false, true).GetAwaiter().GetResult();
@@ -46,6 +53,31 @@ namespace ServiceComponents.AspNet.Wireup
 
                 _log.Verbose("Starting consumer consumer-{consumerId}", consumer.ConsumerTag);
                 consumer.StartAsync().GetAwaiter().GetResult();
+            }
+        }
+
+        /// <summary>
+        /// Starts the RabbitMQ initialization with async/await support.
+        /// </summary>
+        public async Task StartAsync()
+        {
+            await _channel.ExchangeDeclareAsync(_exchange, "direct", false, true);
+
+            if (_retryIntervals != default) {
+                await _channel.AddRabbitRetryAsync(_scope, _queue, _retryIntervals);
+            }
+            else {
+                await _channel.QueueDeclareAsync(_queue, false, false, true);
+            }
+
+            await _channel.QueueBindAsync(_queue, _exchange, _routingKey);
+
+            var consumers = _scope.ResolveKeyed<IEnumerable<RabbitConsumer>>("__consumer__");
+
+            foreach (var consumer in consumers) {
+
+                _log.Verbose("Starting consumer consumer-{consumerId}", consumer.ConsumerTag);
+                await consumer.StartAsync();
             }
         }
     }

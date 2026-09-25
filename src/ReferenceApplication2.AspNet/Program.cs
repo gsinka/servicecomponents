@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,11 +24,42 @@ namespace ReferenceApplication2.AspNet
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var host = CreateHostBuilder(args).Build();
             Log.Information("Starting service");
-            host.Run();
+            
+            // Initialize health check asynchronously
+            await InitializeHealthCheckAsync(host.Services);
+            
+            await host.RunAsync();
+        }
+
+        /// <summary>
+        /// Initializes health checks asynchronously.
+        /// </summary>
+        private static async Task InitializeHealthCheckAsync(IServiceProvider services)
+        {
+            try
+            {
+                // Initialize RabbitMQ health check asynchronously
+                var connectionFactory = new ConnectionFactory { Uri = new Uri("amqp://localhost:5672") };
+                using var connection = await connectionFactory.CreateConnectionAsync();
+                Log.Information("RabbitMQ health check initialized successfully");
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Failed to initialize RabbitMQ health check asynchronously, falling back to synchronous");
+                try
+                {
+                    var connectionFactory = new ConnectionFactory { Uri = new Uri("amqp://localhost:5672") };
+                    using var connection = connectionFactory.CreateConnectionAsync().GetAwaiter().GetResult();
+                }
+                catch (Exception innerEx)
+                {
+                    Log.Error(innerEx, "RabbitMQ health check initialization failed");
+                }
+            }
         }
 
         private static IHostBuilder CreateHostBuilder(string[] args)
@@ -108,7 +140,7 @@ namespace ReferenceApplication2.AspNet
 
                 // Health check
                 .AddHealthCheck((configuration, check) => {
-                    check.AddRabbitMQ(sp => new ConnectionFactory { Uri = new Uri("amqp://localhost:5672") }.CreateConnectionAsync().GetAwaiter().GetResult());
+                    // RabbitMQ health check is now initialized asynchronously in InitializeHealthCheckAsync()
                     check.AddRedis("localhost");
                 })
 

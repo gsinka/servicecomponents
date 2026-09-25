@@ -1,6 +1,7 @@
 ﻿using System;
 using Autofac;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using RabbitMQ.Client;
 using Serilog;
 using ServiceComponents.Infrastructure.Rabbit;
@@ -19,7 +20,7 @@ namespace ServiceComponents.AspNet.Wireup
             Func<IConfiguration, int[]> retryIntervalsBuilder = default)
         {
 
-            return hostBuilder.RegisterCallback((context, containerBuilder) => {
+            return hostBuilder.RegisterCallback((HostBuilderContext context, ContainerBuilder containerBuilder) => {
 
                 var uri = new Uri(connectionStringBuilder(context.Configuration));
                 var clientName = clientNameBuilder(context.Configuration);
