@@ -20,6 +20,39 @@ public static class RabbitAutofacExtensions
         string clientName, object key = default)
     {
         var registration = builder
+            .Register(context => {
+                var options = new RabbitConnectionOptions {
+                    EndpointUri = endpointUri,
+                    ClientName = clientName,
+                    AutomaticRecoveryEnabled = true,
+                    HandshakeContinuationTimeout = TimeSpan.FromSeconds(120)
+                };
+
+                try {
+                    var configuration = context.Resolve<IConfiguration>();
+                    var configOptions = configuration.LoadFromConfiguration();
+                    MergeConfigurationSettings(options, configOptions);
+
+                    options.Validate();
+                }
+                catch {
+                    // Configuration not available or doesn't contain settings, just use defaults
+                }
+
+                return CreateConnectionFactory(options).CreateConnectionAsync().GetAwaiter().GetResult();
+            }).SingleInstance();
+
+        RegisterConnectionWithKey(registration, key);
+        return builder;
+    }
+
+    /// This method is provided for backward compatibility with existing applications.
+    /// If IConfiguration is available in the container, it will be used for additional settings.
+    /// </summary>
+    public static async Task<ContainerBuilder> AddRabbitConnectionAsync(this ContainerBuilder builder, Uri endpointUri,
+        string clientName, object key = default)
+    {
+        var registration = builder
             .Register(async context => {
                 var options = new RabbitConnectionOptions {
                     EndpointUri = endpointUri,
@@ -53,6 +86,23 @@ public static class RabbitAutofacExtensions
         object key = default)
     {
         var channelRegistration = builder
+            .Register(context => connectionKey == default
+                ? context.Resolve<IConnection>().CreateChannelAsync().GetAwaiter().GetResult()
+                : context.ResolveKeyed<IConnection>(connectionKey).CreateChannelAsync().GetAwaiter().GetResult())
+            .SingleInstance();
+
+        RegisterChannelWithKey(channelRegistration, key);
+        return builder;
+    }
+
+    /// <summary>
+    /// Registers a RabbitMQ channel.
+    /// </summary>
+    public static async Task<ContainerBuilder> AddRabbitChannelAsync(this ContainerBuilder builder,
+        object connectionKey = default,
+        object key = default)
+    {
+        var channelRegistration = builder
             .Register(async context => connectionKey == default
                 ? await context.Resolve<IConnection>().CreateChannelAsync()
                 : await context.ResolveKeyed<IConnection>(connectionKey).CreateChannelAsync())
@@ -62,7 +112,6 @@ public static class RabbitAutofacExtensions
         return builder;
     }
 
-
     /// <summary>
     /// Registers a RabbitMQ event publisher.
     /// </summary>
@@ -70,12 +119,13 @@ public static class RabbitAutofacExtensions
         string routingKey, bool mandatory = false, BasicProperties basicProperties = null, object channelKey = default,
         string key = default)
     {
-        var proxyRegistration = builder.Register(context => new RabbitEventPublisherProxy(
-            channelKey == default ? context.Resolve<IChannel>() : context.ResolveKeyed<IChannel>(channelKey),
-            key == default ? context.Resolve<IPublishRabbitEvent>() : context.ResolveKeyed<IPublishRabbitEvent>(key)
-        )).InstancePerDependency();
+        IRegistrationBuilder<RabbitEventPublisherProxy, SimpleActivatorData, SingleRegistrationStyle>
+            proxyRegistration = builder.Register(context => new RabbitEventPublisherProxy(
+                channelKey == default ? context.Resolve<IChannel>() : context.ResolveKeyed<IChannel>(channelKey),
+                key == default ? context.Resolve<IPublishRabbitEvent>() : context.ResolveKeyed<IPublishRabbitEvent>(key)
+            )).InstancePerDependency();
 
-        var senderRegistration =
+        IRegistrationBuilder<RabbitEventPublisher, SimpleActivatorData, SingleRegistrationStyle> senderRegistration =
             builder.Register(context => new RabbitEventPublisher(
                     context.Resolve<ILogger>(),
                     channelKey == default ? context.Resolve<IChannel>() : context.ResolveKeyed<IChannel>(channelKey),
@@ -100,7 +150,7 @@ public static class RabbitAutofacExtensions
     public static ContainerBuilder AddRabbitConsumer(this ContainerBuilder builder, string queue,
         string consumerTag = default, string channelKey = default, string consumerKey = default)
     {
-        var registration = builder
+        IRegistrationBuilder<RabbitConsumer, SimpleActivatorData, SingleRegistrationStyle> registration = builder
             .Register(context => new RabbitConsumer(
                 context.Resolve<ILogger>(),
                 context.Resolve<ILifetimeScope>(),
@@ -137,13 +187,13 @@ public static class RabbitAutofacExtensions
     public static ContainerBuilder AddRabbitCommandSender(this ContainerBuilder builder, string exchange,
         string routingKey = default, object channelKey = default, string key = default)
     {
-        var proxyRegistration =
+        IRegistrationBuilder<RabbitCommandSenderProxy, SimpleActivatorData, SingleRegistrationStyle> proxyRegistration =
             builder.Register(context => new RabbitCommandSenderProxy(
-            channelKey == default ? context.Resolve<IChannel>() : context.ResolveKeyed<IChannel>(channelKey),
-            key == default ? context.Resolve<ISendRabbitCommand>() : context.ResolveKeyed<ISendRabbitCommand>(key)
-        )).InstancePerDependency();
+                channelKey == default ? context.Resolve<IChannel>() : context.ResolveKeyed<IChannel>(channelKey),
+                key == default ? context.Resolve<ISendRabbitCommand>() : context.ResolveKeyed<ISendRabbitCommand>(key)
+            )).InstancePerDependency();
 
-        var senderRegistration =
+        IRegistrationBuilder<RabbitCommandSender, SimpleActivatorData, SingleRegistrationStyle> senderRegistration =
             builder.Register(context => new RabbitCommandSender(
                     context.Resolve<ILogger>(),
                     channelKey == default ? context.Resolve<IChannel>() : context.ResolveKeyed<IChannel>(channelKey),
@@ -168,13 +218,13 @@ public static class RabbitAutofacExtensions
     public static ContainerBuilder AddRabbitQuerySender(this ContainerBuilder builder, string exchange,
         string routingKey = default, object channelKey = default, string key = default)
     {
-        var proxyRegistration =
+        IRegistrationBuilder<RabbitQuerySenderProxy, SimpleActivatorData, SingleRegistrationStyle> proxyRegistration =
             builder.Register(context => new RabbitQuerySenderProxy(
-            channelKey == default ? context.Resolve<IChannel>() : context.ResolveKeyed<IChannel>(channelKey),
-            key == default ? context.Resolve<ISendRabbitQuery>() : context.ResolveKeyed<ISendRabbitQuery>(key)
-        )).InstancePerDependency();
+                channelKey == default ? context.Resolve<IChannel>() : context.ResolveKeyed<IChannel>(channelKey),
+                key == default ? context.Resolve<ISendRabbitQuery>() : context.ResolveKeyed<ISendRabbitQuery>(key)
+            )).InstancePerDependency();
 
-        var senderRegistration =
+        IRegistrationBuilder<RabbitQuerySender, SimpleActivatorData, SingleRegistrationStyle> senderRegistration =
             builder.Register(context => new RabbitQuerySender(
                     context.Resolve<ILogger>(),
                     channelKey == default ? context.Resolve<IChannel>() : context.ResolveKeyed<IChannel>(channelKey),
