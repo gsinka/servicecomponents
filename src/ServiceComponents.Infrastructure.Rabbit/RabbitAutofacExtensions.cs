@@ -44,7 +44,13 @@ public static class RabbitAutofacExtensions
                 return CreateConnectionFactory(options).CreateConnectionAsync().GetAwaiter().GetResult();
             }).SingleInstance();
 
-        RegisterConnectionWithKey(registration, key);
+        if (key == default) {
+            registration.As<IConnection>();
+        }
+        else {
+            registration.Keyed<IConnection>(key);
+        }
+
         return builder;
     }
 
@@ -78,7 +84,13 @@ public static class RabbitAutofacExtensions
                 return await CreateConnectionFactory(options).CreateConnectionAsync();
             }).SingleInstance();
 
-        RegisterConnectionWithKey(registration, key);
+        if (key == default) {
+            registration.As<IConnection>();
+        }
+        else {
+            registration.Keyed<IConnection>(key);
+        }
+
         return builder;
     }
 
@@ -95,7 +107,13 @@ public static class RabbitAutofacExtensions
                 : context.ResolveKeyed<IConnection>(connectionKey).CreateChannelAsync().GetAwaiter().GetResult())
             .SingleInstance();
 
-        RegisterChannelWithKey(channelRegistration, key);
+        if (key == default) {
+            channelRegistration.As<IChannel>();
+        }
+        else {
+            channelRegistration.Keyed<IChannel>(key);
+        }
+
         return builder;
     }
 
@@ -112,7 +130,13 @@ public static class RabbitAutofacExtensions
                 : await context.ResolveKeyed<IConnection>(connectionKey).CreateChannelAsync())
             .SingleInstance();
 
-        RegisterChannelWithKey(channelRegistration, key);
+        if (key == default) {
+            channelRegistration.As<IChannel>();
+        }
+        else {
+            channelRegistration.Keyed<IChannel>(key);
+        }
+
         return builder;
     }
 
@@ -387,31 +411,5 @@ public static class RabbitAutofacExtensions
         options.NetworkRecoveryInterval = configOptions.NetworkRecoveryInterval;
         options.Ssl = configOptions.Ssl;
         options.VirtualHost = configOptions.VirtualHost;
-    }
-
-    /// <summary>
-    /// Registers a connection with the appropriate interfaces based on the key.
-    /// </summary>
-    private static void RegisterConnectionWithKey(dynamic registration, object key)
-    {
-        if (key == default) {
-            registration.As<IConnection>();
-        }
-        else {
-            registration.Keyed<IConnection>(key);
-        }
-    }
-
-    /// <summary>
-    /// Registers a channel with the appropriate interfaces based on the key.
-    /// </summary>
-    private static void RegisterChannelWithKey(dynamic registration, object key)
-    {
-        if (key == default) {
-            registration.As<IChannel>();
-        }
-        else {
-            registration.Keyed<IChannel>(key);
-        }
     }
 }
