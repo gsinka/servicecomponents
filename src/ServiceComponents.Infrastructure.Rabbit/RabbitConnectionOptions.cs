@@ -9,6 +9,8 @@ namespace ServiceComponents.Infrastructure.Rabbit;
 /// </summary>
 public class RabbitConnectionOptions
 {
+    public const string ConfigurationSectionName = "ServiceComponents:RabbitConnectionOptions";
+
     /// <summary>
     /// Gets or sets the RabbitMQ endpoint URI.
     /// Example: "amqp://guest:guest@localhost:5672/"

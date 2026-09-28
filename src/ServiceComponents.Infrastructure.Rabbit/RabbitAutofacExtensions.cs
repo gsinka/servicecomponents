@@ -25,7 +25,7 @@ public static class RabbitAutofacExtensions
             .Register(context => {
                 var options = new RabbitConnectionOptions();
                 context.ResolveOptional<IConfiguration>()?
-                    .GetSection("ServiceComponents:RabbitConnectionOptions").Bind(options);
+                    .GetSection(RabbitConnectionOptions.ConfigurationSectionName).Bind(options);
 
                 options.EndpointUri = endpointUri;
                 options.ClientName = clientName;
@@ -58,7 +58,7 @@ public static class RabbitAutofacExtensions
         return builder.RegisterRabbitConnection(context => {
             var options = new RabbitConnectionOptions();
             context.ResolveOptional<IConfiguration>()?
-                .GetSection("ServiceComponents:RabbitConnectionOptions").Bind(options);
+                .GetSection(RabbitConnectionOptions.ConfigurationSectionName).Bind(options);
             options.EndpointUri = endpointUri;
             options.ClientName = clientName;
             options.Validate();
