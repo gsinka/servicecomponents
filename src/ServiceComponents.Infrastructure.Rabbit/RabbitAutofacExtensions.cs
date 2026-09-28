@@ -387,10 +387,10 @@ public static class RabbitAutofacExtensions
             Uri = options.EndpointUri,
             AutomaticRecoveryEnabled = options.AutomaticRecoveryEnabled,
             ClientProvidedName = options.ClientName,
-            HandshakeContinuationTimeout = options.HandshakeContinuationTimeout,
-            RequestedHeartbeat = options.RequestedHeartbeat,
-            RequestedChannelMax = options.RequestedChannelMax,
-            NetworkRecoveryInterval = options.NetworkRecoveryInterval,
+            HandshakeContinuationTimeout = TimeSpan.FromSeconds(options.HandshakeContinuationTimeoutInSeconds),
+            RequestedHeartbeat = TimeSpan.FromSeconds(options.RequestedHeartbeatInSeconds),
+            RequestedChannelMax = options.RequestedChannelMaxInSeconds,
+            NetworkRecoveryInterval = TimeSpan.FromSeconds(options.NetworkRecoveryIntervalInSeconds),
             Ssl = new SslOption { Enabled = options.Ssl },
             VirtualHost = options.VirtualHost
         };

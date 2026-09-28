@@ -6,6 +6,7 @@ namespace ServiceComponents.Infrastructure.Rabbit;
 /// Options for configuring RabbitMQ connection settings.
 /// These options can be populated from appsettings via dependency injection or manually.
 /// All properties map to RabbitMQ.Client.ConnectionFactory settings.
+/// Duration values are expressed in seconds and converted to TimeSpan when creating the connection factory.
 /// </summary>
 public class RabbitConnectionOptions
 {
@@ -30,29 +31,32 @@ public class RabbitConnectionOptions
     public bool AutomaticRecoveryEnabled { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the handshake continuation timeout duration.
+    /// Gets or sets the handshake continuation timeout in seconds.
     /// Default: 120 seconds
+    /// Configure as a number, for example 120, not milliseconds or a TimeSpan string.
     /// </summary>
-    public TimeSpan HandshakeContinuationTimeout { get; set; } = TimeSpan.FromSeconds(120);
+    public double HandshakeContinuationTimeoutInSeconds { get; set; } = 120;
 
     /// <summary>
-    /// Gets or sets the requested heartbeat timeout.
+    /// Gets or sets the requested heartbeat timeout in seconds.
     /// Default: 60 seconds
+    /// Configure as a number, for example 60, not milliseconds or a TimeSpan string.
     /// </summary>
-    public TimeSpan RequestedHeartbeat { get; set; } = TimeSpan.FromSeconds(60);
+    public double RequestedHeartbeatInSeconds { get; set; } = 60;
 
     /// <summary>
     /// Gets or sets the requested channel maximum.
     /// Default: 2048
     /// </summary>
-    public ushort RequestedChannelMax { get; set; } = 2048;
+    public ushort RequestedChannelMaxInSeconds { get; set; } = 2048;
 
 
     /// <summary>
-    /// Gets or sets the network recovery interval.
+    /// Gets or sets the network recovery interval in seconds.
     /// Default: 5 seconds
+    /// Configure as a number, for example 5, not milliseconds or a TimeSpan string.
     /// </summary>
-    public TimeSpan NetworkRecoveryInterval { get; set; } = TimeSpan.FromSeconds(5);
+    public double NetworkRecoveryIntervalInSeconds { get; set; } = 5;
 
     /// <summary>
     /// Gets or sets whether SSL/TLS is enabled.
