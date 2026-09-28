@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Builder;
@@ -16,30 +17,19 @@ public static class RabbitAutofacExtensions
     /// <summary>
     /// Registers a RabbitMQ connection. This method is provided for backward compatibility with existing applications.
     /// If IConfiguration is available in the container, it will be used for additional settings.
-    /// Consider using <see cref="AddRabbitConnectionAsync"/> instead for better async/await support.
     /// </summary>
     public static ContainerBuilder AddRabbitConnection(this ContainerBuilder builder, Uri endpointUri,
         string clientName, object key = default)
     {
         var registration = builder
             .Register(context => {
-                var options = new RabbitConnectionOptions {
-                    EndpointUri = endpointUri,
-                    ClientName = clientName,
-                    AutomaticRecoveryEnabled = true,
-                    HandshakeContinuationTimeout = TimeSpan.FromSeconds(120)
-                };
+                var options = new RabbitConnectionOptions();
+                context.ResolveOptional<IConfiguration>()?
+                    .GetSection("ServiceComponents:RabbitConnectionOptions").Bind(options);
 
-                try {
-                    var configuration = context.Resolve<IConfiguration>();
-                    var configOptions = configuration.LoadFromConfiguration();
-                    MergeConfigurationSettings(options, configOptions);
-
-                    options.Validate();
-                }
-                catch {
-                    // Configuration not available or doesn't contain settings, just use defaults
-                }
+                options.EndpointUri = endpointUri;
+                options.ClientName = clientName;
+                options.Validate();
 
                 return CreateConnectionFactory(options).CreateConnectionAsync().GetAwaiter().GetResult();
             }).SingleInstance();
@@ -55,48 +45,46 @@ public static class RabbitAutofacExtensions
     }
 
     /// <summary>
-    /// Registers a RabbitMQ connection with async/await support. This method is provided for backward compatibility with existing applications.
-    /// If IConfiguration is available in the container, it will be used for additional settings.
+    /// Registers a singleton connection for asynchronous initialization after the container is built.
+    /// Configuration is applied before opening the connection; the supplied URI and client name take precedence.
+    /// This method performs no network I/O and is safe to call from a synchronous ConfigureContainer callback.
     /// </summary>
-    public static async Task<ContainerBuilder> AddRabbitConnectionAsync(this ContainerBuilder builder, Uri endpointUri,
+    public static ContainerBuilder RegisterRabbitConnection(this ContainerBuilder builder, Uri endpointUri,
         string clientName, object key = default)
     {
-        var registration = builder
-            .Register(async context => {
-                var options = new RabbitConnectionOptions {
-                    EndpointUri = endpointUri,
-                    ClientName = clientName,
-                    AutomaticRecoveryEnabled = true,
-                    HandshakeContinuationTimeout = TimeSpan.FromSeconds(120)
-                };
+        ArgumentNullException.ThrowIfNull(endpointUri);
+        ArgumentException.ThrowIfNullOrWhiteSpace(clientName);
 
-                try {
-                    var configuration = context.Resolve<IConfiguration>();
-                    var configOptions = configuration.LoadFromConfiguration();
-                    MergeConfigurationSettings(options, configOptions);
+        return builder.RegisterRabbitConnection(context => {
+            var options = new RabbitConnectionOptions();
+            context.ResolveOptional<IConfiguration>()?
+                .GetSection("ServiceComponents:RabbitConnectionOptions").Bind(options);
+            options.EndpointUri = endpointUri;
+            options.ClientName = clientName;
+            options.Validate();
 
-                    options.Validate();
-                }
-                catch {
-                    // Configuration not available or doesn't contain settings, just use defaults
-                }
+            return CreateConnectionFactory(options);
+        }, key);
+    }
 
-                return await CreateConnectionFactory(options).CreateConnectionAsync();
-            }).SingleInstance();
+    /// <summary>
+    /// Registers a singleton connection using a custom connection factory, without opening it during registration.
+    /// The factory is obtained from the built container before asynchronous initialization starts.
+    /// </summary>
+    public static ContainerBuilder RegisterRabbitConnection(this ContainerBuilder builder,
+        Func<IComponentContext, IConnectionFactory> connectionFactory, object key = default)
+    {
+        ArgumentNullException.ThrowIfNull(connectionFactory);
 
-        if (key == default) {
-            registration.As<IConnection>();
-        }
-        else {
-            registration.Keyed<IConnection>(key);
-        }
-
-        return builder;
+        return RegisterRabbitResource(builder, context => {
+            var factory = connectionFactory(context);
+            ArgumentNullException.ThrowIfNull(factory);
+            return new RabbitAsyncResource<IConnection>(token => factory.CreateConnectionAsync(token), 0);
+        }, key);
     }
 
     /// <summary>
     /// Registers a RabbitMQ channel.
-    /// Consider using <see cref="AddRabbitChannelAsync"/> instead for better async/await support.
     /// </summary>
     public static ContainerBuilder AddRabbitChannel(this ContainerBuilder builder, object connectionKey = default,
         object key = default)
@@ -118,26 +106,36 @@ public static class RabbitAutofacExtensions
     }
 
     /// <summary>
-    /// Registers a RabbitMQ channel with async/await support.
+    /// Registers a singleton channel for asynchronous initialization, using the default or keyed connection.
+    /// Await <see cref="InitializeRabbitAsync"/> after Build and before resolving the channel or its consumers.
     /// </summary>
-    public static async Task<ContainerBuilder> AddRabbitChannelAsync(this ContainerBuilder builder,
-        object connectionKey = default,
-        object key = default)
+    public static ContainerBuilder RegisterRabbitChannel(this ContainerBuilder builder,
+        object connectionKey = default, object key = default)
     {
-        var channelRegistration = builder
-            .Register(async context => connectionKey == default
-                ? await context.Resolve<IConnection>().CreateChannelAsync()
-                : await context.ResolveKeyed<IConnection>(connectionKey).CreateChannelAsync())
-            .SingleInstance();
+        return RegisterRabbitResource(builder, context => {
+            // Autofac's registration context must not be captured across an await. Retain the owning scope instead.
+            var scope = context.Resolve<ILifetimeScope>();
+            return new RabbitAsyncResource<IChannel>(token => {
+                var connection = connectionKey == default
+                    ? scope.Resolve<IConnection>()
+                    : scope.ResolveKeyed<IConnection>(connectionKey);
+                return connection.CreateChannelAsync(cancellationToken: token);
+            }, 1);
+        }, key);
+    }
 
-        if (key == default) {
-            channelRegistration.As<IChannel>();
-        }
-        else {
-            channelRegistration.Keyed<IChannel>(key);
-        }
-
-        return builder;
+    /// <summary>
+    /// Asynchronously opens all registered connections, then their channels, without modifying the built container.
+    /// Call on the root scope after Build and before resolving RabbitMQ-dependent services or starting the host.
+    /// Concurrent calls share initialization; the first call's token controls it. Failures are propagated and
+    /// partially created resources are disposed. Dispose the container asynchronously at shutdown.
+    /// </summary>
+    public static Task InitializeRabbitAsync(this ILifetimeScope scope, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(scope);
+        cancellationToken.ThrowIfCancellationRequested();
+        return scope.ResolveOptional<RabbitAsyncInitializer>()?.InitializeAsync(cancellationToken) ??
+               Task.CompletedTask;
     }
 
     /// <summary>
@@ -398,18 +396,33 @@ public static class RabbitAutofacExtensions
         };
     }
 
-    /// <summary>
-    /// Merges configuration settings into options while preserving provided Uri and ClientName.
-    /// </summary>
-    private static void MergeConfigurationSettings(RabbitConnectionOptions options,
-        RabbitConnectionOptions configOptions)
+
+    private static ContainerBuilder RegisterRabbitResource<T>(ContainerBuilder builder,
+        Func<IComponentContext, RabbitAsyncResource<T>> factory, object key)
+        where T : class, IDisposable, IAsyncDisposable
     {
-        options.AutomaticRecoveryEnabled = configOptions.AutomaticRecoveryEnabled;
-        options.HandshakeContinuationTimeout = configOptions.HandshakeContinuationTimeout;
-        options.RequestedHeartbeat = configOptions.RequestedHeartbeat;
-        options.RequestedChannelMax = configOptions.RequestedChannelMax;
-        options.NetworkRecoveryInterval = configOptions.NetworkRecoveryInterval;
-        options.Ssl = configOptions.Ssl;
-        options.VirtualHost = configOptions.VirtualHost;
+        ArgumentNullException.ThrowIfNull(builder);
+        builder.RegisterType<RabbitAsyncInitializer>().SingleInstance().IfNotRegistered(typeof(RabbitAsyncInitializer));
+
+        var resourceKey = new object();
+        builder.Register(factory)
+            .Keyed<RabbitAsyncResource<T>>(resourceKey)
+            .As<IRabbitAsyncResource>()
+            .SingleInstance()
+            .ExternallyOwned();
+
+        // The initializer owns disposal, including resources never resolved by an application service.
+        var registration = builder.Register(context => context.ResolveKeyed<RabbitAsyncResource<T>>(resourceKey).Value)
+            .SingleInstance()
+            .ExternallyOwned();
+
+        if (key == default) {
+            registration.As<T>();
+        }
+        else {
+            registration.Keyed<T>(key);
+        }
+
+        return builder;
     }
 }
