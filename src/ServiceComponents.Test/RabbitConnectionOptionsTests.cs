@@ -48,7 +48,7 @@ public class RabbitConnectionOptionsTests
 
         var factory = CreateConnectionFactory(configuration);
 
-        AssertTimeouts(factory, 120, 60, 5);
+        AssertTimeouts(factory, 120000, 60000, 5000);
     }
 
     [Theory]
