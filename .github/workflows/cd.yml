@@ -1,4 +1,4 @@
-name: Continous Delivery
+name: Continuous Delivery
 
 on:
   push:
@@ -9,6 +9,10 @@ jobs:
   
   build:
     runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
     steps:
     
     - name: Checkout
@@ -18,16 +22,6 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '6.0.x'
-               
-    - name: Setup .NET v5.0
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '5.0.x'
-          
-    - name: Setup .NET Core v3.1
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '3.1.x'
     
     - name: Get version
       run:  echo "app_version=`git describe --tags`" >> $GITHUB_ENV      
@@ -48,6 +42,12 @@ jobs:
         
     - name: List packages
       run: ls ./nuget-packages
+
+    - name: NuGet login
+      id: login
+      uses: NuGet/login@v1
+      with:
+        user: ${{ vars.NUGET_USER }}
         
     - name: Publish      
-      run: dotnet nuget push nuget-packages/*.* --api-key ${{ secrets.nuget_api_key }} --skip-duplicate true --source https://api.nuget.org/v3/index.json 
+      run: dotnet nuget push nuget-packages/*.* --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --skip-duplicate --source https://api.nuget.org/v3/index.json
