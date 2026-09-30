@@ -342,41 +342,6 @@ public static class RabbitAutofacExtensions
         return channel;
     }
 
-    /// <summary>
-    /// Adds retry configuration to a RabbitMQ channel with async/await support.
-    /// </summary>
-    public static async Task<IChannel> AddRabbitRetryAsync(this IChannel channel, ILifetimeScope scope, string queue,
-        int[] ttls)
-    {
-        await channel.QueueDeclareAsync(queue, false, false, true,
-            new Dictionary<string, object> { { "x-dead-letter-exchange", $"{queue}-dlx-wait-{ttls[0]}" } });
-
-        for (var i = 0; i < ttls.Length; i++) {
-            await channel.ExchangeDeclareAsync($"{queue}-dlx-wait-{ttls[i]}", "direct", false, true);
-            await channel.ExchangeDeclareAsync($"{queue}-dlx-retry-{ttls[i]}", "direct", false, true);
-
-            await channel.QueueDeclareAsync($"{queue}-wait-{ttls[i]}", false, false, true,
-                new Dictionary<string, object>
-                    { { "x-message-ttl", ttls[i] }, { "x-dead-letter-exchange", $"{queue}-dlx-retry-{ttls[i]}" } });
-            await channel.QueueDeclareAsync($"{queue}-retry-{ttls[i]}", false, false, true,
-                new Dictionary<string, object> {
-                    {
-                        "x-dead-letter-exchange",
-                        i == ttls.Length - 1 ? $"{queue}-dlx" : $"{queue}-dlx-wait-{ttls[i + 1]}"
-                    }
-                });
-            await channel.QueueBindAsync($"{queue}-wait-{ttls[i]}", $"{queue}-dlx-wait-{ttls[i]}", string.Empty);
-            await channel.QueueBindAsync($"{queue}-retry-{ttls[i]}", $"{queue}-dlx-retry-{ttls[i]}", string.Empty);
-
-            //scope.ResolveKeyed<RabbitConsumer>($"consumer-retry-{ttls[i]}").StartAsync(CancellationToken.None).Wait();
-        }
-
-        await channel.ExchangeDeclareAsync($"{queue}-dlx", "direct", false, true);
-        await channel.QueueDeclareAsync($"{queue}-dlx", false, false, true);
-        await channel.QueueBindAsync($"{queue}-dlx", $"{queue}-dlx", string.Empty);
-
-        return channel;
-    }
 
     /// <summary>
     /// Creates a ConnectionFactory from RabbitConnectionOptions.

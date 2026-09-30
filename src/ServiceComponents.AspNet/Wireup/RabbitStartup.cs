@@ -54,28 +54,4 @@ public class RabbitStartup : IStartable
             consumer.StartAsync().GetAwaiter().GetResult();
         }
     }
-
-    /// <summary>
-    /// Starts the RabbitMQ initialization with async/await support.
-    /// </summary>
-    public async Task StartAsync()
-    {
-        await _channel.ExchangeDeclareAsync(_exchange, "direct", false, true);
-
-        if (_retryIntervals != default) {
-            await _channel.AddRabbitRetryAsync(_scope, _queue, _retryIntervals);
-        }
-        else {
-            await _channel.QueueDeclareAsync(_queue, false, false, true);
-        }
-
-        await _channel.QueueBindAsync(_queue, _exchange, _routingKey);
-
-        var consumers = _scope.ResolveKeyed<IEnumerable<RabbitConsumer>>("__consumer__");
-
-        foreach (var consumer in consumers) {
-            _log.Verbose("Starting consumer consumer-{consumerId}", consumer.ConsumerTag);
-            await consumer.StartAsync();
-        }
-    }
 }
