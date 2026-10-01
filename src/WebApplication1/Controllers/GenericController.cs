@@ -1,7 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 using ServiceComponents.AspNet.Http;
 
 namespace WebApplication1.Controllers
@@ -41,7 +40,7 @@ namespace WebApplication1.Controllers
                 async (@event, ct) => await _eventReceiver.ReceiveAsync(@event, ct),
                 cancellationToken);
 
-            return result == null ? (IActionResult)Ok() : Ok(result);
+            return result == null ? Ok() : Ok(result);
         }
     }
 }

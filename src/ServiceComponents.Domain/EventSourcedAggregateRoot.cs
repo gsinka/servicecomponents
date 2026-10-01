@@ -15,13 +15,19 @@ namespace ServiceComponents.Domain
 
         protected EventSourcedAggregateRoot(string aggregateId)
         {
-            if (string.IsNullOrEmpty(aggregateId)) throw new ArgumentNullException(nameof(aggregateId));
+            if (string.IsNullOrEmpty(aggregateId)) {
+                throw new ArgumentNullException(nameof(aggregateId));
+            }
+
             AggregateId = aggregateId;
         }
 
         protected EventSourcedAggregateRoot(IEnumerable<IEvent> events)
         {
-            if (events == null) throw new ArgumentException(nameof(events));
+            if (events == null) {
+                throw new ArgumentException(nameof(events));
+            }
+
             foreach (IEvent @event in events) { ApplyEvent(@event); }
         }
 
@@ -37,7 +43,7 @@ namespace ServiceComponents.Domain
             
             var handler = GetType()
                 .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
-                .SingleOrDefault(info => info.Name == "Apply" && info.GetParameters().Length == 1 && Enumerable.Single<ParameterInfo>(info.GetParameters()).ParameterType == @event.GetType());
+                .SingleOrDefault(info => info.Name == "Apply" && info.GetParameters().Length == 1 && info.GetParameters().Single().ParameterType == @event.GetType());
             
             if (handler == null) {
                 throw new InvalidOperationException($"No handler for event {@event.GetType().FullName} found on aggregate {GetType().FullName}");

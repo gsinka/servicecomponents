@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Prometheus;
 
 namespace ServiceComponents.AspNet.Monitoring
 {
@@ -13,11 +14,11 @@ namespace ServiceComponents.AspNet.Monitoring
         /// </summary>
         /// <returns></returns>
         // GET /metrics
-        [HttpGet()]
+        [HttpGet]
         public async Task<ActionResult<string>> GetMetrics()
         {
             var stream = new MemoryStream();
-            await Prometheus.Metrics.DefaultRegistry.CollectAndExportAsTextAsync(stream);
+            await Metrics.DefaultRegistry.CollectAndExportAsTextAsync(stream);
             stream.Position = 0;
             
             var reader = new StreamReader(stream);

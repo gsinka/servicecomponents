@@ -1,6 +1,5 @@
 ﻿using Autofac;
 using ServiceComponents.Infrastructure.Dispatchers;
-using ServiceComponents.Infrastructure.Mediator;
 
 namespace ServiceComponents.Infrastructure.Behaviors.Stopwatch
 {

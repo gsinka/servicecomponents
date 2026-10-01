@@ -1,5 +1,4 @@
 ﻿using System;
-using Autofac;
 using RabbitMQ.Client;
 using Serilog;
 using ServiceComponents.Application;
@@ -20,7 +19,9 @@ namespace ServiceComponents.Infrastructure.Rabbit.Senders
         protected void UpdateCorrelation(BasicProperties basicProperties)
         {
             basicProperties.CorrelationId = string.IsNullOrWhiteSpace(Correlation.CorrelationId) ? Guid.NewGuid().ToString() : Correlation.CorrelationId;
-            if (!string.IsNullOrWhiteSpace(Correlation.CurrentId)) basicProperties.Headers.Add("causation_id", Correlation.CurrentId);
+            if (!string.IsNullOrWhiteSpace(Correlation.CurrentId)) {
+                basicProperties.Headers.Add("causation_id", Correlation.CurrentId);
+            }
 
             _log.ForContext("correlation", new { correlationId = basicProperties.CorrelationId, causationId = Correlation.CurrentId }, true).Debug("RabbitMQ basic properties updated with correlation");
         }

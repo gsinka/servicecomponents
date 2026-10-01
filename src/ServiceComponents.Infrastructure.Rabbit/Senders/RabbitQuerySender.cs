@@ -32,7 +32,9 @@ namespace ServiceComponents.Infrastructure.Rabbit.Senders
             var commandJson = JsonConvert.SerializeObject(query, Formatting.None);
             basicProperties.Type = query.AssemblyVersionlessQualifiedName();
 
-            if (string.IsNullOrEmpty(basicProperties.CorrelationId)) basicProperties.CorrelationId = Guid.NewGuid().ToString();
+            if (string.IsNullOrEmpty(basicProperties.CorrelationId)) {
+                basicProperties.CorrelationId = Guid.NewGuid().ToString();
+            }
 
             var responseQueue = new BlockingCollection<string>();
 

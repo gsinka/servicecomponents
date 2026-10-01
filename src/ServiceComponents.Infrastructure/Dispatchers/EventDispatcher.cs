@@ -28,7 +28,9 @@ namespace ServiceComponents.Infrastructure.Dispatchers
 
             var handlers = (IEnumerable<dynamic>)scope.ResolveOptional(typeof(IEnumerable<>).MakeGenericType(typeof(IHandleEvent<>).MakeGenericType(@event.GetType())));
 
-            if (handlers == null) return;
+            if (handlers == null) {
+                return;
+            }
 
             var tasks = handlers.Select(h => {
                 _log.Verbose("Dispatching {eventType} to {handlerType}", @event.DisplayName(), TypeExtensions.DisplayName(h));

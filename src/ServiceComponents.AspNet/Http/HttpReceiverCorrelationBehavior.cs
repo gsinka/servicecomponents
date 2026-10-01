@@ -25,7 +25,7 @@ namespace ServiceComponents.AspNet.Http
         {
             var correlationId = _httpContextAccessor.HttpContext.Request.Headers[_httpRequestOptions.CorrelationIdHeaderKey];
 
-            _correlation.CorrelationId =  string.IsNullOrWhiteSpace(correlationId) ? Guid.NewGuid().ToString() : (string) correlationId;
+            _correlation.CorrelationId =  string.IsNullOrWhiteSpace(correlationId) ? Guid.NewGuid().ToString() : correlationId;
             _correlation.CausationId = _httpContextAccessor.HttpContext.Request.Headers[_httpRequestOptions.CausationIdHeaderKey];
             _correlation.CurrentId = currentId;
 

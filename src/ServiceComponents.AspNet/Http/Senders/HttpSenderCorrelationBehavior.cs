@@ -20,7 +20,10 @@ namespace ServiceComponents.AspNet.Http.Senders
 
         protected void SetCorrelation(IDictionary<string, string> headers)
         {
-            if (!string.IsNullOrEmpty(_correlation.CorrelationId)) headers.Add(_options.CorrelationIdHeaderKey, _correlation.CorrelationId);
+            if (!string.IsNullOrEmpty(_correlation.CorrelationId)) {
+                headers.Add(_options.CorrelationIdHeaderKey, _correlation.CorrelationId);
+            }
+
             headers.Add(_options.CausationIdHeaderKey, _correlation.CurrentId);
 
             _log.ForContext("correlation", new { correlationId = _correlation.CorrelationId, causationId = _correlation.CausationId }, true).Debug("HttpHeaders updated with correlation");

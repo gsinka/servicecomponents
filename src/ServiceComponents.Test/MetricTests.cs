@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Linq;
+﻿using System.Linq;
 using ReferenceApplication.Api;
 using ServiceComponents.Infrastructure.Monitoring;
 using Xunit;

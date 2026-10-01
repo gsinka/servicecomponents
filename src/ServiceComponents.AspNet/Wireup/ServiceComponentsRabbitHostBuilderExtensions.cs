@@ -1,6 +1,7 @@
 ﻿using System;
 using Autofac;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using RabbitMQ.Client;
 using Serilog;
 using ServiceComponents.Infrastructure.Rabbit;
@@ -19,7 +20,7 @@ namespace ServiceComponents.AspNet.Wireup
             Func<IConfiguration, int[]> retryIntervalsBuilder = default)
         {
 
-            return hostBuilder.RegisterCallback((context, containerBuilder) => {
+            return hostBuilder.RegisterCallback((HostBuilderContext context, ContainerBuilder containerBuilder) => {
 
                 var uri = new Uri(connectionStringBuilder(context.Configuration));
                 var clientName = clientNameBuilder(context.Configuration);
@@ -50,7 +51,9 @@ namespace ServiceComponents.AspNet.Wireup
 
                 // Add consumers for queue
                 var consumerCount = Environment.ProcessorCount - (retryIntervals?.Length ?? 0);
-                if (consumerCount < 1) consumerCount = 1;
+                if (consumerCount < 1) {
+                    consumerCount = 1;
+                }
 
                 for (var i = 0; i < consumerCount; i++) {
 
@@ -77,7 +80,7 @@ namespace ServiceComponents.AspNet.Wireup
 
         public static ServiceComponentsHostBuilder AddRabbit(this ServiceComponentsHostBuilder hostBuilder, string connectionString, string clientName, string queue, string exchange, string routingKey = "", int[] retryIntervals = default)
         {
-            return AddRabbit(hostBuilder, configuration => connectionString, configuration => clientName,
+            return hostBuilder.AddRabbit(configuration => connectionString, configuration => clientName,
                 configuration => queue, configuration => exchange, configuration => routingKey,
                 configuration => retryIntervals);
         }

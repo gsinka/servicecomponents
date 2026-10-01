@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using ServiceComponents.Api.Mediator;
-
-namespace ServiceComponents.Domain
+﻿namespace ServiceComponents.Domain
 {
     public interface IAggregateRoot
     {

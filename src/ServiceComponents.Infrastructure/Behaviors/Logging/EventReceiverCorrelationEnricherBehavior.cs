@@ -1,8 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using Serilog.Context;
 using ServiceComponents.Api.Mediator;
+using ServiceComponents.Infrastructure.CorrelationContext;
 using ServiceComponents.Infrastructure.Receivers;
 
 namespace ServiceComponents.Infrastructure.Behaviors.Logging
@@ -11,7 +11,7 @@ namespace ServiceComponents.Infrastructure.Behaviors.Logging
     {
         private readonly IReceiveEvent _next;
 
-        public EventReceiverCorrelationEnricherBehavior(IOptions<CorrelationLogOptions> options, CorrelationContext.Correlation correlation, IReceiveEvent next)
+        public EventReceiverCorrelationEnricherBehavior(IOptions<CorrelationLogOptions> options, Correlation correlation, IReceiveEvent next)
             : base(options, correlation)
         {
             _next = next;

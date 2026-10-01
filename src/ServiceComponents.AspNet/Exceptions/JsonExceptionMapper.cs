@@ -81,7 +81,10 @@ namespace ServiceComponents.AspNet.Exceptions
 
         public async Task ThrowExceptionIfNeeded(HttpResponseMessage httpResponse)
         {
-            if (httpResponse.IsSuccessStatusCode) return;
+            if (httpResponse.IsSuccessStatusCode) {
+                return;
+            }
+
             throw _exceptionMapper(httpResponse.StatusCode, httpResponse.Content) ?? new Exception("Unknown error");
 
         }

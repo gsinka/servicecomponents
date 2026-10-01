@@ -64,9 +64,13 @@ namespace ServiceComponents.AspNet.Wireup
             return hostBuilder.RegisterCallback((context, containerBuilder) => { 
                 
                 containerBuilder.AddReceivers();
-                if (http) containerBuilder.AddHttpReceivers();
-                if (loopback) containerBuilder.AddLoopbackReceivers();
+                if (http) {
+                    containerBuilder.AddHttpReceivers();
+                }
 
+                if (loopback) {
+                    containerBuilder.AddLoopbackReceivers();
+                }
             });
         }
 

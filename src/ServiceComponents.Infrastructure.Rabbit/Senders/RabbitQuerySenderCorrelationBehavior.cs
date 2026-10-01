@@ -1,6 +1,5 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Autofac;
 using RabbitMQ.Client;
 using Serilog;
 using ServiceComponents.Api.Mediator;

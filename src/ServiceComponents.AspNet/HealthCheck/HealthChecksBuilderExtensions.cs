@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using ServiceComponents.Infrastructure.Rabbit.HealthCheck;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace ServiceComponents.AspNet.HealthCheck
 {
     public static class HealthChecksBuilderExtensions
     {

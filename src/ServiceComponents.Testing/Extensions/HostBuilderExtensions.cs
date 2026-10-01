@@ -14,7 +14,7 @@ namespace ServiceComponents.Testing.Extensions
             }
 
             return builder.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration)
-                                                                               .WriteTo.Seq("http://localhost:5341", Serilog.Events.LogEventLevel.Verbose)
+                                                                               .WriteTo.Seq("http://localhost:5341")
                                                                                .WriteTo.TestOutput(outputHelper).MinimumLevel.Verbose());
         }
     }

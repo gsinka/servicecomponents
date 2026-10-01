@@ -39,7 +39,10 @@ namespace ServiceComponents.Infrastructure.Behaviors.CommandConstraints
 
         public async Task HandleFailureAsync(ICommand command, Exception exception, CancellationToken cancellationToken = default)
         {
-            if (exception is CommandConstraintException) return;
+            if (exception is CommandConstraintException) {
+                return;
+            }
+
             await DecrementValue(command, cancellationToken);
         }
 
@@ -57,7 +60,10 @@ namespace ServiceComponents.Infrastructure.Behaviors.CommandConstraints
 
         public async Task HandleFailureAsync(IQuery query, Exception exception, CancellationToken cancellationToken = default)
         {
-            if (exception is CommandConstraintException) return;
+            if (exception is CommandConstraintException) {
+                return;
+            }
+
             await DecrementValue(query, cancellationToken);
         }
 
@@ -66,7 +72,9 @@ namespace ServiceComponents.Infrastructure.Behaviors.CommandConstraints
         private async Task IncrementValue(IRequest request, CancellationToken cancellationToken)
         {
             var keys = _keys(request);
-            if (keys == default || keys.Length == 0) return;
+            if (keys == default || keys.Length == 0) {
+                return;
+            }
 
             foreach (var key in keys)
             {
@@ -77,7 +85,7 @@ namespace ServiceComponents.Infrastructure.Behaviors.CommandConstraints
                 {
                     value++;
                     await _cache.SetAsync(key, BitConverter.GetBytes(value),
-                        new DistributedCacheEntryOptions() {AbsoluteExpirationRelativeToNow = _expiry(key)}, cancellationToken);
+                        new DistributedCacheEntryOptions {AbsoluteExpirationRelativeToNow = _expiry(key)}, cancellationToken);
                 }
                 else
                 {
@@ -89,7 +97,9 @@ namespace ServiceComponents.Infrastructure.Behaviors.CommandConstraints
         private async Task DecrementValue(IRequest request, CancellationToken cancellationToken)
         {
             var keys = _keys(request);
-            if (keys == default || keys.Length == 0) return;
+            if (keys == default || keys.Length == 0) {
+                return;
+            }
 
             foreach (var key in keys) {
                 var value = BitConverter.ToInt32(await _cache.GetAsync(key, cancellationToken), 0);

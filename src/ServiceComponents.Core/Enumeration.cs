@@ -30,7 +30,9 @@ namespace ServiceComponents.Core
 
         public override bool Equals(object obj)
         {
-            if (!(obj is Enumeration otherValue)) return false;
+            if (!(obj is Enumeration otherValue)) {
+                return false;
+            }
 
             var typeMatches = GetType() == obj.GetType();
             var valueMatches = Id.Equals(otherValue.Id);
