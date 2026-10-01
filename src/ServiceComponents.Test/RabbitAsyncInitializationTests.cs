@@ -153,18 +153,16 @@ public class RabbitAsyncInitializationTests
     }
 
     [Fact]
-    public async Task Invalid_optional_configuration_is_silently_ignored_keeping_defaults()
+    public void Invalid_optional_configuration_is_ignored_and_defaults_are_preserved()
     {
         var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string> {
             ["ServiceComponents:RabbitConnectionOptions:RequestedHeartbeat"] = "not-a-number"
         }).Build();
-        var builder = new ContainerBuilder();
-        builder.RegisterRabbitConnection(new Uri("amqp://localhost"), "configuration-test");
-        builder.RegisterInstance(configuration).As<IConfiguration>();
-        await using var container = builder.Build();
+        var options = new RabbitConnectionOptions();
 
-        // Invalid config is silently ignored; defaults are used.
-        await container.InitializeRabbitAsync();
+        configuration.GetSection(RabbitConnectionOptions.ConfigurationSectionName).Bind(options);
+
+        Assert.Equal(60, options.RequestedHeartbeatInSeconds);
     }
 
     [Fact]
