@@ -37,9 +37,15 @@ namespace ServiceComponents.Infrastructure.Behaviors.ProcessContextBehavior
                 return;
             }
 
-            exception.Data.Add(_options.titleKey, attribute.Title);
+            // The same exception instance can pass through several dispatch levels (nested commands/queries);
+            // the innermost context, where the failure originated, wins.
+            if (exception.Data.Contains(_options.titleKey)) {
+                return;
+            }
+
+            exception.Data[_options.titleKey] = attribute.Title;
             if (!string.IsNullOrWhiteSpace(attribute.ContextCode)) {
-                exception.Data.Add(_options.contextCodeKey, attribute.ContextCode);
+                exception.Data[_options.contextCodeKey] = attribute.ContextCode;
             }
         }
     }
