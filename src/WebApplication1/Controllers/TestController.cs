@@ -49,6 +49,7 @@ namespace WebApplication1.Controllers
             return awaiter.IsCompletedSuccessfully ? Ok(awaiter.Result.Data) : BadRequest("Event never arrived");
         }
 
+        [HttpPost("post")]
         public async Task<IActionResult> Post(TestCommand testCommand, CancellationToken cancellationToken)
         {
             var awaiter = _eventRecorder.WaitFor<TestEvent>(

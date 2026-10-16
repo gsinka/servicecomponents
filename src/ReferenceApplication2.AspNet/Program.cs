@@ -7,14 +7,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi;
 using Newtonsoft.Json.Converters;
-using NHibernate.Tool.hbm2ddl;
 using RabbitMQ.Client;
 using ReferenceApplication.Api;
 using ReferenceApplication.Application;
-using ReferenceApplication.Application.Entities;
 using Serilog;
 using Serilog.Events;
-using ServiceComponents.AspNet.Exceptions;
 using ServiceComponents.AspNet.Monitoring;
 using ServiceComponents.AspNet.Wireup;
 using Swashbuckle.AspNetCore.Filters;
@@ -41,7 +38,7 @@ public class Program
                     app.UseDeveloperExceptionPage();
                 }
 
-                app.UseMiddleware<ErrorHandlingMiddleware>();
+                //app.UseMiddleware<ErrorHandlingMiddleware>();
 
                 app.UseCors(builder => {
                     builder.AllowAnyOrigin();
@@ -124,7 +121,7 @@ public class Program
 
             // Rabbit
             //.AddRabbit("amqp://guest:guest@localhost:5672", "test2", "test-queue", "test-exchange", retryIntervals: new[] { 1000, 3000, 5000 })
-            .AddRabbit("amqp://guest:guest@localhost:5672", "test2", "test-queue", "test-exchange")
+            .AddRabbit("amqp://admin:admin@localhost:5672", "test2", "test-queue", "test-exchange")
             .ConfigureMvc(builder => builder.AddNewtonsoftJson(options => {
                 options.UseCamelCasing(true);
                 options.SerializerSettings.Converters.Add(new StringEnumConverter());
@@ -147,10 +144,10 @@ public class Program
             })
 
             // NHibernate
-            .AddNHibernate(
-                configuration => "Server=localhost; Port=5432; Database=ref-app; User Id=postgres; Password=postgres",
-                map => map.FluentMappings.AddFromAssemblyOf<TestEntity>(),
-                configuration => new SchemaUpdate(configuration).Execute(true, true))
+            //.AddNHibernate(
+            //    configuration => "Server=localhost; Port=5432; Database=ref-app; User Id=postgres; Password=postgres",
+            //    map => map.FluentMappings.AddFromAssemblyOf<TestEntity>(),
+            //    configuration => new SchemaUpdate(configuration).Execute(true, true))
             .AddPrometheusMetrics()
             .CreateHostBuilder(args);
     }

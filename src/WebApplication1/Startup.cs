@@ -19,6 +19,7 @@ using ServiceComponents.AspNet.Monitoring;
 using ServiceComponents.AspNet.OpenApi;
 using ServiceComponents.Core.Services;
 using ServiceComponents.Infrastructure.Behaviors.Logging;
+using ServiceComponents.Infrastructure.Behaviors.ProcessContextBehavior;
 using ServiceComponents.Infrastructure.Behaviors.Stopwatch;
 using ServiceComponents.Infrastructure.CorrelationContext;
 using ServiceComponents.Infrastructure.Mediator;
@@ -108,6 +109,7 @@ namespace WebApplication1
             builder.AddValidationBehavior(_customStartup.ApiAssembly);
             builder.AddLogBehavior();
             builder.AddStopwatchBehavior();
+            builder.AddProcessContextBehavior("TEST_TITLE_KEY", "TEST_CONTEXT_CODE_KEY");
 
             // Correlation
             builder.AddCorrelationInfo();

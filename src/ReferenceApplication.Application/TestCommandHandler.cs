@@ -11,10 +11,10 @@ namespace ReferenceApplication.Application
 {
     public class TestCommandHandler : HandleCommand<TestCommand>
     {
-        public TestCommandHandler(ILogger log, ICorrelation correlation, ISendQuery querySender, IPublishEvent eventPublisher) 
+        public TestCommandHandler(ILogger log, ICorrelation correlation, ISendQuery querySender, IPublishEvent eventPublisher)
             : base(log, correlation, querySender, eventPublisher)
         {
-            
+
         }
 
         override public async Task HandleAsync(TestCommand command, CancellationToken cancellationToken = default)
