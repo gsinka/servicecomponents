@@ -31,6 +31,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\ReferenceApplication.Api\ReferenceApplication.Api.csproj"/>
+        <ProjectReference Include="..\ServiceComponents.AspNet\ServiceComponents.AspNet.csproj"/>
         <ProjectReference Include="..\ServiceComponents.Core\ServiceComponents.Core.csproj"/>
         <ProjectReference Include="..\ServiceComponents.Domain\ServiceComponents.Domain.csproj"/>
         <ProjectReference Include="..\ServiceComponents.Infrastructure.Rabbit\ServiceComponents.Infrastructure.Rabbit.csproj"/>
