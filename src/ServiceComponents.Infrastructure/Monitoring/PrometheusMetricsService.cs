@@ -14,10 +14,27 @@ namespace ServiceComponents.Infrastructure.Monitoring
         private readonly ConcurrentDictionary<object, Histogram> _histograms = new();
         private readonly ConcurrentDictionary<object, Gauge> _gauges = new();
 
+        // GetCustomAttributes creates new attribute instances on every call; the attribute of a metric type is fixed
+        // and only read here, so one instance per type is enough. A type without one is cached as null.
+        // Types from collectible load contexts are not cached.
+        private readonly ConcurrentDictionary<Type, MetricAttribute> _metricKinds = new();
+
+        private MetricAttribute MetricKind(Type metricType)
+        {
+            return metricType.IsCollectible
+                ? ReadMetricKind(metricType)
+                : _metricKinds.GetOrAdd(metricType, ReadMetricKind);
+        }
+
+        private static MetricAttribute ReadMetricKind(Type metricType)
+        {
+            return metricType.GetCustomAttributes(true).OfType<MetricAttribute>().FirstOrDefault();
+        }
+
         public void Increment(object metric, double increment = 1)
         {
             var metricType = metric.GetType();
-            var metricKind = metricType.GetCustomAttributes(true).OfType<MetricAttribute>().FirstOrDefault();
+            var metricKind = MetricKind(metricType);
 
             switch (metricKind) {
 
@@ -49,7 +66,7 @@ namespace ServiceComponents.Infrastructure.Monitoring
         public void Decrement(object metric, double decrement = 1)
         {
             Type metricType = metric.GetType();
-            var metricKind = metricType.GetCustomAttributes(true).OfType<MetricAttribute>().FirstOrDefault();
+            var metricKind = MetricKind(metricType);
 
             switch (metricKind) {
 
@@ -71,7 +88,7 @@ namespace ServiceComponents.Infrastructure.Monitoring
         public void Set(object metric, double target)
         {
             Type metricType = metric.GetType();
-            var metricKind = metricType.GetCustomAttributes(true).OfType<MetricAttribute>().FirstOrDefault();
+            var metricKind = MetricKind(metricType);
 
             switch (metricKind) {
 
@@ -93,7 +110,7 @@ namespace ServiceComponents.Infrastructure.Monitoring
         public void Observe(object metric, double duration)
         {
             Type metricType = metric.GetType();
-            var metricKind = metricType.GetCustomAttributes(true).OfType<MetricAttribute>().FirstOrDefault();
+            var metricKind = MetricKind(metricType);
 
             switch (metricKind) {
 
@@ -149,7 +166,7 @@ namespace ServiceComponents.Infrastructure.Monitoring
         public void Observe(object metric, double val, long count)
         {
             Type metricType = metric.GetType();
-            var metricKind = metricType.GetCustomAttributes(true).OfType<MetricAttribute>().FirstOrDefault();
+            var metricKind = MetricKind(metricType);
 
             switch (metricKind) {
 
