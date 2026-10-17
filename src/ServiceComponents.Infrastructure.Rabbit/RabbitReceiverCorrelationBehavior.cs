@@ -2,6 +2,7 @@
 using System.Text;
 using RabbitMQ.Client.Events;
 using Serilog;
+using Serilog.Events;
 using ServiceComponents.Infrastructure.CorrelationContext;
 
 namespace ServiceComponents.Infrastructure.Rabbit
@@ -26,7 +27,10 @@ namespace ServiceComponents.Infrastructure.Rabbit
 
             _correlation.CurrentId = currentId;
 
-            _log.ForContext("correlation", _correlation, true).Debug("Correlation updated from RabbitMQ basic properties");
+            // ForContext destructures immediately, even when Debug is disabled
+            if (_log.IsEnabled(LogEventLevel.Debug)) {
+                _log.ForContext("correlation", _correlation, true).Debug("Correlation updated from RabbitMQ basic properties");
+            }
         }
     }
 }

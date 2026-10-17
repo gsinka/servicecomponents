@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Serilog;
+using Serilog.Events;
 using ServiceComponents.Infrastructure.CorrelationContext;
 
 namespace ServiceComponents.AspNet.Http
@@ -29,7 +30,10 @@ namespace ServiceComponents.AspNet.Http
             _correlation.CausationId = _httpContextAccessor.HttpContext.Request.Headers[_httpRequestOptions.CausationIdHeaderKey];
             _correlation.CurrentId = currentId;
 
-            _log.ForContext("correlation", _correlation, true).Debug("Correlation updated from HttpContext");
+            // ForContext destructures immediately, even when Debug is disabled
+            if (_log.IsEnabled(LogEventLevel.Debug)) {
+                _log.ForContext("correlation", _correlation, true).Debug("Correlation updated from HttpContext");
+            }
         }
     }
 }
