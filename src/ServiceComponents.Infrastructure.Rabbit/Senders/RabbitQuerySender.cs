@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,7 +35,9 @@ namespace ServiceComponents.Infrastructure.Rabbit.Senders
                 basicProperties.CorrelationId = Guid.NewGuid().ToString();
             }
 
-            var responseQueue = new BlockingCollection<string>();
+            // The first matching reply completes this; awaiting it keeps the calling thread free while the
+            // remote service works (a blocking wait here starves the thread pool under concurrent queries).
+            var responseSource = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
 
             var replyConsumer = new AsyncEventingBasicConsumer(_channel);
             var replyQueueDeclareOk = await _channel.QueueDeclareAsync(cancellationToken: cancellationToken);
@@ -45,7 +46,7 @@ namespace ServiceComponents.Infrastructure.Rabbit.Senders
 
             replyConsumer.ReceivedAsync += (sender, args) => {
                 if (args.BasicProperties.CorrelationId == basicProperties.CorrelationId) {
-                    responseQueue.Add(Encoding.UTF8.GetString(args.Body.ToArray()));
+                    responseSource.TrySetResult(Encoding.UTF8.GetString(args.Body.Span));
                 }
                 return Task.CompletedTask;
             };
@@ -56,11 +57,27 @@ namespace ServiceComponents.Infrastructure.Rabbit.Senders
 
             await _channel.BasicPublishAsync("", _exchange, false, basicProperties, Encoding.UTF8.GetBytes(commandJson), cancellationToken);
 
-            var response = responseQueue.Take(cancellationToken);
+            var response = await WaitForResponse(responseSource.Task, cancellationToken);
 
             await _channel.QueueDeleteAsync(replyQueueName, false, false, cancellationToken: cancellationToken);
 
             return JsonConvert.DeserializeObject<TResult>(response);
+        }
+
+        /// <summary>
+        /// Waits like BlockingCollection.Take(cancellationToken): an already canceled token wins even over a
+        /// reply that has arrived, and cancellation surfaces as OperationCanceledException with the caller's token.
+        /// </summary>
+        private static async Task<string> WaitForResponse(Task<string> response, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            try {
+                return await response.WaitAsync(cancellationToken);
+            }
+            catch (TaskCanceledException) when (cancellationToken.IsCancellationRequested) {
+                throw new OperationCanceledException(cancellationToken);
+            }
         }
     }
 }
