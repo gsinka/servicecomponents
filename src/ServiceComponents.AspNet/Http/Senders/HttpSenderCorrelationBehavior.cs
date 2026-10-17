@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.Options;
 using Serilog;
+using Serilog.Events;
 using ServiceComponents.Application;
 
 namespace ServiceComponents.AspNet.Http.Senders
@@ -26,7 +27,10 @@ namespace ServiceComponents.AspNet.Http.Senders
 
             headers.Add(_options.CausationIdHeaderKey, _correlation.CurrentId);
 
-            _log.ForContext("correlation", new { correlationId = _correlation.CorrelationId, causationId = _correlation.CausationId }, true).Debug("HttpHeaders updated with correlation");
+            // ForContext destructures immediately, even when Debug is disabled
+            if (_log.IsEnabled(LogEventLevel.Debug)) {
+                _log.ForContext("correlation", new { correlationId = _correlation.CorrelationId, causationId = _correlation.CausationId }, true).Debug("HttpHeaders updated with correlation");
+            }
         }
     }
 }
