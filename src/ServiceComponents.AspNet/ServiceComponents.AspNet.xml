@@ -4,9 +4,49 @@
         <name>ServiceComponents.AspNet</name>
     </assembly>
     <members>
+        <member name="T:ServiceComponents.AspNet.Exceptions.ErrorHandlerErrorResponse">
+            <summary>
+            ProblemDetails (RFC 7807) response of the exceptions of DotNet.ErrorHandler (business, not found, conflict).
+            The property names follow what the frontend (ngx-error-handler) reads, <see cref="P:ServiceComponents.AspNet.Exceptions.ErrorHandlerErrorResponse.Data"/> keeps the
+            original Exception.Data entries so the exception can be restored on the BFF
+            </summary>
+        </member>
+        <member name="T:ServiceComponents.AspNet.Exceptions.ErrorHandlerServiceError">
+            <summary>
+            The error of the iService behind the exception. Everything but the text and the hint (module, source, line...)
+            is in <see cref="P:ServiceComponents.AspNet.Exceptions.ErrorHandlerServiceError.Extra"/> and goes to the frontend as it is
+            </summary>
+        </member>
+        <member name="T:ServiceComponents.AspNet.Exceptions.ErrorHandlerExceptionInfo">
+            <summary>
+            Recognizes the exceptions of DotNet.ErrorHandler by their full type name (without referencing the package),
+            reads their metadata from Exception.Data and converts it to <see cref="T:ServiceComponents.AspNet.Exceptions.ErrorHandlerErrorResponse"/>
+            </summary>
+        </member>
+        <member name="M:ServiceComponents.AspNet.Exceptions.ErrorHandlerExceptionInfo.GetStatusCode(System.Exception)">
+            <summary>
+            Status code of the exceptions to be sent as <see cref="T:ServiceComponents.AspNet.Exceptions.ErrorHandlerErrorResponse"/>, null for any other exception
+            </summary>
+        </member>
+        <member name="M:ServiceComponents.AspNet.Exceptions.ErrorHandlerExceptionInfo.CreateServiceError(System.Exception)">
+            <summary>
+            The message of the inner exception is the text, everything else goes to the frontend unchanged:
+            the simple public properties of the exception (e.g. Hint, Links) and the entries of its Exception.Data
+            </summary>
+        </member>
         <member name="M:ServiceComponents.AspNet.Exceptions.JsonExceptionMapper.#ctor">
             <summary>
             Exception mapper with built-in mapping
+            </summary>
+        </member>
+        <member name="M:ServiceComponents.AspNet.Exceptions.JsonExceptionMapper.ParseErrorHandlerResponse(System.Net.HttpStatusCode,Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Reads only what is needed to restore the exception: the status, the message and the original Exception.Data entries
+            </summary>
+        </member>
+        <member name="M:ServiceComponents.AspNet.Exceptions.JsonExceptionMapper.CreateErrorHandlerException(ServiceComponents.AspNet.Exceptions.ErrorHandlerErrorResponse)">
+            <summary>
+            Creates the exception of a DotNet.ErrorHandler response with its metadata in Exception.Data
             </summary>
         </member>
         <member name="M:ServiceComponents.AspNet.Exceptions.JsonExceptionMapper.#ctor(System.Func{System.Exception,System.ValueTuple{System.Int32,ServiceComponents.AspNet.Exceptions.IErrorResponse}},System.Func{System.Net.HttpStatusCode,System.Net.Http.HttpContent,System.Exception})">
@@ -25,6 +65,12 @@
         <member name="T:ServiceComponents.AspNet.OpenApi.ActionHidingConvention">
             <summary>
             Hiding specific endpoints
+            </summary>
+        </member>
+        <member name="M:ServiceComponents.AspNet.Wireup.RabbitStartup.Start">
+            <summary>
+            Starts the RabbitMQ initialization.
+            Use StartAsync for async/await support.
             </summary>
         </member>
     </members>
